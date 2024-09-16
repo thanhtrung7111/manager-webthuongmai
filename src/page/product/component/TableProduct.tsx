@@ -478,6 +478,9 @@ export const TableProduct = () => {
     },
     {
       id: "actions",
+      header: () => {
+        return <div className="flex justify-end">Tác vụ</div>;
+      },
       enableHiding: false,
       cell: ({ row }) => {
         const payment = row.original;
