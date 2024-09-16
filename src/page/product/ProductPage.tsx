@@ -26,20 +26,17 @@ const ProductPage = () => {
 
       {/* Action  */}
       <div className="flex justify-between items-center">
+        <h4 className="text-xl font-medium text-gray-600">
+          Danh sách sản phẩm
+        </h4>
         <div className="flex gap-x-2">
-          <Input
-            placeholder="Nhập sản phẩm tìm kiếm"
-            className="!ring-0 !ring-transparent bg-white w-[500px]"
-          ></Input>
-          <Button className="bg-white text-gray-600" variant={"outline"}>
-            <i className="ri-search-line"></i>
-          </Button>
-        </div>
-        <div className="flex gap-x-2">
-          <Button className="transition-colors">
+          <Button className="transition-colors" size={"sm"}>
             <i className="ri-download-2-line mr-2"></i>Xuất excel
           </Button>
-          <Button className="bg-green-600 hover:bg-green-500 transition-colors">
+          <Button
+            className="bg-green-600 hover:bg-green-500 transition-colors"
+            size={"sm"}
+          >
             Thêm mới
           </Button>
         </div>

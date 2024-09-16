@@ -34,6 +34,13 @@ import {
 } from "@/components/ui/table";
 import { useState } from "react";
 import { FixedSizeList } from "react-window";
+import PaginationCustom from "@/component_common/pagination/PaginationCustom";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 export type Payment = {
   id: string;
   amount: number;
@@ -52,6 +59,192 @@ const data: Payment[] = [
     amount: 242,
     status: "success",
     email: "Abe45@gmail.com",
+  },
+  {
+    id: "derv1ws0",
+    amount: 837,
+    status: "processing",
+    email: "Monserrat44@gmail.com",
+  },
+  {
+    id: "derv1ws0",
+    amount: 837,
+    status: "processing",
+    email: "Monserrat44@gmail.com",
+  },
+  {
+    id: "derv1ws0",
+    amount: 837,
+    status: "processing",
+    email: "Monserrat44@gmail.com",
+  },
+  {
+    id: "derv1ws0",
+    amount: 837,
+    status: "processing",
+    email: "Monserrat44@gmail.com",
+  },
+  {
+    id: "derv1ws0",
+    amount: 837,
+    status: "processing",
+    email: "Monserrat44@gmail.com",
+  },
+  {
+    id: "derv1ws0",
+    amount: 837,
+    status: "processing",
+    email: "Monserrat44@gmail.com",
+  },
+  {
+    id: "derv1ws0",
+    amount: 837,
+    status: "processing",
+    email: "Monserrat44@gmail.com",
+  },
+  {
+    id: "derv1ws0",
+    amount: 837,
+    status: "processing",
+    email: "Monserrat44@gmail.com",
+  },
+  {
+    id: "derv1ws0",
+    amount: 837,
+    status: "processing",
+    email: "Monserrat44@gmail.com",
+  },
+  {
+    id: "derv1ws0",
+    amount: 837,
+    status: "processing",
+    email: "Monserrat44@gmail.com",
+  },
+  {
+    id: "derv1ws0",
+    amount: 837,
+    status: "processing",
+    email: "Monserrat44@gmail.com",
+  },
+  {
+    id: "derv1ws0",
+    amount: 837,
+    status: "processing",
+    email: "Monserrat44@gmail.com",
+  },
+  {
+    id: "derv1ws0",
+    amount: 837,
+    status: "processing",
+    email: "Monserrat44@gmail.com",
+  },
+  {
+    id: "derv1ws0",
+    amount: 837,
+    status: "processing",
+    email: "Monserrat44@gmail.com",
+  },
+  {
+    id: "derv1ws0",
+    amount: 837,
+    status: "processing",
+    email: "Monserrat44@gmail.com",
+  },
+  {
+    id: "derv1ws0",
+    amount: 837,
+    status: "processing",
+    email: "Monserrat44@gmail.com",
+  },
+  {
+    id: "derv1ws0",
+    amount: 837,
+    status: "processing",
+    email: "Monserrat44@gmail.com",
+  },
+  {
+    id: "derv1ws0",
+    amount: 837,
+    status: "processing",
+    email: "Monserrat44@gmail.com",
+  },
+  {
+    id: "derv1ws0",
+    amount: 837,
+    status: "processing",
+    email: "Monserrat44@gmail.com",
+  },
+  {
+    id: "derv1ws0",
+    amount: 837,
+    status: "processing",
+    email: "Monserrat44@gmail.com",
+  },
+  {
+    id: "derv1ws0",
+    amount: 837,
+    status: "processing",
+    email: "Monserrat44@gmail.com",
+  },
+  {
+    id: "derv1ws0",
+    amount: 837,
+    status: "processing",
+    email: "Monserrat44@gmail.com",
+  },
+  {
+    id: "derv1ws0",
+    amount: 837,
+    status: "processing",
+    email: "Monserrat44@gmail.com",
+  },
+  {
+    id: "derv1ws0",
+    amount: 837,
+    status: "processing",
+    email: "Monserrat44@gmail.com",
+  },
+  {
+    id: "derv1ws0",
+    amount: 837,
+    status: "processing",
+    email: "Monserrat44@gmail.com",
+  },
+  {
+    id: "derv1ws0",
+    amount: 837,
+    status: "processing",
+    email: "Monserrat44@gmail.com",
+  },
+  {
+    id: "derv1ws0",
+    amount: 837,
+    status: "processing",
+    email: "Monserrat44@gmail.com",
+  },
+  {
+    id: "derv1ws0",
+    amount: 837,
+    status: "processing",
+    email: "Monserrat44@gmail.com",
+  },
+  {
+    id: "derv1ws0",
+    amount: 837,
+    status: "processing",
+    email: "Monserrat44@gmail.com",
+  },
+  {
+    id: "derv1ws0",
+    amount: 837,
+    status: "processing",
+    email: "Monserrat44@gmail.com",
+  },
+  {
+    id: "derv1ws0",
+    amount: 837,
+    status: "processing",
+    email: "Monserrat44@gmail.com",
   },
   {
     id: "derv1ws0",
@@ -95,14 +288,105 @@ const data: Payment[] = [
     status: "failed",
     email: "carmella@hotmail.com",
   },
+  {
+    id: "bhqecj4p",
+    amount: 721,
+    status: "failed",
+    email: "carmella@hotmail.com",
+  },
+  {
+    id: "bhqecj4p",
+    amount: 721,
+    status: "failed",
+    email: "carmella@hotmail.com",
+  },
+  {
+    id: "bhqecj4p",
+    amount: 721,
+    status: "failed",
+    email: "carmella@hotmail.com",
+  },
+  {
+    id: "bhqecj4p",
+    amount: 721,
+    status: "failed",
+    email: "carmella@hotmail.com",
+  },
+  {
+    id: "bhqecj4p",
+    amount: 721,
+    status: "failed",
+    email: "carmella@hotmail.com",
+  },
+  {
+    id: "bhqecj4p",
+    amount: 721,
+    status: "failed",
+    email: "carmella@hotmail.com",
+  },
+  {
+    id: "bhqecj4p",
+    amount: 721,
+    status: "failed",
+    email: "carmella@hotmail.com",
+  },
+  {
+    id: "bhqecj4p",
+    amount: 721,
+    status: "failed",
+    email: "carmella@hotmail.com",
+  },
+  {
+    id: "bhqecj4p",
+    amount: 721,
+    status: "failed",
+    email: "carmella@hotmail.com",
+  },
+  {
+    id: "bhqecj4p",
+    amount: 721,
+    status: "failed",
+    email: "carmella@hotmail.com",
+  },
+  {
+    id: "bhqecj4p",
+    amount: 721,
+    status: "failed",
+    email: "carmella@hotmail.com",
+  },
+  {
+    id: "bhqecj4p",
+    amount: 721,
+    status: "failed",
+    email: "carmella@hotmail.com",
+  },
+  {
+    id: "bhqecj4p",
+    amount: 721,
+    status: "failed",
+    email: "carmella@hotmail.com",
+  },
+  {
+    id: "bhqecj4p",
+    amount: 721,
+    status: "failed",
+    email: "carmella@hotmail.com",
+  },
+  {
+    id: "bhqecj4p",
+    amount: 721,
+    status: "failed",
+    email: "carmella@hotmail.com",
+  },
 ];
 
+const pageSize = 10;
 export const TableProduct = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-
+  const [pageIndex, setPageIndex] = useState<number>(0);
   const [dataInit, setDataInit] = useState<Payment[]>([...data]);
   const columns: ColumnDef<Payment>[] = [
     {
@@ -133,6 +417,7 @@ export const TableProduct = () => {
       cell: ({ row }) => (
         <div className="capitalize">{row.getValue("status")}</div>
       ),
+      enableHiding: true,
     },
     {
       accessorKey: "email",
@@ -143,17 +428,41 @@ export const TableProduct = () => {
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Email
-            <ArrowUpDown className="ml-2 h-4 w-4" />
+            {column.getIsSorted() === "asc" ? (
+              <i className="ri-arrow-up-line"></i>
+            ) : (
+              <i className="ri-arrow-down-line"></i>
+            )}
           </Button>
         );
       },
       cell: ({ row }) => (
-        <div className="lowercase">{row.getValue("email")}</div>
+        <div
+          className="lowercase"
+          onClick={() => row.toggleSelected(!row?.getIsSelected())}
+        >
+          {row.getValue("email")}
+        </div>
       ),
+      enableHiding: true,
     },
     {
       accessorKey: "amount",
-      header: () => <div className="text-right">Amount</div>,
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Số lượng
+            {column.getIsSorted() === "asc" ? (
+              <i className="ri-arrow-up-line"></i>
+            ) : (
+              <i className="ri-arrow-down-line"></i>
+            )}
+          </Button>
+        );
+      },
       cell: ({ row }) => {
         const amount = parseFloat(row.getValue("amount"));
 
@@ -163,8 +472,9 @@ export const TableProduct = () => {
           currency: "USD",
         }).format(amount);
 
-        return <div className="text-right font-medium">{formatted}</div>;
+        return <div className="text-left font-medium">{formatted}</div>;
       },
+      enableHiding: true,
     },
     {
       id: "actions",
@@ -178,27 +488,23 @@ export const TableProduct = () => {
           );
         };
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => click()}>
-                Delete
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>View customer</DropdownMenuItem>
-              <DropdownMenuItem>View payment details</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="flex gap-x-2 justify-end">
+            <Button className="bg-yellow-500 hover:bg-yellow-400" size={"sm"}>
+              <i className="ri-error-warning-line"></i>{" "}
+              <span className="ml-2">Xem chi tiết</span>
+            </Button>
+            <Button className="bg-red-600 hover:bg-red-500" size={"sm"}>
+              <i className="ri-delete-bin-line"></i>{" "}
+              <span className="text-sm ml-2">Xóa</span>
+            </Button>
+          </div>
         );
       },
     },
   ];
+  type ObjectArray = {
+    [key: string]: any;
+  };
   const table = useReactTable({
     data: dataInit,
     columns: columns,
@@ -208,11 +514,12 @@ export const TableProduct = () => {
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     state: {
       pagination: {
-        pageIndex: 1,
-        pageSize: 2,
+        pageIndex: pageIndex,
+        pageSize: pageSize,
       },
       sorting,
       columnFilters,
@@ -220,16 +527,101 @@ export const TableProduct = () => {
       rowSelection,
     },
   });
+  const printObject = (list: ObjectArray[]) => {
+    for (let item of list) {
+      console.log(item?.original);
+    }
+  };
+  console.log(pageIndex);
   return (
-    <div className="w-full">
-      <div className="rounded-md p-5 bg-white border-gray-300 border shadow-md">
+    <div
+      className="w-full"
+      onClick={() => printObject(table.getSelectedRowModel().rows)}
+    >
+      <div className="rounded-md p-5 bg-white border-gray-200 border shadow-md">
+        <div className="flex justify-between mb-3">
+          <div className="flex gap-x-2 items-center">
+            <Input
+              placeholder="Nhập tên tìm kiếm"
+              className="!ring-0 !ring-transparent bg-white w-[500px] h-full text-sm"
+              onChange={(e) => {
+                table.getColumn("email")?.setFilterValue(e.target.value);
+
+                setPageIndex(0);
+              }}
+            ></Input>
+            <Button className="bg-white text-gray-600" variant={"outline"}>
+              <i className="ri-search-line"></i>
+            </Button>
+
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div
+                    className="rotate-0 hover:rotate-90 transition-transform duration-500 cursor-pointer"
+                    onClick={() => {
+                      table.resetColumnFilters();
+                      table.toggleAllRowsSelected(false);
+                      setPageIndex(0);
+                    }}
+                  >
+                    <i className="ri-refresh-line text-xl text-gray-500"></i>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Refresh</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+          <div className="flex gap-x-2 items-center">
+            <div className="flex-1 text-sm text-muted-foreground">
+              {pageIndex * pageSize}-
+              {pageIndex * pageSize + pageSize >=
+              table.getCoreRowModel().rows.length
+                ? table.getCoreRowModel().rows.length
+                : pageIndex * pageSize + pageSize}{" "}
+              trên {table.getCoreRowModel().rows.length} sản phẩm
+            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="ml-auto text-gray-600 focus:!ring-0 focus:!ring-transparent text-xs"
+                  size={"sm"}
+                >
+                  Hiển thị cột <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {table
+                  .getAllColumns()
+                  .filter((column) => column.getCanHide())
+                  .map((column) => {
+                    return (
+                      <DropdownMenuCheckboxItem
+                        key={column.id}
+                        className="capitalize"
+                        checked={column.getIsVisible()}
+                        onCheckedChange={(value) =>
+                          column.toggleVisibility(!!value)
+                        }
+                      >
+                        {column.id}
+                      </DropdownMenuCheckboxItem>
+                    );
+                  })}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
         <Table className="bg-white">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow className="hover:bg-white" key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead key={header.id} className="p-2">
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -248,10 +640,14 @@ export const TableProduct = () => {
                 <TableRow
                   className="border-r-0 border-l-0"
                   key={row.id}
+
                   // data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      className="!text-gray-600 !p-2 !w-fit"
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -272,30 +668,16 @@ export const TableProduct = () => {
             )}
           </TableBody>
         </Table>
-      </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredRowModel().rows.length} of{" "}
-          {table.getRowModel().rows.length} row(s) selected.
-        </div>
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div>
+        {table.getFilteredRowModel().rows.length > pageSize && (
+          <div className="flex items-center justify-center space-x-2 py-4 mt-5">
+            <PaginationCustom
+              size={table.getFilteredRowModel().rows.length}
+              pageIndex={pageIndex + 1}
+              pageSize={pageSize}
+              onPageChange={(value) => setPageIndex(value - 1)}
+            ></PaginationCustom>
+          </div>
+        )}
       </div>
     </div>
   );
