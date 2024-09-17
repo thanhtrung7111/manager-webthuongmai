@@ -1,8 +1,10 @@
 import {
   fetchColor,
   fetchDcmnSbCd,
+  fetchEnum_PrdcOptn,
   fetchProductBrand,
   fetchQUOM,
+  fetchSpndSgDt_Tax_RaNm,
 } from "@/assets/api/commonApi";
 import BreadcrumbCustom from "@/component_common/breadcrumb/BreadcrumbCustom";
 import { Button } from "@/components/ui/button";
@@ -79,6 +81,24 @@ const ProductCreatePage = () => {
   } = useQuery({
     queryKey: ["lstColor"],
     queryFn: () => fetchColor(),
+  });
+
+  const {
+    data: lstSpndSgDt_Tax_RaNm,
+    isFetching: isFetchinglstSpndSgDt_Tax_RaNm,
+    isSuccess: isSuccesslstSpndSgDt_Tax_RaNm,
+  } = useQuery({
+    queryKey: ["lstSpndSgDt_Tax_RaNm"],
+    queryFn: () => fetchSpndSgDt_Tax_RaNm(),
+  });
+
+  const {
+    data: lstEnum_PrdcOptn,
+    isFetching: isFetchinglstEnum_PrdcOptn,
+    isSuccess: isSuccesslstEnum_PrdcOptn,
+  } = useQuery({
+    queryKey: ["Enum_PrdcOptn"],
+    queryFn: () => fetchEnum_PrdcOptn(),
   });
 
   console.log(lstQUOM);
@@ -454,26 +474,71 @@ const ProductCreatePage = () => {
               name="COLRCODE"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-600">Màu sắc</FormLabel>
+                  <FormLabel className="text-gray-600">Thuế suất</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
                     <FormControl>
                       <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
-                        <SelectValue className="" placeholder="Chọn màu sắc" />
+                        <SelectValue
+                          className=""
+                          placeholder="Chọn thuế suất"
+                        />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {lstColor &&
-                        isSuccesslstColor &&
-                        lstColor.map((item: CategoryObject, index: number) => {
-                          return (
-                            <SelectItem value={item.ITEMCODE}>
-                              {item.ITEMNAME}
-                            </SelectItem>
-                          );
-                        })}
+                      {lstSpndSgDt_Tax_RaNm &&
+                        isSuccesslstSpndSgDt_Tax_RaNm &&
+                        lstSpndSgDt_Tax_RaNm.map(
+                          (item: CategoryObject, index: number) => {
+                            return (
+                              <SelectItem value={item.ITEMCODE}>
+                                {item.ITEMNAME}
+                              </SelectItem>
+                            );
+                          }
+                        )}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage className="text-xs font-light" />
+                </FormItem>
+              )}
+            />
+
+            {/* Tính chất sản phẩm */}
+            <FormField
+              control={form.control}
+              name="COLRCODE"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-600">
+                    Tính chất sản phẩm
+                  </FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
+                        <SelectValue
+                          className=""
+                          placeholder="Chọn tính chất sản phẩm"
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {lstEnum_PrdcOptn &&
+                        isSuccesslstEnum_PrdcOptn &&
+                        lstEnum_PrdcOptn.map(
+                          (item: CategoryObject, index: number) => {
+                            return (
+                              <SelectItem value={item.ITEMCODE}>
+                                {item.ITEMNAME}
+                              </SelectItem>
+                            );
+                          }
+                        )}
                     </SelectContent>
                   </Select>
                   <FormMessage className="text-xs font-light" />
