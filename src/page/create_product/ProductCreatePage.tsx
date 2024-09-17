@@ -3,7 +3,9 @@ import {
   fetchDcmnSbCd,
   fetchEnum_PrdcOptn,
   fetchProductBrand,
+  fetchProductGroup,
   fetchQUOM,
+  fetchSortCode,
   fetchSpndSgDt_Tax_RaNm,
 } from "@/assets/api/commonApi";
 import BreadcrumbCustom from "@/component_common/breadcrumb/BreadcrumbCustom";
@@ -100,6 +102,23 @@ const ProductCreatePage = () => {
     queryKey: ["Enum_PrdcOptn"],
     queryFn: () => fetchEnum_PrdcOptn(),
   });
+  const {
+    data: lstSortCode,
+    isFetching: isFetchinglstSortCode,
+    isSuccess: isSuccesslstSortCode,
+  } = useQuery({
+    queryKey: ["lstSortCode"],
+    queryFn: () => fetchSortCode(),
+  });
+
+  const {
+    data: lstProductGroup,
+    isFetching: isFetchinglstProductGroup,
+    isSuccess: isSuccesslstProductGroup,
+  } = useQuery({
+    queryKey: ["lstProductGroup"],
+    queryFn: () => fetchProductGroup(),
+  });
 
   console.log(lstQUOM);
   const formSchema = z.object({
@@ -116,9 +135,9 @@ const ProductCreatePage = () => {
     BRNDCODE: z.string(),
     COLRCODE: z.string(),
     MDELPRDC: z.string(),
-    VAT_RATE: z.number(),
-    PRDCOPTN: z.number(),
-    SORTCODE: z.number(),
+    VAT_RATE: z.string(),
+    PRDCOPTN: z.string(),
+    SORTCODE: z.string(),
     GRPRCODE: z.string(),
     MGRPRNME: z.string(),
     COMPCODE: z.string(),
@@ -183,9 +202,9 @@ const ProductCreatePage = () => {
       BRNDCODE: "",
       COLRCODE: "",
       MDELPRDC: "",
-      VAT_RATE: 0,
-      PRDCOPTN: 0,
-      SORTCODE: 0,
+      VAT_RATE: "",
+      PRDCOPTN: "",
+      SORTCODE: "",
       GRPRCODE: "",
       MGRPRNME: "",
       COMPCODE: "",
@@ -471,7 +490,7 @@ const ProductCreatePage = () => {
             {/* Thuế suất */}
             <FormField
               control={form.control}
-              name="COLRCODE"
+              name="VAT_RATE"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-gray-600">Thuế suất</FormLabel>
@@ -509,7 +528,7 @@ const ProductCreatePage = () => {
             {/* Tính chất sản phẩm */}
             <FormField
               control={form.control}
-              name="COLRCODE"
+              name="PRDCOPTN"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-gray-600">
@@ -531,6 +550,82 @@ const ProductCreatePage = () => {
                       {lstEnum_PrdcOptn &&
                         isSuccesslstEnum_PrdcOptn &&
                         lstEnum_PrdcOptn.map(
+                          (item: CategoryObject, index: number) => {
+                            return (
+                              <SelectItem value={item.ITEMCODE}>
+                                {item.ITEMNAME}
+                              </SelectItem>
+                            );
+                          }
+                        )}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage className="text-xs font-light" />
+                </FormItem>
+              )}
+            />
+
+            {/* Loại hàng hóa */}
+            <FormField
+              control={form.control}
+              name="SORTCODE"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-600">Loại hàng hóa</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
+                        <SelectValue
+                          className=""
+                          placeholder="Chọn loại hàng hóa"
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {lstSortCode &&
+                        isSuccesslstSortCode &&
+                        lstSortCode.map(
+                          (item: CategoryObject, index: number) => {
+                            return (
+                              <SelectItem value={item.ITEMCODE}>
+                                {item.ITEMNAME}
+                              </SelectItem>
+                            );
+                          }
+                        )}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage className="text-xs font-light" />
+                </FormItem>
+              )}
+            />
+
+            {/* Nhóm hàng */}
+            <FormField
+              control={form.control}
+              name="GRPRCODE"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-600">Nhóm hàng</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
+                        <SelectValue
+                          className=""
+                          placeholder="Chọn nhóm hàng"
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {lstProductGroup &&
+                        isSuccesslstProductGroup &&
+                        lstProductGroup.map(
                           (item: CategoryObject, index: number) => {
                             return (
                               <SelectItem value={item.ITEMCODE}>
