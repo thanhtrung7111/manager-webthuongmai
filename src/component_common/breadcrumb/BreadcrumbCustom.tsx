@@ -8,6 +8,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { BreadcrumbItemObject } from "@/type/TypeCommon";
+import { NavLink } from "react-router-dom";
 const BreadcrumbCustom = ({
   linkList,
   itemLink,
@@ -24,9 +25,9 @@ const BreadcrumbCustom = ({
           return item[itemLink] && item[itemLink] != "" ? (
             <>
               <BreadcrumbItem>
-                <BreadcrumbLink href={item[itemLink]}>
+                <NavLink to={item[itemLink]} className={"hover:text-gray-600"}>
                   {item[itemName] as string}
-                </BreadcrumbLink>
+                </NavLink>
               </BreadcrumbItem>
               {index + 1 != linkList.length && <BreadcrumbSeparator />}
             </>

@@ -36,12 +36,23 @@ const menu = [
     ],
   },
   {
-    itemName: "Chung",
+    itemName: "Quản lí chung",
     itemList: [
       {
         itemName: "Sản phẩm",
         itemIcon: <i className="ri-instance-line"></i>,
-        link: "/product",
+        itemList: [
+          {
+            itemName: "Danh sách sản phẩm",
+            itemIcon: <i className="ri-instance-line"></i>,
+            link: "/product",
+          },
+          {
+            itemName: "Tạo mới",
+            itemIcon: <i className="ri-file-add-line"></i>,
+            link: "/create_product",
+          },
+        ],
       },
       {
         itemName: "Quảng cáo",

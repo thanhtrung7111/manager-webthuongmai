@@ -77,9 +77,7 @@ const PaginationCustom = ({
               onClick={() => onPageChange(pageNumber)}
             >
               <div
-                className={` w-8 h-8 text-sm flex items-center justify-center rounded-md border ${
-                  pageIndex == pageNumber ? "px" : ""
-                } ${
+                className={`h-8 px-3 text-sm flex items-center justify-center rounded-md border ${
                   pageIndex == pageNumber
                     ? "bg-primary text-gray-100"
                     : "bg-slate-50 text-gray-500"

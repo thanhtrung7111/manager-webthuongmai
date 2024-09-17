@@ -54,7 +54,7 @@ export const usePanigation = ({
     	Case 2: No left dots to show, but rights dots to be shown
     */
     if (!shouldShowLeftDots && shouldShowRightDots) {
-      let leftItemCount: number = 2 + 2 * siblingCount;
+      let leftItemCount: number = 3 + 2 * siblingCount;
       let leftRange: number[] = range(1, leftItemCount);
 
       return [...leftRange, DOTS, totalPageCount];
@@ -64,12 +64,12 @@ export const usePanigation = ({
     	Case 3: No right dots to show, but left dots to be shown
     */
     if (shouldShowLeftDots && !shouldShowRightDots) {
-      let rightItemCount: number = 2 + 2 * siblingCount;
+      let rightItemCount: number = 3 + 2 * siblingCount;
       let rightRange: number[] = range(
         totalPageCount - rightItemCount + 1,
         totalPageCount
       );
-      return [firstPageIndex, DOTS, ...rightRange, lastPageIndex];
+      return [firstPageIndex, DOTS, ...rightRange];
     }
 
     /*
