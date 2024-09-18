@@ -60,6 +60,7 @@ export type ProductObject = {
   STTEICON: number;
   STTENAME: string;
   STTESIGN: number;
+  [key: string]: any;
 };
 
 export type Payment = {

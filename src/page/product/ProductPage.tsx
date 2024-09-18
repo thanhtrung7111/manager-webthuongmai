@@ -2,7 +2,7 @@ import BreadcrumbCustom from "@/component_common/breadcrumb/BreadcrumbCustom";
 import { Button } from "@/components/ui/button";
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchProduct } from "@/assets/api/commonApi";
+import { fetchDataCondition } from "@/assets/api/commonApi";
 import { error } from "console";
 import TableCustom from "@/component_common/table/TableCustom";
 import { payments } from "@/component_common/data/data";
@@ -15,7 +15,16 @@ const ProductPage = () => {
   const navigate = useNavigate();
   const { data, isLoading, isFetching, error, isSuccess } = useQuery({
     queryKey: ["products"],
-    queryFn: () => fetchProduct({ date: new Date() }),
+    queryFn: () =>
+      fetchDataCondition({
+        DCMNCODE: "appPrdcList",
+        PARACODE: "001",
+        LCTNCODE: "001",
+        CURRDATE: "2024-09-17",
+        CUSTCODE: "%",
+        SHOPCODE: "%",
+        KEY_WORD: "%",
+      }),
   });
   const breadBrumb = [
     {

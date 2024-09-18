@@ -13,6 +13,7 @@ import { fetchInitialToken } from "./assets/api/authApi";
 import { useUserStore } from "./store/userStore";
 import SpinnerLoading from "./component_common/loading/SpinnerLoading";
 import ProductCreatePage from "./page/create_product/ProductCreatePage";
+import { Toaster } from "sonner";
 
 function App() {
   const { currentUser, tokenInitial, setTokenInitial } = useUserStore();
@@ -34,6 +35,7 @@ function App() {
     </div>
   ) : (
     <>
+      <Toaster />
       <BrowserRouter>
         <Routes>
           <Route
