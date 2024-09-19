@@ -2,7 +2,7 @@ import BreadcrumbCustom from "@/component_common/breadcrumb/BreadcrumbCustom";
 import { Button } from "@/components/ui/button";
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchDataCondition } from "@/assets/api/commonApi";
+import { fetchDataCondition } from "@/api/commonApi";
 import { error } from "console";
 import TableCustom from "@/component_common/table/TableCustom";
 import { payments } from "@/component_common/data/data";
@@ -10,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Payment, ProductObject } from "@/type/TypeCommon";
 import { ColumnDef } from "@tanstack/react-table";
 import { useNavigate } from "react-router-dom";
+import ButtonForm from "@/component_common/commonForm/ButtonForm";
 
 const ProductPage = () => {
   const navigate = useNavigate();
@@ -141,14 +142,19 @@ const ProductPage = () => {
         console.log(payment);
         return (
           <div className="flex gap-x-2 justify-end">
-            <Button className="bg-yellow-500 hover:bg-yellow-400" size={"sm"}>
-              <i className="ri-error-warning-line"></i>{" "}
-              <span className="ml-2">Xem chi tiết</span>
-            </Button>
-            <Button className="bg-red-600 hover:bg-red-500" size={"sm"}>
-              <i className="ri-delete-bin-line"></i>{" "}
-              <span className="text-sm ml-2">Xóa</span>
-            </Button>
+            <ButtonForm
+              className="!bg-yellow-500 !w-28"
+              type="button"
+              icon={<i className="ri-error-warning-line"></i>}
+              label="Xem chi tiết"
+            ></ButtonForm>
+
+            <ButtonForm
+              className="!bg-red-500 !w-20"
+              type="button"
+              icon={<i className="ri-delete-bin-line"></i>}
+              label="Xóa"
+            ></ButtonForm>
           </div>
         );
       },
@@ -171,16 +177,19 @@ const ProductPage = () => {
           Danh sách sản phẩm
         </h4>
         <div className="flex gap-x-2">
-          <Button className="transition-colors" size={"sm"}>
-            <i className="ri-download-2-line mr-2"></i>Xuất excel
-          </Button>
-          <Button
-            className="bg-green-600 hover:bg-green-500 transition-colors"
-            size={"sm"}
+          <ButtonForm
+            className="!bg-primary !w-28"
+            type="button"
+            icon={<i className="ri-download-2-line"></i>}
+            label="Xuất excel"
+          ></ButtonForm>
+          <ButtonForm
+            className="!bg-secondary !w-28"
+            type="button"
+            icon={<i className="ri-file-add-line"></i>}
             onClick={() => navigate("/create_product")}
-          >
-            Thêm mới
-          </Button>
+            label="Thêm mới"
+          ></ButtonForm>
         </div>
       </div>
 

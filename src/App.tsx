@@ -9,11 +9,12 @@ import DashboardRevenuePage from "./page/dashboard_revenue/DashboardRevenuePage"
 import AppLogin from "./template/AppLogin";
 import LoginPage from "./page/login/LoginPage";
 import { useQuery } from "@tanstack/react-query";
-import { fetchInitialToken } from "./assets/api/authApi";
+import { fetchInitialToken } from "./api/authApi";
 import { useUserStore } from "./store/userStore";
 import SpinnerLoading from "./component_common/loading/SpinnerLoading";
 import ProductCreatePage from "./page/create_product/ProductCreatePage";
 import { Toaster } from "sonner";
+import ProductCreatePageFormik from "./page/create_product/ProductCreatePageFormik";
 
 function App() {
   const { currentUser, tokenInitial, setTokenInitial } = useUserStore();
@@ -29,7 +30,7 @@ function App() {
   }, [isSuccess]);
 
   return isFetching ? (
-    <div className="h-full w-full flex items-center justify-center gap-x-3">
+    <div className="h-screen w-full flex items-center justify-center gap-x-3">
       <SpinnerLoading className="w-10 h-10 fill-primary" />
       <span className="text-2xl text-gray-500 italic">Đang tải dữ liệu..</span>
     </div>
@@ -53,9 +54,10 @@ function App() {
               path="/product"
             ></Route>
             <Route
-              element={<ProductCreatePage></ProductCreatePage>}
+              element={<ProductCreatePageFormik></ProductCreatePageFormik>}
               path="/create_product"
             ></Route>
+
             <Route
               element={<AdvertisementPage></AdvertisementPage>}
               path="/advertisement"

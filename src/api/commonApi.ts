@@ -76,9 +76,9 @@ export const postData = async (body: { [key: string]: any }) => {
 };
 
 // Thêm mới hình ảnh
-export const postImage = async (body: { [key: string]: any }) => {
+export const postImage = async (body: FormData) => {
   const response = await axios.post(
-    "https://api-dev.firstems.com/Api/data/runApi_Data?run_Code=DTA011",
+    "https://api-dev.firstems.com/Api/data/runApi_File?run_Code=DTA011",
     body,
     {
       headers: {

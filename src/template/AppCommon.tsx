@@ -4,10 +4,10 @@ import { Outlet } from "react-router-dom";
 
 const AppCommon = () => {
   return (
-    <div className="h-full block">
-      <div className="flex">
+    <div className="block h-screen">
+      <div className="flex h-full">
         <Sidebar></Sidebar>
-        <div className="flex-auto flex flex-col bg-slate-50">
+        <div className="flex-auto h-screen overflow-y-scroll flex flex-col bg-slate-50">
           <Navbar></Navbar>
           <div className="flex-auto p-5">
             <Outlet />

@@ -79,7 +79,7 @@ const Sidebar = () => {
   const [open, setOpen] = useState<boolean>(true);
   return (
     <div
-      className={`hidden lg:flex ${
+      className={`hidden shrink-0 lg:flex ${
         !open ? "w-20" : "w-72"
       } border-r bg-white  flex-col justify-between border-gray-100 h-screen sticky top-0 transition-[width] duration-300`}
     >
@@ -104,7 +104,7 @@ const Sidebar = () => {
             <div
               className={`flex items-center justify-center ${
                 open ? "p-2 px-5" : "p-2"
-              } bg-white w-fit border-gray-500 rounded-full shadow-custom-sm shadow-gray-800`}
+              } bg-white w-fit border-gray-500 rounded-full shadow-custom-sm shadow-gray-500`}
             >
               <img src={IconCompany} alt="" className="w-full max-w-20" />
             </div>

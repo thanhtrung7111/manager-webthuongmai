@@ -76,6 +76,17 @@
 
     width: 1px;
   }
+
+  .custom-scrollbar-wider::-webkit-scrollbar {
+    width: 4px;
+    background-color: rgb(241, 241, 241);
+  }
+
+  .custom-scrollbar-wider::-webkit-scrollbar-thumb {
+    background: #d8d8d8;
+
+    width: 4px;
+  }
 }
 
 .menuItem1:hover .menuItemChild1 {

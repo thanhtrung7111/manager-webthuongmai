@@ -93,7 +93,7 @@ const Navbar = () => {
   const isMobileScreen = useMediaQuery({ query: "(max-width:1024px)" });
   console.log(currentUser);
   return (
-    <div className="sticky top-0 z-10 bg-white shadow-lg border-b h-20 border-gray-200 px-5 py-4 flex justify-between items-center">
+    <div className="sticky shrink-0 top-0 z-10 bg-white shadow-lg border-b h-20 border-gray-200 px-5 py-4 flex justify-between items-center">
       <div className="flex items-center gap-x-2">
         {isMobileScreen && (
           <Sheet>

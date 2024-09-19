@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
-import { loginLocation, loginUser } from "@/assets/api/authApi";
+import { loginLocation, loginUser } from "@/api/authApi";
 import {
   CompcodeObject,
   LctnCodeObject,

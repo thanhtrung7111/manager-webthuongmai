@@ -1,4 +1,4 @@
-import { fetchCategory, postData } from "@/assets/api/commonApi";
+import { fetchCategory, postData } from "@/api/commonApi";
 import BreadcrumbCustom from "@/component_common/breadcrumb/BreadcrumbCustom";
 import SpinnerLoading from "@/component_common/loading/SpinnerLoading";
 import { Button } from "@/components/ui/button";
@@ -26,7 +26,7 @@ import { useUserStore } from "@/store/userStore";
 import { CategoryObject, ProductObject } from "@/type/TypeCommon";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import React, { useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -207,7 +207,18 @@ const ProductCreatePage = () => {
     onSuccess: (data: ProductObject[]) => {
       if (queryClient.getQueryData(["products"])) {
         queryClient.setQueryData(["products"], (oldData: ProductObject[]) => {
-          return [data[0], ...oldData];
+          const resultData = data[0];
+          return [
+            {
+              PRDCNAME: resultData?.MPRDCNME,
+              QUOMNAME: lstQUOM.find(
+                (item: CategoryObject) =>
+                  item.ITEMCODE == resultData?.QUOMCODE.toString()
+              ).ITEMNAME,
+              PRDCCODE: resultData?.PRDCCODE,
+            },
+            ...oldData,
+          ];
         });
       }
     },
@@ -387,15 +398,14 @@ const ProductCreatePage = () => {
     });
   };
 
-  console.log(postProduct.data);
   return (
     <div className="flex flex-col gap-y-2">
-      <Progress value={progress} className="w-[60%]" />
+      {/* <Progress value={progress} className="w-[60%]" />
       <Button
         onClick={() => {
           setProgress(50);
         }}
-      ></Button>
+      ></Button> */}
       <div className="mb-3">
         <BreadcrumbCustom
           linkList={breadBrumb}
@@ -437,496 +447,929 @@ const ProductCreatePage = () => {
       </div>
 
       {/* table */}
+
       <div className="rounded-md p-5 bg-white border-gray-200 border shadow-md">
-        <Form {...form}>
-          <form>
-            <div className="grid grid-cols-[1fr_3fr] gap-3 mb-3">
-              <div className="relative h-full">
-                <div className="grid w-full max-w-sm items-center gap-1.5 h-full">
-                  <Label htmlFor="picture" className="h-full">
-                    <div className="bg-slate-50 w-full h-full border border-gray-200 shadow-sm overflow-hidden">
-                      <img
-                        src={image != null ? URL.createObjectURL(image) : ""}
-                        alt=""
-                        className="h-full w-full object-contain object-center"
-                      />
-                    </div>
-                  </Label>
-                  <Label
-                    htmlFor="picture"
-                    className="absolute bottom-4 right-5 flex items-center shadow-sm cursor-pointer justify-center rounded-full border border-gray-200 w-10 h-10  bg-white"
-                  >
-                    <i className="ri-add-line text-gray-700 text-xl"></i>
-                  </Label>
-                  <Input
-                    id="picture"
-                    type="file"
-                    className="hidden"
-                    onChange={(e) =>
-                      setImage(
-                        e.target.files && e.target.files.length > 0
-                          ? e.target.files[0]
-                          : null
-                      )
-                    }
+        {isFetchingLstQUOM &&
+        isFetchinglstAssetAttribute &&
+        isFetchinglstAssetSubType &&
+        isFetchinglstAssetType &&
+        isFetchinglstAsstSgAt &&
+        isFetchinglstColor &&
+        isFetchinglstDcmnSbCd &&
+        isFetchinglstEnum_PrdcOptn &&
+        isFetchinglstMnfrType_inpPrdcOdMt &&
+        isFetchinglstPrdcMchn &&
+        isFetchinglstPrdcSection &&
+        isFetchinglstProductBrand &&
+        isFetchinglstProductGroup &&
+        isFetchinglstProductGroupMnfr &&
+        isFetchinglstProduct_Set_Mtrl &&
+        isFetchinglstSortCode &&
+        isFetchinglstSpndSgDt_Tax_RaNm &&
+        isFetchinglstStdrQUOM ? (
+          <div>
+            <SpinnerLoading className="w-5 h-5 fill-primary"></SpinnerLoading>{" "}
+            Đang tải dữ liệu form...
+          </div>
+        ) : (
+          <Form {...form}>
+            <form>
+              <div className="grid grid-cols-[1fr_3fr] gap-3 mb-3">
+                <div className="relative h-full">
+                  <div className="grid w-full max-w-sm items-center gap-1.5 h-full">
+                    <Label htmlFor="picture" className="h-full">
+                      <div className="bg-slate-50 w-full h-full border border-gray-200 shadow-sm overflow-hidden">
+                        <img
+                          src={image != null ? URL.createObjectURL(image) : ""}
+                          alt=""
+                          className="h-full w-full object-contain object-center"
+                        />
+                      </div>
+                    </Label>
+                    <Label
+                      htmlFor="picture"
+                      className="absolute bottom-4 right-5 flex items-center shadow-sm cursor-pointer justify-center rounded-full border border-gray-200 w-10 h-10  bg-white"
+                    >
+                      <i className="ri-add-line text-gray-700 text-xl"></i>
+                    </Label>
+                    <Input
+                      id="picture"
+                      type="file"
+                      className="hidden"
+                      onChange={(e) =>
+                        setImage(
+                          e.target.files && e.target.files.length > 0
+                            ? e.target.files[0]
+                            : null
+                        )
+                      }
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-3 h-fit">
+                  {/* Mã hàng hóa  */}
+                  <FormField
+                    control={form.control}
+                    name="PRDCCODE"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-600">
+                          Mã hàng hóa
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Nhập mã hàng hóa..."
+                            className="focus:!ring-0 focus:!ring-transparent text-gray-700"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-xs font-light" />
+                      </FormItem>
+                    )}
+                  />
+                  {/* Tên sản phẩm  */}
+                  <FormField
+                    control={form.control}
+                    name="MPRDCNME"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-600">
+                          Tên sản phẩm <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Nhập tên sản phẩm..."
+                            className="focus:!ring-0 focus:!ring-transparent text-gray-700"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-xs font-light" />
+                      </FormItem>
+                    )}
+                  />
+                  {/* Đơn vị tính  */}
+                  <FormField
+                    control={form.control}
+                    name="QUOMCODE"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-600">
+                          Đơn vị tính <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={
+                            field.value == -1 ? "" : field.value.toString()
+                          }
+                        >
+                          <FormControl>
+                            <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
+                              <SelectValue
+                                className=""
+                                placeholder="Chọn đơn vị tính---"
+                              />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {lstQUOM &&
+                              isSuccessLstQUOM &&
+                              lstQUOM.map(
+                                (item: CategoryObject, index: number) => {
+                                  return (
+                                    <SelectItem
+                                      value={item.ITEMCODE}
+                                      key={item.ITEMCODE}
+                                    >
+                                      {item.ITEMNAME}
+                                    </SelectItem>
+                                  );
+                                }
+                              )}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage className="text-xs font-light" />
+                      </FormItem>
+                    )}
+                  />
+                  {/* Phân loại  */}
+                  <FormField
+                    control={form.control}
+                    name="DCMNSBCD"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-600">
+                          Phân loại <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <Select
+                          onValueChange={(value) => {
+                            form.setValue("DCMNSBCD", value);
+                            form.setValue(
+                              "MDCSBNME",
+                              lstDcmnSbCd?.find(
+                                (item: CategoryObject) =>
+                                  item?.ITEMCODE == value
+                              ).ITEMNAME
+                            );
+                            form.trigger("DCMNSBCD");
+                          }}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
+                              <SelectValue
+                                className=""
+                                placeholder="Chọn phân loại ---"
+                              />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {lstDcmnSbCd &&
+                              isSuccesslstDcmnSbCd &&
+                              lstDcmnSbCd.map(
+                                (item: CategoryObject, index: number) => {
+                                  return (
+                                    <SelectItem
+                                      value={item.ITEMCODE}
+                                      key={item.ITEMCODE}
+                                    >
+                                      {item.ITEMNAME}
+                                    </SelectItem>
+                                  );
+                                }
+                              )}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage className="text-xs font-light" />
+                      </FormItem>
+                    )}
+                  />
+                  {/* Thương hiệu  */}
+                  <FormField
+                    control={form.control}
+                    name="BRNDCODE"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-600">
+                          Thương hiệu <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
+                              <SelectValue
+                                className=""
+                                placeholder="Chọn thương hiệu ---"
+                              />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {lstProductBrand &&
+                              isSuccesslstProductBrand &&
+                              lstProductBrand.map(
+                                (item: CategoryObject, index: number) => {
+                                  return (
+                                    <SelectItem
+                                      value={item.ITEMCODE}
+                                      key={item.ITEMCODE}
+                                    >
+                                      {item.ITEMNAME}
+                                    </SelectItem>
+                                  );
+                                }
+                              )}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage className="text-xs font-light" />
+                      </FormItem>
+                    )}
+                  />
+                  {/* Màu sắc */}
+                  <FormField
+                    control={form.control}
+                    name="COLRCODE"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-600">
+                          Màu sắc <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
+                              <SelectValue
+                                className=""
+                                placeholder="Chọn màu sắc ---"
+                              />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {lstColor &&
+                              isSuccesslstColor &&
+                              lstColor.map(
+                                (item: CategoryObject, index: number) => {
+                                  return (
+                                    <SelectItem
+                                      value={item.ITEMCODE}
+                                      key={item.ITEMCODE}
+                                    >
+                                      {item.ITEMNAME}
+                                    </SelectItem>
+                                  );
+                                }
+                              )}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage className="text-xs font-light" />
+                      </FormItem>
+                    )}
+                  />
+                  {/* Model  */}
+                  <FormField
+                    control={form.control}
+                    name="MDELPRDC"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-600">
+                          Model sản phẩm <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Nhập model..."
+                            className="focus:!ring-0 focus:!ring-transparent text-gray-700"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-xs font-light" />
+                      </FormItem>
+                    )}
+                  />
+                  {/* Thuế suất */}
+                  <FormField
+                    control={form.control}
+                    name="VAT_RATE"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-600">
+                          Thuế suất <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={
+                            field.value == -1 ? "" : field.value.toString()
+                          }
+                        >
+                          <FormControl>
+                            <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
+                              <SelectValue
+                                className=""
+                                placeholder="Chọn thuế suất ---"
+                              />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {lstSpndSgDt_Tax_RaNm &&
+                              isSuccesslstSpndSgDt_Tax_RaNm &&
+                              lstSpndSgDt_Tax_RaNm.map(
+                                (item: CategoryObject, index: number) => {
+                                  return (
+                                    <SelectItem
+                                      value={item.ITEMCODE}
+                                      key={item.ITEMCODE}
+                                    >
+                                      {item.ITEMNAME}
+                                    </SelectItem>
+                                  );
+                                }
+                              )}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage className="text-xs font-light" />
+                      </FormItem>
+                    )}
+                  />
+                  {/* Tính chất sản phẩm */}
+                  <FormField
+                    control={form.control}
+                    name="PRDCOPTN"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-600">
+                          Tính chất sản phẩm{" "}
+                          <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={
+                            field.value == -1 ? "" : field.value.toString()
+                          }
+                        >
+                          <FormControl>
+                            <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
+                              <SelectValue
+                                className=""
+                                placeholder="Chọn tính chất sản phẩm ---"
+                              />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {lstEnum_PrdcOptn &&
+                              isSuccesslstEnum_PrdcOptn &&
+                              lstEnum_PrdcOptn.map(
+                                (item: CategoryObject, index: number) => {
+                                  return (
+                                    <SelectItem
+                                      value={item.ITEMCODE}
+                                      key={item.ITEMCODE}
+                                    >
+                                      {item.ITEMNAME}
+                                    </SelectItem>
+                                  );
+                                }
+                              )}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage className="text-xs font-light" />
+                      </FormItem>
+                    )}
+                  />
+                  {/* Loại hàng hóa */}
+                  <FormField
+                    control={form.control}
+                    name="SORTCODE"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-600">
+                          Loại hàng hóa <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={
+                            field.value == -1 ? "" : field.value.toString()
+                          }
+                        >
+                          <FormControl>
+                            <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
+                              <SelectValue
+                                className=""
+                                placeholder="Chọn loại hàng hóa ---"
+                              />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {lstSortCode &&
+                              isSuccesslstSortCode &&
+                              lstSortCode.map(
+                                (item: CategoryObject, index: number) => {
+                                  return (
+                                    <SelectItem
+                                      value={item.ITEMCODE}
+                                      key={item.ITEMCODE}
+                                    >
+                                      {item.ITEMNAME}
+                                    </SelectItem>
+                                  );
+                                }
+                              )}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage className="text-xs font-light" />
+                      </FormItem>
+                    )}
+                  />
+                  {/* Nhóm hàng */}
+                  <FormField
+                    control={form.control}
+                    name="GRPRCODE"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-600">
+                          Nhóm hàng <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
+                              <SelectValue
+                                className=""
+                                placeholder="Chọn nhóm hàng ---"
+                              />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {lstProductGroup &&
+                              isSuccesslstProductGroup &&
+                              lstProductGroup.map(
+                                (item: CategoryObject, index: number) => {
+                                  return (
+                                    <SelectItem
+                                      value={item.ITEMCODE}
+                                      key={item.ITEMCODE}
+                                    >
+                                      {item.ITEMNAME}
+                                    </SelectItem>
+                                  );
+                                }
+                              )}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage className="text-xs font-light" />
+                      </FormItem>
+                    )}
+                  />
+                  {/*Giá bán*/}
+                  <FormField
+                    control={form.control}
+                    name="PRDCPRCE"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-600">
+                          Giá bán <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder="Nhập giá bán..."
+                            className="focus:!ring-0 focus:!ring-transparent text-gray-700"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-xs font-light" />
+                      </FormItem>
+                    )}
+                  />
+                  {/*Mã sản phẩm công ty*/}
+                  <FormField
+                    control={form.control}
+                    name="CURRCODE"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-600">
+                          Mã sản phẩm công ty
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="text"
+                            placeholder="Nhập mã sản phẩm công ty..."
+                            className="focus:!ring-0 focus:!ring-transparent text-gray-700"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-xs font-light" />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Ngành hàng*/}
+                  <FormField
+                    control={form.control}
+                    name="SCTNCODE"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-600">
+                          Ngành hàng <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
+                              <SelectValue
+                                className=""
+                                placeholder="Chọn ngành hàng ---"
+                              />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {lstPrdcSection &&
+                              isSuccesslstPrdcSection &&
+                              lstPrdcSection.map(
+                                (item: CategoryObject, index: number) => {
+                                  return (
+                                    <SelectItem
+                                      value={item.ITEMCODE}
+                                      key={item.ITEMCODE}
+                                    >
+                                      {item.ITEMNAME}
+                                    </SelectItem>
+                                  );
+                                }
+                              )}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage className="text-xs font-light" />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/*Tên viết tắt*/}
+                  <FormField
+                    control={form.control}
+                    name="BRIFNAME"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-600">
+                          Tên viết tắt <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="text"
+                            placeholder="Nhập tên viết tắt..."
+                            className="focus:!ring-0 focus:!ring-transparent text-gray-700"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-xs font-light" />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Đơn vị tính báo cáo*/}
+                  <FormField
+                    control={form.control}
+                    name="QUOMRPRT"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-600">
+                          Đơn vị tính báo cáo{" "}
+                          <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={
+                            field.value == -1 ? "" : field.value.toString()
+                          }
+                        >
+                          <FormControl>
+                            <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
+                              <SelectValue
+                                className=""
+                                placeholder="Chọn đơn vị tính báo cáo ---"
+                              />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {lstQUOM &&
+                              isSuccessLstQUOM &&
+                              lstQUOM.map(
+                                (item: CategoryObject, index: number) => {
+                                  return (
+                                    <SelectItem
+                                      value={item.ITEMCODE}
+                                      key={item.ITEMCODE}
+                                    >
+                                      {item.ITEMNAME}
+                                    </SelectItem>
+                                  );
+                                }
+                              )}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage className="text-xs font-light" />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/*Tên sản phẩm báo cáo*/}
+                  <FormField
+                    control={form.control}
+                    name="PRDCRPRT"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-600">
+                          Tên sản phẩm báo cáo{" "}
+                          <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="text"
+                            placeholder="Nhập tên sản phẩm báo cáo..."
+                            className="focus:!ring-0 focus:!ring-transparent text-gray-700"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-xs font-light" />
+                      </FormItem>
+                    )}
+                  />
+                  {/* Lọai gia công*/}
+                  <FormField
+                    control={form.control}
+                    name="MNFRCOST"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-600">
+                          Loại gia công <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
+                              <SelectValue
+                                className=""
+                                placeholder="Chọn loại gia công ---"
+                              />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {lstPrdcMchn &&
+                              isSuccesslstPrdcMchn &&
+                              lstPrdcMchn.map(
+                                (item: CategoryObject, index: number) => {
+                                  return (
+                                    <SelectItem
+                                      value={item.ITEMCODE}
+                                      key={item.ITEMCODE}
+                                    >
+                                      {item.ITEMNAME}
+                                    </SelectItem>
+                                  );
+                                }
+                              )}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage className="text-xs font-light" />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/*Quy cách*/}
+                  <FormField
+                    control={form.control}
+                    name="DESCRIPT"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-600">
+                          Quy cách
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="text"
+                            placeholder="Nhập quy cách..."
+                            className="focus:!ring-0 focus:!ring-transparent text-gray-700"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-xs font-light" />
+                      </FormItem>
+                    )}
+                  />
+                  {/* Nhóm hàng sản xuất*/}
+                  <FormField
+                    control={form.control}
+                    name="GRP_MNFR"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-600">
+                          Nhóm hàng sản xuất{" "}
+                          <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
+                              <SelectValue
+                                className=""
+                                placeholder="Chọn nhóm hàng sản xuất ---"
+                              />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {lstProductGroupMnfr &&
+                              isSuccesslstProductGroupMnfr &&
+                              lstProductGroupMnfr.map(
+                                (item: CategoryObject, index: number) => {
+                                  return (
+                                    <SelectItem
+                                      value={item.ITEMCODE}
+                                      key={item.ITEMCODE}
+                                    >
+                                      {item.ITEMNAME}
+                                    </SelectItem>
+                                  );
+                                }
+                              )}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage className="text-xs font-light" />
+                      </FormItem>
+                    )}
+                  />
+                  {/* Loại sản xuất*/}
+                  <FormField
+                    control={form.control}
+                    name="MNFRTYPE"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-600">
+                          Loại sản xuất <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={
+                            field.value == -1 ? "" : field.value.toString()
+                          }
+                        >
+                          <FormControl>
+                            <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
+                              <SelectValue
+                                className=""
+                                placeholder="Chọn loại sản xuất ---"
+                              />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {lstMnfrType_inpPrdcOdMt &&
+                              isSuccesslstMnfrType_inpPrdcOdMt &&
+                              lstMnfrType_inpPrdcOdMt.map(
+                                (item: CategoryObject, index: number) => {
+                                  return (
+                                    <SelectItem
+                                      value={item.ITEMCODE}
+                                      key={item.ITEMCODE}
+                                    >
+                                      {item.ITEMNAME}
+                                    </SelectItem>
+                                  );
+                                }
+                              )}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage className="text-xs font-light" />
+                      </FormItem>
+                    )}
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-3 h-fit">
-                {/* Mã hàng hóa  */}
+              <div className="grid grid-cols-4 gap-3">
+                {/*Chiều dài*/}
                 <FormField
                   control={form.control}
-                  name="PRDCCODE"
+                  name="PRDCLONG"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-gray-600">
-                        Mã hàng hóa
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Nhập mã hàng hóa..."
-                          className="focus:!ring-0 focus:!ring-transparent text-gray-700"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage className="text-xs font-light" />
-                    </FormItem>
-                  )}
-                />
-                {/* Tên sản phẩm  */}
-                <FormField
-                  control={form.control}
-                  name="MPRDCNME"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-600">
-                        Tên sản phẩm <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Nhập tên sản phẩm..."
-                          className="focus:!ring-0 focus:!ring-transparent text-gray-700"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage className="text-xs font-light" />
-                    </FormItem>
-                  )}
-                />
-                {/* Đơn vị tính  */}
-                <FormField
-                  control={form.control}
-                  name="QUOMCODE"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-600">
-                        Đơn vị tính <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <Select
-                        onValueChange={(value) => {
-                          form.setValue("QUOMCODE", Number(value));
-                          form.setValue(
-                            "MQUOMNME",
-                            lstQUOM.find(
-                              (item: CategoryObject) => item.ITEMCODE == value
-                            ).ITEMNAME
-                          );
-                          form.trigger("QUOMCODE");
-                        }}
-                        defaultValue={
-                          field.value == -1 ? "" : field.value.toString()
-                        }
-                      >
-                        <FormControl>
-                          <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
-                            <SelectValue
-                              className=""
-                              placeholder="Chọn đơn vị tính---"
-                            />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {lstQUOM &&
-                            isSuccessLstQUOM &&
-                            lstQUOM.map(
-                              (item: CategoryObject, index: number) => {
-                                return (
-                                  <SelectItem value={item.ITEMCODE}>
-                                    {item.ITEMNAME}
-                                  </SelectItem>
-                                );
-                              }
-                            )}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage className="text-xs font-light" />
-                    </FormItem>
-                  )}
-                />
-                {/* Phân loại  */}
-                <FormField
-                  control={form.control}
-                  name="DCMNSBCD"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-600">
-                        Phân loại <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <Select
-                        onValueChange={(value) => {
-                          form.setValue("DCMNSBCD", value);
-                          form.setValue(
-                            "MDCSBNME",
-                            lstDcmnSbCd?.find(
-                              (item: CategoryObject) => item?.ITEMCODE == value
-                            ).ITEMNAME
-                          );
-                          form.trigger("DCMNSBCD");
-                        }}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
-                            <SelectValue
-                              className=""
-                              placeholder="Chọn phân loại ---"
-                            />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {lstDcmnSbCd &&
-                            isSuccesslstDcmnSbCd &&
-                            lstDcmnSbCd.map(
-                              (item: CategoryObject, index: number) => {
-                                return (
-                                  <SelectItem value={item.ITEMCODE}>
-                                    {item.ITEMNAME}
-                                  </SelectItem>
-                                );
-                              }
-                            )}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage className="text-xs font-light" />
-                    </FormItem>
-                  )}
-                />
-                {/* Thương hiệu  */}
-                <FormField
-                  control={form.control}
-                  name="BRNDCODE"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-600">
-                        Thương hiệu <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
-                            <SelectValue
-                              className=""
-                              placeholder="Chọn thương hiệu ---"
-                            />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {lstProductBrand &&
-                            isSuccesslstProductBrand &&
-                            lstProductBrand.map(
-                              (item: CategoryObject, index: number) => {
-                                return (
-                                  <SelectItem value={item.ITEMCODE}>
-                                    {item.ITEMNAME}
-                                  </SelectItem>
-                                );
-                              }
-                            )}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage className="text-xs font-light" />
-                    </FormItem>
-                  )}
-                />
-                {/* Màu sắc */}
-                <FormField
-                  control={form.control}
-                  name="COLRCODE"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-600">
-                        Màu sắc <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
-                            <SelectValue
-                              className=""
-                              placeholder="Chọn màu sắc ---"
-                            />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {lstColor &&
-                            isSuccesslstColor &&
-                            lstColor.map(
-                              (item: CategoryObject, index: number) => {
-                                return (
-                                  <SelectItem value={item.ITEMCODE}>
-                                    {item.ITEMNAME}
-                                  </SelectItem>
-                                );
-                              }
-                            )}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage className="text-xs font-light" />
-                    </FormItem>
-                  )}
-                />
-                {/* Model  */}
-                <FormField
-                  control={form.control}
-                  name="MDELPRDC"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-600">
-                        Model sản phẩm <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Nhập model..."
-                          className="focus:!ring-0 focus:!ring-transparent text-gray-700"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage className="text-xs font-light" />
-                    </FormItem>
-                  )}
-                />
-                {/* Thuế suất */}
-                <FormField
-                  control={form.control}
-                  name="VAT_RATE"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-600">
-                        Thuế suất <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <Select
-                        onValueChange={(value) => {
-                          form.setValue("VAT_RATE", Number(value));
-                          form.trigger("VAT_RATE");
-                        }}
-                        defaultValue={
-                          field.value == -1 ? "" : field.value.toString()
-                        }
-                      >
-                        <FormControl>
-                          <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
-                            <SelectValue
-                              className=""
-                              placeholder="Chọn thuế suất ---"
-                            />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {lstSpndSgDt_Tax_RaNm &&
-                            isSuccesslstSpndSgDt_Tax_RaNm &&
-                            lstSpndSgDt_Tax_RaNm.map(
-                              (item: CategoryObject, index: number) => {
-                                return (
-                                  <SelectItem value={item.ITEMCODE}>
-                                    {item.ITEMNAME}
-                                  </SelectItem>
-                                );
-                              }
-                            )}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage className="text-xs font-light" />
-                    </FormItem>
-                  )}
-                />
-                {/* Tính chất sản phẩm */}
-                <FormField
-                  control={form.control}
-                  name="PRDCOPTN"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-600">
-                        Tính chất sản phẩm{" "}
-                        <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <Select
-                        onValueChange={(value) => {
-                          form.setValue("PRDCOPTN", Number(value));
-                          form.trigger("PRDCOPTN");
-                        }}
-                        defaultValue={
-                          field.value == -1 ? "" : field.value.toString()
-                        }
-                      >
-                        <FormControl>
-                          <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
-                            <SelectValue
-                              className=""
-                              placeholder="Chọn tính chất sản phẩm ---"
-                            />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {lstEnum_PrdcOptn &&
-                            isSuccesslstEnum_PrdcOptn &&
-                            lstEnum_PrdcOptn.map(
-                              (item: CategoryObject, index: number) => {
-                                return (
-                                  <SelectItem value={item.ITEMCODE}>
-                                    {item.ITEMNAME}
-                                  </SelectItem>
-                                );
-                              }
-                            )}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage className="text-xs font-light" />
-                    </FormItem>
-                  )}
-                />
-                {/* Loại hàng hóa */}
-                <FormField
-                  control={form.control}
-                  name="SORTCODE"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-600">
-                        Loại hàng hóa <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <Select
-                        onValueChange={(value) => {
-                          form.setValue("SORTCODE", Number(value));
-                          form.trigger("SORTCODE");
-                        }}
-                        defaultValue={
-                          field.value == -1 ? "" : field.value.toString()
-                        }
-                      >
-                        <FormControl>
-                          <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
-                            <SelectValue
-                              className=""
-                              placeholder="Chọn loại hàng hóa ---"
-                            />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {lstSortCode &&
-                            isSuccesslstSortCode &&
-                            lstSortCode.map(
-                              (item: CategoryObject, index: number) => {
-                                return (
-                                  <SelectItem value={item.ITEMCODE}>
-                                    {item.ITEMNAME}
-                                  </SelectItem>
-                                );
-                              }
-                            )}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage className="text-xs font-light" />
-                    </FormItem>
-                  )}
-                />
-                {/* Nhóm hàng */}
-                <FormField
-                  control={form.control}
-                  name="GRPRCODE"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-600">
-                        Nhóm hàng <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <Select
-                        onValueChange={(value) => {
-                          form.setValue("GRPRCODE", value);
-                          form.setValue(
-                            "MGRPRNME",
-                            lstProductGroup.find(
-                              (item: CategoryObject) => item.ITEMCODE == value
-                            ).ITEMNAME
-                          );
-                          form.trigger("GRPRCODE");
-                        }}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
-                            <SelectValue
-                              className=""
-                              placeholder="Chọn nhóm hàng ---"
-                            />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {lstProductGroup &&
-                            isSuccesslstProductGroup &&
-                            lstProductGroup.map(
-                              (item: CategoryObject, index: number) => {
-                                return (
-                                  <SelectItem value={item.ITEMCODE}>
-                                    {item.ITEMNAME}
-                                  </SelectItem>
-                                );
-                              }
-                            )}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage className="text-xs font-light" />
-                    </FormItem>
-                  )}
-                />
-                {/*Giá bán*/}
-                <FormField
-                  control={form.control}
-                  name="PRDCPRCE"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-600">
-                        Giá bán <span className="text-red-500">*</span>
+                        Chiều dài <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
                         <Input
                           type="number"
-                          placeholder="Nhập giá bán..."
+                          placeholder="Nhập chiều dài..."
                           className="focus:!ring-0 focus:!ring-transparent text-gray-700"
-                          onChange={(e) => {
-                            form.setValue("PRDCPRCE", Number(e.target.value));
-                            form.trigger("PRDCPRCE");
-                          }}
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage className="text-xs font-light" />
                     </FormItem>
                   )}
                 />
-                {/*Mã sản phẩm công ty*/}
+                {/*Chiều rộng*/}
                 <FormField
                   control={form.control}
-                  name="CURRCODE"
+                  name="PRDCHORZ"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-gray-600">
-                        Mã sản phẩm công ty
+                        Chiều rộng <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormControl>
                         <Input
-                          type="text"
-                          placeholder="Nhập mã sản phẩm công ty..."
+                          type="number"
+                          placeholder="Nhập chiều rộng..."
+                          className="focus:!ring-0 focus:!ring-transparent text-gray-700"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs font-light" />
+                    </FormItem>
+                  )}
+                />
+                {/*Chiều cao*/}
+                <FormField
+                  control={form.control}
+                  name="PRDCHIGH"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-600">
+                        Chiều cao <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="Nhập chiều cao..."
+                          className="focus:!ring-0 focus:!ring-transparent text-gray-700"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs font-light" />
+                    </FormItem>
+                  )}
+                />
+                {/*Trọng lượng*/}
+                <FormField
+                  control={form.control}
+                  name="PRDCWEGH"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-600">
+                        Trọng lượng <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="Nhập trọng lượng..."
+                          className="focus:!ring-0 focus:!ring-transparent text-gray-700"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs font-light" />
+                    </FormItem>
+                  )}
+                />
+                {/*Thể tích*/}
+                <FormField
+                  control={form.control}
+                  name="PRDCVLUM"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-600">
+                        Thể tích <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="Nhập thể tích..."
+                          className="focus:!ring-0 focus:!ring-transparent text-gray-700"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs font-light" />
+                    </FormItem>
+                  )}
+                />
+                {/*Diện tích*/}
+                <FormField
+                  control={form.control}
+                  name="PRDCAREA"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-600">
+                        Diện tích <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="Nhập diện tích..."
                           className="focus:!ring-0 focus:!ring-transparent text-gray-700"
                           {...field}
                         />
@@ -936,92 +1379,18 @@ const ProductCreatePage = () => {
                   )}
                 />
 
-                {/* Ngành hàng*/}
+                {/* Tính công sản xuất*/}
                 <FormField
                   control={form.control}
-                  name="SCTNCODE"
+                  name="STDRQUOM"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-gray-600">
-                        Ngành hàng <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <Select
-                        onValueChange={(value) => {
-                          form.setValue("SCTNCODE", value);
-                          form.setValue(
-                            "MSCTNNME",
-                            lstPrdcSection.find(
-                              (item: CategoryObject) => item.ITEMCODE == value
-                            ).ITEMNAME
-                          );
-                          form.trigger("SCTNCODE");
-                        }}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
-                            <SelectValue
-                              className=""
-                              placeholder="Chọn ngành hàng ---"
-                            />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {lstPrdcSection &&
-                            isSuccesslstPrdcSection &&
-                            lstPrdcSection.map(
-                              (item: CategoryObject, index: number) => {
-                                return (
-                                  <SelectItem value={item.ITEMCODE}>
-                                    {item.ITEMNAME}
-                                  </SelectItem>
-                                );
-                              }
-                            )}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage className="text-xs font-light" />
-                    </FormItem>
-                  )}
-                />
-
-                {/*Tên viết tắt*/}
-                <FormField
-                  control={form.control}
-                  name="BRIFNAME"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-600">
-                        Tên viết tắt <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="text"
-                          placeholder="Nhập tên viết tắt..."
-                          className="focus:!ring-0 focus:!ring-transparent text-gray-700"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage className="text-xs font-light" />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Đơn vị tính báo cáo*/}
-                <FormField
-                  control={form.control}
-                  name="QUOMRPRT"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-600">
-                        Đơn vị tính báo cáo{" "}
+                        Tính công sản xuất{" "}
                         <span className="text-red-500">*</span>
                       </FormLabel>
                       <Select
-                        onValueChange={(value) => {
-                          form.setValue("QUOMRPRT", Number(value));
-                          form.trigger("QUOMRPRT");
-                        }}
+                        onValueChange={field.onChange}
                         defaultValue={
                           field.value == -1 ? "" : field.value.toString()
                         }
@@ -1030,17 +1399,20 @@ const ProductCreatePage = () => {
                           <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
                             <SelectValue
                               className=""
-                              placeholder="Chọn đơn vị tính báo cáo ---"
+                              placeholder="Chọn tính công sản xuất ---"
                             />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {lstQUOM &&
-                            isSuccessLstQUOM &&
-                            lstQUOM.map(
+                          {lstStdrQUOM &&
+                            isSuccesslstStdrQUOM &&
+                            lstStdrQUOM.map(
                               (item: CategoryObject, index: number) => {
                                 return (
-                                  <SelectItem value={item.ITEMCODE}>
+                                  <SelectItem
+                                    value={item.ITEMCODE}
+                                    key={item.ITEMCODE}
+                                  >
                                     {item.ITEMNAME}
                                   </SelectItem>
                                 );
@@ -1052,166 +1424,18 @@ const ProductCreatePage = () => {
                     </FormItem>
                   )}
                 />
-
-                {/*Tên sản phẩm báo cáo*/}
+                {/*Khai báo định mức*/}
                 <FormField
                   control={form.control}
-                  name="PRDCRPRT"
+                  name="SET_MTRL"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-gray-600">
-                        Tên sản phẩm báo cáo{" "}
-                        <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="text"
-                          placeholder="Nhập tên sản phẩm báo cáo..."
-                          className="focus:!ring-0 focus:!ring-transparent text-gray-700"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage className="text-xs font-light" />
-                    </FormItem>
-                  )}
-                />
-                {/* Lọai gia công*/}
-                <FormField
-                  control={form.control}
-                  name="MNFRCOST"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-600">
-                        Loại gia công <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <Select
-                        onValueChange={(value) => {
-                          form.setValue("MNFRCOST", value);
-                          form.setValue(
-                            "MMCHNNME",
-                            lstQUOM.find(
-                              (item: CategoryObject) => item.ITEMCODE == value
-                            ).ITEMNAME
-                          );
-                          form.trigger("MNFRCOST");
-                        }}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
-                            <SelectValue
-                              className=""
-                              placeholder="Chọn loại gia công ---"
-                            />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {lstPrdcMchn &&
-                            isSuccesslstPrdcMchn &&
-                            lstPrdcMchn.map(
-                              (item: CategoryObject, index: number) => {
-                                return (
-                                  <SelectItem value={item.ITEMCODE}>
-                                    {item.ITEMNAME}
-                                  </SelectItem>
-                                );
-                              }
-                            )}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage className="text-xs font-light" />
-                    </FormItem>
-                  )}
-                />
-
-                {/*Quy cách*/}
-                <FormField
-                  control={form.control}
-                  name="DESCRIPT"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-600">Quy cách</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="text"
-                          placeholder="Nhập quy cách..."
-                          className="focus:!ring-0 focus:!ring-transparent text-gray-700"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage className="text-xs font-light" />
-                    </FormItem>
-                  )}
-                />
-                {/* Nhóm hàng sản xuất*/}
-                <FormField
-                  control={form.control}
-                  name="GRP_MNFR"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-600">
-                        Nhóm hàng sản xuất{" "}
+                        Khai báo định mức{" "}
                         <span className="text-red-500">*</span>
                       </FormLabel>
                       <Select
-                        onValueChange={(value) => {
-                          form.setValue("GRP_MNFR", value);
-                          form.setValue(
-                            "GRMFNAME",
-                            lstProductGroupMnfr.find(
-                              (item: CategoryObject) => item.ITEMCODE == value
-                            ).ITEMNAME
-                          );
-                          form.trigger("GRP_MNFR");
-                        }}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
-                            <SelectValue
-                              className=""
-                              placeholder="Chọn nhóm hàng sản xuất ---"
-                            />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {lstProductGroupMnfr &&
-                            isSuccesslstProductGroupMnfr &&
-                            lstProductGroupMnfr.map(
-                              (item: CategoryObject, index: number) => {
-                                return (
-                                  <SelectItem value={item.ITEMCODE}>
-                                    {item.ITEMNAME}
-                                  </SelectItem>
-                                );
-                              }
-                            )}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage className="text-xs font-light" />
-                    </FormItem>
-                  )}
-                />
-                {/* Loại sản xuất*/}
-                <FormField
-                  control={form.control}
-                  name="MNFRTYPE"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-600">
-                        Loại sản xuất <span className="text-red-500">*</span>
-                      </FormLabel>
-                      <Select
-                        onValueChange={(value) => {
-                          form.setValue("MNFRTYPE", Number(value));
-                          form.setValue(
-                            "DATANAME",
-                            lstMnfrType_inpPrdcOdMt.find(
-                              (item: CategoryObject) => item.ITEMCODE == value
-                            ).ITEMNAME
-                          );
-                          form.trigger("MNFRTYPE");
-                        }}
+                        onValueChange={field.onChange}
                         defaultValue={
                           field.value == -1 ? "" : field.value.toString()
                         }
@@ -1220,17 +1444,287 @@ const ProductCreatePage = () => {
                           <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
                             <SelectValue
                               className=""
-                              placeholder="Chọn loại sản xuất ---"
+                              placeholder="Chọn khai báo định mức ---"
                             />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {lstMnfrType_inpPrdcOdMt &&
-                            isSuccesslstMnfrType_inpPrdcOdMt &&
-                            lstMnfrType_inpPrdcOdMt.map(
+                          {lstProduct_Set_Mtrl &&
+                            isSuccesslstProduct_Set_Mtrl &&
+                            lstProduct_Set_Mtrl.map(
                               (item: CategoryObject, index: number) => {
                                 return (
-                                  <SelectItem value={item.ITEMCODE}>
+                                  <SelectItem
+                                    value={item.ITEMCODE}
+                                    key={item.ITEMCODE}
+                                  >
+                                    {item.ITEMNAME}
+                                  </SelectItem>
+                                );
+                              }
+                            )}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage className="text-xs font-light" />
+                    </FormItem>
+                  )}
+                />
+
+                {/*Đặt hàng tối thiểu*/}
+                <FormField
+                  control={form.control}
+                  name="MIN_ODER"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-600">
+                        Đặt tối thiểu <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="Nhập số lượng..."
+                          className="focus:!ring-0 focus:!ring-transparent text-gray-700"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs font-light" />
+                    </FormItem>
+                  )}
+                />
+                {/*Tồn kho tối thiểu*/}
+                <FormField
+                  control={form.control}
+                  name="MIN_QTTY"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-600">
+                        Tồn kho tối thiểu{" "}
+                        <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="Nhập số lượng..."
+                          className="focus:!ring-0 focus:!ring-transparent text-gray-700"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs font-light" />
+                    </FormItem>
+                  )}
+                />
+                {/*Thời gian nhận hàng*/}
+                <FormField
+                  control={form.control}
+                  name="ODERERLY"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-600">
+                        Thời gian nhận hàng sớm nhất(ngày){" "}
+                        <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="Nhập số ngày..."
+                          className="focus:!ring-0 focus:!ring-transparent text-gray-700"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs font-light" />
+                    </FormItem>
+                  )}
+                />
+                {/*Thời gian nhận hàng trễ nhất*/}
+                <FormField
+                  control={form.control}
+                  name="ODERLATE"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-600">
+                        Thời gian nhận hàng trễ nhất(ngày){" "}
+                        <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="Nhập số ngày..."
+                          className="focus:!ring-0 focus:!ring-transparent text-gray-700"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs font-light" />
+                    </FormItem>
+                  )}
+                />
+
+                {/*Loại tài sản*/}
+                <FormField
+                  control={form.control}
+                  name="ASTPCODE"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-600">
+                        Loại tài sản <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
+                            <SelectValue
+                              className=""
+                              placeholder="Chọn loại tài sản ---"
+                            />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {lstAssetType &&
+                            isSuccesslstAssetType &&
+                            lstAssetType.map(
+                              (item: CategoryObject, index: number) => {
+                                return (
+                                  <SelectItem
+                                    value={item.ITEMCODE}
+                                    key={item.ITEMCODE}
+                                  >
+                                    {item.ITEMNAME}
+                                  </SelectItem>
+                                );
+                              }
+                            )}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage className="text-xs font-light" />
+                    </FormItem>
+                  )}
+                />
+
+                {/*Phân loại tài sản*/}
+                <FormField
+                  control={form.control}
+                  name="SBTPCODE"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-600">
+                        Phân loại tài sản{" "}
+                        <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
+                            <SelectValue
+                              className=""
+                              placeholder="Chọn phân loại tài sản ---"
+                            />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {lstAssetSubType &&
+                            isSuccesslstAssetSubType &&
+                            lstAssetSubType.map(
+                              (item: CategoryObject, index: number) => {
+                                return (
+                                  <SelectItem
+                                    value={item.ITEMCODE}
+                                    key={item.ITEMCODE}
+                                  >
+                                    {item.ITEMNAME}
+                                  </SelectItem>
+                                );
+                              }
+                            )}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage className="text-xs font-light" />
+                    </FormItem>
+                  )}
+                />
+                {/*Nhóm tài sản quản lí*/}
+                <FormField
+                  control={form.control}
+                  name="ATTRCODE"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-600">
+                        Nhóm tài sản quản lí{" "}
+                        <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={
+                          field.value == -1 ? "" : field.value.toString()
+                        }
+                      >
+                        <FormControl>
+                          <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
+                            <SelectValue
+                              className=""
+                              placeholder="Chọn nhóm tài sản quản lí ---"
+                            />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {lstAsstSgAt &&
+                            isSuccesslstAsstSgAt &&
+                            lstAsstSgAt.map(
+                              (item: CategoryObject, index: number) => {
+                                return (
+                                  <SelectItem
+                                    value={item.ITEMCODE}
+                                    key={item.ITEMCODE}
+                                  >
+                                    {item.ITEMNAME}
+                                  </SelectItem>
+                                );
+                              }
+                            )}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage className="text-xs font-light" />
+                    </FormItem>
+                  )}
+                />
+                {/*Chủng loại tài sản*/}
+                <FormField
+                  control={form.control}
+                  name="ATTPCODE"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-600">
+                        Chủng loại tài sản{" "}
+                        <span className="text-red-500">*</span>
+                      </FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={
+                          field.value == -1 ? "" : field.value.toString()
+                        }
+                      >
+                        <FormControl>
+                          <SelectTrigger
+                            className={`focus:!ring-0 focus:!ring-transparent`}
+                          >
+                            <SelectValue
+                              className=""
+                              placeholder="Chọn chủng lọai tài sản ---"
+                            />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {lstAssetAttribute &&
+                            isSuccesslstAssetAttribute &&
+                            lstAssetAttribute.map(
+                              (item: CategoryObject, index: number) => {
+                                return (
+                                  <SelectItem
+                                    value={item.ITEMCODE}
+                                    key={item.ITEMCODE}
+                                  >
                                     {item.ITEMNAME}
                                   </SelectItem>
                                 );
@@ -1243,534 +1737,29 @@ const ProductCreatePage = () => {
                   )}
                 />
               </div>
-            </div>
-            <div className="grid grid-cols-4 gap-3">
-              {/*Chiều dài*/}
+              {/*Ghi chú sản xuất*/}
               <FormField
                 control={form.control}
-                name="PRDCLONG"
+                name="NOTETEXT"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-gray-600">
-                      Chiều dài <span className="text-red-500">*</span>
+                      Ghi chú sản xuất
                     </FormLabel>
                     <FormControl>
-                      <Input
-                        type="number"
-                        placeholder="Nhập chiều dài..."
+                      <Textarea
+                        placeholder="Nhập ghi chú sản xuất..."
                         className="focus:!ring-0 focus:!ring-transparent text-gray-700"
-                        onChange={(e) => {
-                          form.setValue("PRDCLONG", Number(e.target.value));
-                          form.trigger("PRDCLONG");
-                        }}
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage className="text-xs font-light" />
                   </FormItem>
                 )}
               />
-              {/*Chiều rộng*/}
-              <FormField
-                control={form.control}
-                name="PRDCHORZ"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-600">
-                      Chiều rộng <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        placeholder="Nhập chiều rộng..."
-                        className="focus:!ring-0 focus:!ring-transparent text-gray-700"
-                        onChange={(e) => {
-                          form.setValue("PRDCHORZ", Number(e.target.value));
-                          form.trigger("PRDCHORZ");
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage className="text-xs font-light" />
-                  </FormItem>
-                )}
-              />
-              {/*Chiều cao*/}
-              <FormField
-                control={form.control}
-                name="PRDCHIGH"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-600">
-                      Chiều cao <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        placeholder="Nhập chiều cao..."
-                        className="focus:!ring-0 focus:!ring-transparent text-gray-700"
-                        onChange={(e) => {
-                          form.setValue("PRDCHIGH", Number(e.target.value));
-                          form.trigger("PRDCHIGH");
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage className="text-xs font-light" />
-                  </FormItem>
-                )}
-              />
-              {/*Trọng lượng*/}
-              <FormField
-                control={form.control}
-                name="PRDCWEGH"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-600">
-                      Trọng lượng <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        placeholder="Nhập trọng lượng..."
-                        className="focus:!ring-0 focus:!ring-transparent text-gray-700"
-                        onChange={(e) => {
-                          form.setValue("PRDCWEGH", Number(e.target.value));
-                          form.trigger("PRDCWEGH");
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage className="text-xs font-light" />
-                  </FormItem>
-                )}
-              />
-              {/*Thể tích*/}
-              <FormField
-                control={form.control}
-                name="PRDCVLUM"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-600">
-                      Thể tích <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        placeholder="Nhập thể tích..."
-                        className="focus:!ring-0 focus:!ring-transparent text-gray-700"
-                        onChange={(e) => {
-                          form.setValue("PRDCVLUM", Number(e.target.value));
-                          form.trigger("PRDCVLUM");
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage className="text-xs font-light" />
-                  </FormItem>
-                )}
-              />
-              {/*Diện tích*/}
-              <FormField
-                control={form.control}
-                name="PRDCAREA"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-600">
-                      Diện tích <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        placeholder="Nhập diện tích..."
-                        className="focus:!ring-0 focus:!ring-transparent text-gray-700"
-                        onChange={(e) => {
-                          form.setValue("PRDCAREA", Number(e.target.value));
-                          form.trigger("PRDCAREA");
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage className="text-xs font-light" />
-                  </FormItem>
-                )}
-              />
-
-              {/* Tính công sản xuất*/}
-              <FormField
-                control={form.control}
-                name="STDRQUOM"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-600">
-                      Tính công sản xuất <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <Select
-                      onValueChange={(value) => {
-                        form.setValue("STDRQUOM", Number(value));
-                        form.trigger("STDRQUOM");
-                      }}
-                      defaultValue={
-                        field.value == -1 ? "" : field.value.toString()
-                      }
-                    >
-                      <FormControl>
-                        <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
-                          <SelectValue
-                            className=""
-                            placeholder="Chọn tính công sản xuất ---"
-                          />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {lstStdrQUOM &&
-                          isSuccesslstStdrQUOM &&
-                          lstStdrQUOM.map(
-                            (item: CategoryObject, index: number) => {
-                              return (
-                                <SelectItem value={item.ITEMCODE}>
-                                  {item.ITEMNAME}
-                                </SelectItem>
-                              );
-                            }
-                          )}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage className="text-xs font-light" />
-                  </FormItem>
-                )}
-              />
-              {/*Khai báo định mức*/}
-              <FormField
-                control={form.control}
-                name="SET_MTRL"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-600">
-                      Khai báo định mức <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <Select
-                      onValueChange={(value) => {
-                        form.setValue("SET_MTRL", Number(value));
-                        form.trigger("SET_MTRL");
-                      }}
-                      defaultValue={
-                        field.value == -1 ? "" : field.value.toString()
-                      }
-                    >
-                      <FormControl>
-                        <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
-                          <SelectValue
-                            className=""
-                            placeholder="Chọn khai báo định mức ---"
-                          />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {lstProduct_Set_Mtrl &&
-                          isSuccesslstProduct_Set_Mtrl &&
-                          lstProduct_Set_Mtrl.map(
-                            (item: CategoryObject, index: number) => {
-                              return (
-                                <SelectItem value={item.ITEMCODE}>
-                                  {item.ITEMNAME}
-                                </SelectItem>
-                              );
-                            }
-                          )}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage className="text-xs font-light" />
-                  </FormItem>
-                )}
-              />
-
-              {/*Đặt hàng tối thiểu*/}
-              <FormField
-                control={form.control}
-                name="MIN_ODER"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-600">
-                      Đặt tối thiểu <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        placeholder="Nhập số lượng..."
-                        className="focus:!ring-0 focus:!ring-transparent text-gray-700"
-                        onChange={(e) => {
-                          form.setValue("MIN_ODER", Number(e.target.value));
-                          form.trigger("MIN_ODER");
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage className="text-xs font-light" />
-                  </FormItem>
-                )}
-              />
-              {/*Tồn kho tối thiểu*/}
-              <FormField
-                control={form.control}
-                name="MIN_QTTY"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-600">
-                      Tồn kho tối thiểu <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        placeholder="Nhập số lượng..."
-                        className="focus:!ring-0 focus:!ring-transparent text-gray-700"
-                        onChange={(e) => {
-                          form.setValue("MIN_QTTY", Number(e.target.value));
-                          form.trigger("MIN_QTTY");
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage className="text-xs font-light" />
-                  </FormItem>
-                )}
-              />
-              {/*Thời gian nhận hàng*/}
-              <FormField
-                control={form.control}
-                name="ODERERLY"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-600">
-                      Thời gian nhận hàng sớm nhất(ngày){" "}
-                      <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        placeholder="Nhập số ngày..."
-                        className="focus:!ring-0 focus:!ring-transparent text-gray-700"
-                        onChange={(e) => {
-                          form.setValue("ODERERLY", Number(e.target.value));
-                          form.trigger("ODERERLY");
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage className="text-xs font-light" />
-                  </FormItem>
-                )}
-              />
-              {/*Thời gian nhận hàng trễ nhất*/}
-              <FormField
-                control={form.control}
-                name="ODERLATE"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-600">
-                      Thời gian nhận hàng trễ nhất(ngày){" "}
-                      <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        placeholder="Nhập số ngày..."
-                        className="focus:!ring-0 focus:!ring-transparent text-gray-700"
-                        onChange={(e) => {
-                          form.setValue("ODERLATE", Number(e.target.value));
-                          form.trigger("ODERLATE");
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage className="text-xs font-light" />
-                  </FormItem>
-                )}
-              />
-
-              {/*Loại tài sản*/}
-              <FormField
-                control={form.control}
-                name="ASTPCODE"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-600">
-                      Loại tài sản <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
-                          <SelectValue
-                            className=""
-                            placeholder="Chọn loại tài sản ---"
-                          />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {lstAssetType &&
-                          isSuccesslstAssetType &&
-                          lstAssetType.map(
-                            (item: CategoryObject, index: number) => {
-                              return (
-                                <SelectItem value={item.ITEMCODE}>
-                                  {item.ITEMNAME}
-                                </SelectItem>
-                              );
-                            }
-                          )}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage className="text-xs font-light" />
-                  </FormItem>
-                )}
-              />
-
-              {/*Phân loại tài sản*/}
-              <FormField
-                control={form.control}
-                name="SBTPCODE"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-600">
-                      Phân loại tài sản <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
-                          <SelectValue
-                            className=""
-                            placeholder="Chọn phân loại tài sản ---"
-                          />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {lstAssetSubType &&
-                          isSuccesslstAssetSubType &&
-                          lstAssetSubType.map(
-                            (item: CategoryObject, index: number) => {
-                              return (
-                                <SelectItem value={item.ITEMCODE}>
-                                  {item.ITEMNAME}
-                                </SelectItem>
-                              );
-                            }
-                          )}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage className="text-xs font-light" />
-                  </FormItem>
-                )}
-              />
-              {/*Nhóm tài sản quản lí*/}
-              <FormField
-                control={form.control}
-                name="ATTRCODE"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-600">
-                      Nhóm tài sản quản lí{" "}
-                      <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <Select
-                      onValueChange={(value) => {
-                        form.setValue("ATTRCODE", Number(value));
-                        form.trigger("ATTRCODE");
-                      }}
-                      defaultValue={
-                        field.value == -1 ? "" : field.value.toString()
-                      }
-                    >
-                      <FormControl>
-                        <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
-                          <SelectValue
-                            className=""
-                            placeholder="Chọn nhóm tài sản quản lí ---"
-                          />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {lstAsstSgAt &&
-                          isSuccesslstAsstSgAt &&
-                          lstAsstSgAt.map(
-                            (item: CategoryObject, index: number) => {
-                              return (
-                                <SelectItem value={item.ITEMCODE}>
-                                  {item.ITEMNAME}
-                                </SelectItem>
-                              );
-                            }
-                          )}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage className="text-xs font-light" />
-                  </FormItem>
-                )}
-              />
-              {/*Chủng loại tài sản*/}
-              <FormField
-                control={form.control}
-                name="ATTPCODE"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-600">
-                      Chủng loại tài sản <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <Select
-                      onValueChange={(value) => {
-                        form.setValue("ATTPCODE", Number(value));
-                        form.trigger("ATTPCODE");
-                      }}
-                      defaultValue={
-                        field.value == -1 ? "" : field.value.toString()
-                      }
-                    >
-                      <FormControl>
-                        <SelectTrigger
-                          className={`focus:!ring-0 focus:!ring-transparent`}
-                        >
-                          <SelectValue
-                            className=""
-                            placeholder="Chọn chủng lọai tài sản ---"
-                          />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {lstAssetAttribute &&
-                          isSuccesslstAssetAttribute &&
-                          lstAssetAttribute.map(
-                            (item: CategoryObject, index: number) => {
-                              return (
-                                <SelectItem value={item.ITEMCODE}>
-                                  {item.ITEMNAME}
-                                </SelectItem>
-                              );
-                            }
-                          )}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage className="text-xs font-light" />
-                  </FormItem>
-                )}
-              />
-            </div>
-            {/*Ghi chú sản xuất*/}
-            <FormField
-              control={form.control}
-              name="NOTETEXT"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-gray-600">
-                    Ghi chú sản xuất
-                  </FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Nhập ghi chú sản xuất..."
-                      className="focus:!ring-0 focus:!ring-transparent text-gray-700"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage className="text-xs font-light" />
-                </FormItem>
-              )}
-            />
-          </form>
-        </Form>
+            </form>
+          </Form>
+        )}
       </div>
     </div>
   );
