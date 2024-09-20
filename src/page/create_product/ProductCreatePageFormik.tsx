@@ -6,29 +6,30 @@ import NumberFormikForm from "@/component_common/commonForm/NumberFormikForm";
 import SelectFormikForm from "@/component_common/commonForm/SelectFormikForm";
 import TextareaFormikForm from "@/component_common/commonForm/TextareaFormikForm";
 import SpinnerLoading from "@/component_common/loading/SpinnerLoading";
-import { Button } from "@/components/ui/button";
 import {
   DialogDescription,
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Progress } from "@/components/ui/progress";
 import { useUserStore } from "@/store/userStore";
-import { CategoryObject, ProductObject } from "@/type/TypeCommon";
-import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  CategoryObject,
+  DataExcelObject,
+  ProductObject,
+} from "@/type/TypeCommon";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Form, Formik } from "formik";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import * as Yup from "yup";
+import Excel from "exceljs";
+import { exportExcel } from "@/helper/excelHelper";
+
 const breadBrumb = [
   {
     itemName: "Quản lí chung",
@@ -361,6 +362,349 @@ const ProductCreatePageFormik = () => {
     // console.log(imageResult);
   };
 
+  const extractExcel = async () => {
+    const arrayLstQUOM: string = lstDcmnSbCd
+      ?.map((item: CategoryObject) => `${item.ITEMNAME}`)
+      .join(",");
+    console.log(arrayLstQUOM);
+    const dataExcelObject: DataExcelObject[] = [
+      {
+        id: "CompCode",
+        type: "single",
+        dataDemo: "PMC",
+        header: "Công ty",
+      },
+      {
+        id: "LctnCode",
+        type: "single",
+        dataDemo: "001",
+        header: "Chi nhánh",
+      },
+      {
+        id: "PRDCNAME",
+        type: "single",
+        dataDemo: "",
+        header: "Mã sản phẩm",
+      },
+      {
+        id: "QUOMCODE",
+        type: "list",
+        data: [
+          "",
+
+          ...lstQUOM.map((item: CategoryObject) => `${item.ITEMCODE}`),
+        ],
+        dataDemo: lstQUOM[0].ITEMCODE,
+        header: "Đơn vị tính",
+      },
+      {
+        id: "DCMNSBCD",
+        type: "list",
+        data: [
+          "",
+          ...lstDcmnSbCd.map((item: CategoryObject) => `${item.ITEMCODE}`),
+        ],
+        dataDemo: lstDcmnSbCd[0].ITEMCODE,
+        header: "Phân loại",
+      },
+      {
+        id: "BRNDCODE",
+        type: "list",
+        data: [
+          "",
+
+          ...lstProductBrand.map((item: CategoryObject) => `${item.ITEMCODE}`),
+        ],
+        dataDemo: lstProductBrand[0].ITEMCODE,
+        header: "Thương hiệu",
+      },
+      {
+        id: "COLRCODE",
+        type: "list",
+        data: [
+          "",
+
+          ...lstColor.map((item: CategoryObject) => `${item.ITEMCODE}`),
+        ],
+        dataDemo: lstColor[0].ITEMCODE,
+        header: "Màu sắc",
+      },
+      {
+        id: "MDELPRDC",
+        type: "single",
+        dataDemo: "Trắng vàng",
+        header: "Model sản phẩm",
+      },
+      {
+        id: "VAT_RATE",
+        type: "list",
+        data: [
+          "",
+
+          ...lstSpndSgDt_Tax_RaNm.map(
+            (item: CategoryObject) => `${item.ITEMCODE}`
+          ),
+        ],
+        dataDemo: lstSpndSgDt_Tax_RaNm[0].ITEMCODE,
+        header: "Thuế suất(%)",
+      },
+      {
+        id: "PRDCOPTN",
+        type: "list",
+        data: [
+          "",
+
+          ...lstEnum_PrdcOptn.map((item: CategoryObject) => `${item.ITEMCODE}`),
+        ],
+        dataDemo: lstEnum_PrdcOptn[0].ITEMCODE,
+        header: "Tính chất sản phẩm",
+      },
+      {
+        id: "SORTCODE",
+        type: "list",
+        data: [
+          "",
+
+          ...lstSortCode.map((item: CategoryObject) => `${item.ITEMCODE}`),
+        ],
+        dataDemo: lstSortCode[0].ITEMCODE,
+        header: "Loại hàng hóa",
+      },
+      {
+        id: "GRPRCODE",
+        type: "list",
+        data: [
+          "",
+
+          ...lstProductGroup.map((item: CategoryObject) => `${item.ITEMCODE}`),
+        ],
+        dataDemo: lstProductGroup[0].ITEMCODE,
+        header: "Nhóm hàng",
+      },
+      {
+        id: "PRDCPRCE",
+        type: "single",
+        dataDemo: 500000,
+        header: "Giá bán",
+      },
+      {
+        id: "CURRCODE",
+        type: "single",
+        dataDemo: "Lenovo 30",
+        header: "Mã sản phẩm công ty",
+      },
+      {
+        id: "SCTNCODE",
+        type: "list",
+        data: [
+          "",
+
+          ...lstPrdcSection.map((item: CategoryObject) => `${item.ITEMCODE}`),
+        ],
+        dataDemo: lstPrdcSection[0].ITEMCODE,
+        header: "Ngành hàng",
+      },
+      {
+        id: "BRIFNAME",
+        type: "single",
+        dataDemo: "Lenovo 30",
+        header: "Tên viết tắt",
+      },
+      {
+        id: "QUOMRPRT",
+        type: "list",
+        data: [
+          "",
+
+          ...lstQUOM.map((item: CategoryObject) => `${item.ITEMCODE}`),
+        ],
+        dataDemo: lstQUOM[0].ITEMCODE,
+        header: "Đơn vị báo cáo",
+      },
+      {
+        id: "PRDCRPRT",
+        type: "single",
+        dataDemo: "Lenovo 30",
+        header: "Tên sp báo cáo",
+      },
+      {
+        id: "MNFRCOST",
+        type: "list",
+        data: [
+          "",
+
+          ...lstPrdcMchn.map((item: CategoryObject) => `${item.ITEMCODE}`),
+        ],
+        dataDemo: lstPrdcMchn[0].ITEMCODE,
+        header: "Loại gia công",
+      },
+      {
+        id: "PRDCLONG",
+        type: "single",
+        dataDemo: 2,
+        header: "Chiều dài",
+      },
+      {
+        id: "PRDCHORZ",
+        type: "single",
+        dataDemo: 2,
+        header: "Chiều rộng",
+      },
+      {
+        id: "PRDCHIGH",
+        type: "single",
+        dataDemo: 2,
+        header: "Chiều cao",
+      },
+      {
+        id: "PRDCWEGH",
+        type: "single",
+        dataDemo: 2,
+        header: "Khối lượng",
+      },
+      {
+        id: "PRDCVLUM",
+        type: "single",
+        dataDemo: 8,
+        header: "Thể tích",
+      },
+      {
+        id: "PRDCAREA",
+        type: "single",
+        dataDemo: 4,
+        header: "Diện tích",
+      },
+      {
+        id: "GRP_MNFR",
+        type: "list",
+        data: [
+          "",
+
+          ...lstProductGroupMnfr.map(
+            (item: CategoryObject) => `${item.ITEMCODE}`
+          ),
+        ],
+        dataDemo: lstProductGroupMnfr[0].ITEMCODE,
+        header: "Nhóm hàng sản xuẩt",
+      },
+      {
+        id: "MNFRTYPE",
+        type: "list",
+        data: [
+          "",
+
+          ...lstMnfrType_inpPrdcOdMt.map(
+            (item: CategoryObject) => `${item.ITEMCODE}`
+          ),
+        ],
+        dataDemo: lstMnfrType_inpPrdcOdMt[0].ITEMCODE,
+        header: "Loại sản xuất",
+      },
+      {
+        id: "STDRQUOM",
+        type: "list",
+        data: [
+          "",
+
+          ...lstStdrQUOM.map((item: CategoryObject) => `${item.ITEMCODE}`),
+        ],
+        dataDemo: lstStdrQUOM[0].ITEMCODE,
+        header: "Tính gia công sản xuất",
+      },
+      {
+        id: "SET_MTRL",
+        type: "list",
+        data: [
+          "",
+
+          ...lstProduct_Set_Mtrl.map(
+            (item: CategoryObject) => `${item.ITEMCODE}`
+          ),
+        ],
+        dataDemo: lstProduct_Set_Mtrl[0].ITEMCODE,
+        header: "Khai báo định mức",
+      },
+      {
+        id: "MIN_ODER",
+        type: "single",
+        dataDemo: 1,
+        header: "Đặt hàng tối thiểu",
+      },
+      {
+        id: "MIN_QTTY",
+        type: "single",
+        dataDemo: 1000,
+        header: "Tồn kho tối thiểu",
+      },
+      {
+        id: "ODERERLY",
+        type: "single",
+        dataDemo: 1,
+        header: "Nhận hàng sớm nhất(ngày)",
+      },
+      {
+        id: "ODERLATE",
+        type: "single",
+        dataDemo: 10,
+        header: "Nhận hàng trễ nhất(ngày)",
+      },
+      {
+        id: "ASTPCODE",
+        type: "list",
+        data: [
+          "",
+
+          ...lstAssetType.map((item: CategoryObject) => `${item.ITEMCODE}`),
+        ],
+        dataDemo: lstAssetType[0].ITEMCODE,
+        header: "Loại tài sản",
+      },
+      {
+        id: "SBTPCODE",
+        type: "list",
+        data: [
+          "",
+
+          ...lstAssetSubType.map((item: CategoryObject) => `${item.ITEMCODE}`),
+        ],
+        dataDemo: lstAssetSubType[0].ITEMCODE,
+        header: "Phân loại tài sản",
+      },
+      {
+        id: "ATTRCODE",
+        type: "list",
+        data: [
+          "",
+
+          ...lstAsstSgAt.map((item: CategoryObject) => `${item.ITEMCODE}`),
+        ],
+        dataDemo: lstAsstSgAt[0].ITEMCODE,
+        header: "Nhóm tài sản quản lí",
+      },
+      {
+        id: "ATTPCODE",
+        type: "list",
+        data: [
+          "",
+
+          ...lstAssetAttribute.map(
+            (item: CategoryObject) => `${item.ITEMCODE}`
+          ),
+        ],
+        dataDemo: lstAssetAttribute[0].ITEMCODE,
+        header: "Chủng loại tài sản",
+      },
+      {
+        id: "NOTETEXT",
+        type: "single",
+        dataDemo: "Đang sản xuất lenov 30",
+        header: "Ghi chú sản xuất",
+      },
+    ];
+
+    await exportExcel(dataExcelObject);
+  };
+
   console.log(handlePostProduct.data);
   return (
     <div className="flex flex-col gap-y-2">
@@ -405,6 +749,7 @@ const ProductCreatePageFormik = () => {
                       label="Xem danh sách"
                       onClick={() => navigate("/product")}
                     ></ButtonForm>
+
                     <ButtonForm
                       type="button"
                       className="!w-28"
@@ -468,6 +813,13 @@ const ProductCreatePageFormik = () => {
                   disabled={
                     handlePostProduct.isPending || handlePostImage.isPending
                   }
+                  icon={<i className="ri-download-2-line"></i>}
+                ></ButtonForm>
+                <ButtonForm
+                  label="File excel mẫu"
+                  type="button"
+                  className="!bg-yellow-500 !w-36"
+                  onClick={() => extractExcel()}
                   icon={<i className="ri-download-2-line"></i>}
                 ></ButtonForm>
                 <ButtonForm
@@ -789,11 +1141,11 @@ const ProductCreatePageFormik = () => {
                     itemKey={"ITEMCODE"}
                     itemValue={"ITEMNAME"}
                     important={true}
-                    name="DATANAME"
+                    name="MNFRTYPE"
                     onChange={(e) => {
                       setFieldValue(
-                        "GRMFNAME",
-                        lstProductGroupMnfr.find(
+                        "DATANAME",
+                        lstMnfrType_inpPrdcOdMt.find(
                           (item: CategoryObject) => item.ITEMCODE == e.ITEMCODE
                         ).ITEMNAME
                       );
@@ -863,7 +1215,7 @@ const ProductCreatePageFormik = () => {
                   // disabled={isLoadingLogin}
                   important={true}
                 ></NumberFormikForm>
-                {/* Loại sản xuất  */}
+                {/* Tính gia công sản xuất */}
                 <SelectFormikForm
                   options={lstStdrQUOM ? lstStdrQUOM : []}
                   loading={isFetchinglstStdrQUOM}

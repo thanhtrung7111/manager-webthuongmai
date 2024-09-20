@@ -70,8 +70,8 @@ const MenuItem = ({
     <div className="mb-5">
       {!compact ? (
         <p
-          className={`text-primary font-bold text-xs uppercase ${
-            !compact ? "opacity-100 w-fit" : "opacity-0 w-0"
+          className={`text-primary font-bold delay-1000 text-xs uppercase ${
+            !compact ? "opacity-100 visible" : "opacity-0 invisible"
           } transition-opacity mb-2`}
         >
           {item[name] as string}
@@ -200,7 +200,11 @@ const MenuItem = ({
     </div>
   ) : (
     // Mở rộng menu
-    <div className={`relative ${"menuItem" + level}`}>
+    <div
+      className={`relative ${"menuItem" + level} ${
+        compact ? "invisible opacity-0" : "visible opacity-100"
+      }`}
+    >
       {Array.isArray(item[listName]) ? (
         <div
           onClick={() => {
@@ -212,13 +216,13 @@ const MenuItem = ({
         >
           <div className="flex gap-x-2 items-center">
             {item[iconName] as React.ReactNode}
-            <span
-              className={`group-hover/a:text-primary text-sm ${
-                !compact ? "opacity-100 visible" : "opacity-0 w-0 invisible"
+            <p
+              className={`group-hover/a:text-primary text-sm transition-opacity${
+                !compact ? "opacity-100 visible" : "opacity-0 invisible"
               }`}
             >
               {!compact && (item[name] as string)}
-            </span>
+            </p>
           </div>
           {Array.isArray(item[listName]) && (
             <i

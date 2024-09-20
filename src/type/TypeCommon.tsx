@@ -86,3 +86,11 @@ export type CategoryObject = {
   KEY_CODE: string;
   LISTCODE: string;
 };
+
+export type DataExcelObject = {
+  header: string;
+  id: string;
+  type: "list" | "single";
+  dataDemo?: string | number;
+  data?: string[];
+};

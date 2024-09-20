@@ -45,7 +45,7 @@ export const fetchCategory = async (category: string) => {
     throw new Error("Failed to fetch data");
   }
   // Nếu dữ liệu trả về là undefined hoặc null, ném lỗi
-  if (!response.data?.RETNCODE) {
+  if (!response.data?.RETNCODE || response.data?.RETNDATA == null) {
     throw new Error("No data found");
   }
   return response.data?.RETNDATA;

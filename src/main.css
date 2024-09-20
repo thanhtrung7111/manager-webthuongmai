@@ -103,3 +103,7 @@
   opacity: 100 !important;
   visibility: visible !important;
 }
+
+.transition-opacityVisible {
+  transition: opacity visible ease-in 0.5;
+}
