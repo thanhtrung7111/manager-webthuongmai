@@ -38,12 +38,17 @@ import { ChevronDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { SearchObjectProduct } from "@/type/TypeCommon";
 import SpinnerLoading from "../loading/SpinnerLoading";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   search: SearchObjectProduct[];
-  isLoading: boolean;
+  isLoading?: boolean;
 }
 const pageSize = 20;
 const TableCustom = <TData, TValue>({
@@ -83,36 +88,59 @@ const TableCustom = <TData, TValue>({
     <div className="w-full">
       <div className="flex justify-between mb-3">
         <div className="flex gap-x-2 items-center">
-          {search.map((item: SearchObjectProduct) => {
-            return (
-              <Input
-                id={item.key}
-                placeholder={`Nhập ${item.name} tìm kiếm...`}
-                className="!ring-0 !ring-transparent bg-white min-w-[400px] w-full h-full text-sm"
-                onChange={(e) => {
-                  table
-                    .getColumn(`${item.key}`)
-                    ?.setFilterValue(e.target.value);
+          <Popover>
+            <PopoverTrigger>
+              <Button
+                className="flex items-center gap-x-2"
+                variant={"outline"}
+                type="submit"
+                size={"sm"}
+              >
+                <span className="text-gray-600">Lọc</span>
+                <div className="rotate-0 transition-transform duration-500 cursor-pointer">
+                  <i className="ri-filter-line text-gray-600"></i>
+                </div>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="flex flex-col gap-y-2" align="start">
+              {search.map((item: SearchObjectProduct) => {
+                return (
+                  <input
+                    placeholder={`Nhập ${item.name} tìm kiếm...`}
+                    className="outline-none rounded-md border border-gray-300 text-sm py-2 px-3"
+                    onChange={(e) => {
+                      table
+                        .getColumn(`${item.key}`)
+                        ?.setFilterValue(e.target.value);
 
-                  setPageIndex(0);
-                }}
-              ></Input>
-            );
-          })}
-
+                      setPageIndex(0);
+                    }}
+                  ></input>
+                );
+              })}
+            </PopoverContent>
+          </Popover>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <div
-                  className="rotate-0 hover:rotate-90 transition-transform duration-500 cursor-pointer"
+                <Button
+                  className="group flex items-center gap-x-2"
+                  size={"sm"}
                   onClick={() => {
                     table.resetColumnFilters();
                     table.toggleAllRowsSelected(false);
+                    table.resetColumnVisibility();
+                    table.resetPageIndex();
+                    table.resetSorting();
                     setPageIndex(0);
                   }}
+                  variant={"outline"}
                 >
-                  <i className="ri-refresh-line text-xl text-gray-500"></i>
-                </div>
+                  <span className="text-gray-600">Làm mới</span>
+                  <div className="rotate-0 group-hover:rotate-90 transition-transform duration-500 cursor-pointer">
+                    <i className="ri-refresh-line text-xl text-gray-600"></i>
+                  </div>
+                </Button>
               </TooltipTrigger>
               <TooltipContent>
                 <p>Refresh</p>
@@ -122,12 +150,12 @@ const TableCustom = <TData, TValue>({
         </div>
         <div className="flex gap-x-2 items-center">
           <div className="flex-1 text-sm text-muted-foreground">
-            {pageIndex * pageSize}-
+            ({pageIndex * pageSize} -{" "}
             {pageIndex * pageSize + pageSize >=
             table.getCoreRowModel().rows.length
               ? table.getCoreRowModel().rows.length
-              : pageIndex * pageSize + pageSize}{" "}
-            trên {table.getCoreRowModel().rows.length} sản phẩm
+              : pageIndex * pageSize + pageSize}
+            ) trên {table.getCoreRowModel().rows.length} sản phẩm
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -153,7 +181,7 @@ const TableCustom = <TData, TValue>({
                         column.toggleVisibility(!!value)
                       }
                     >
-                      {column.id}
+                      {column.columnDef.meta as string}
                     </DropdownMenuCheckboxItem>
                   );
                 })}
@@ -161,7 +189,7 @@ const TableCustom = <TData, TValue>({
           </DropdownMenu>
         </div>
       </div>
-      <Table className="bg-white">
+      <Table className="bg-white relative z-0">
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow className="hover:bg-white" key={headerGroup.id}>

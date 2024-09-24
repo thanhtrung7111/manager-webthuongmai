@@ -70,7 +70,7 @@ const MenuItem = ({
     <div className="mb-5">
       {!compact ? (
         <p
-          className={`text-primary font-bold delay-1000 text-xs uppercase ${
+          className={`text-orange-300 font-bold delay-1000 text-xs uppercase ${
             !compact ? "opacity-100 visible" : "opacity-0 invisible"
           } transition-opacity mb-2`}
         >
@@ -88,7 +88,7 @@ const MenuItem = ({
           </TooltipProvider>
         </div>
       )}
-      <div>
+      <div className="flex flex-col gap-y-1">
         {Array.isArray(item[listName]) &&
           (item[listName] as MenuItemObject[]).length >= 1 &&
           (item[listName] as MenuItemObject[]).map((i) => {
@@ -111,7 +111,7 @@ const MenuItem = ({
     <div className={`relative flex justify-center ${"menuItem" + level}`}>
       {Array.isArray(item[listName]) ? (
         <div
-          className={`group/a hover:bg-primary-foreground flex justify-between py-2 px-3 cursor-pointer text-gray-500 hover:text-primary  rounded-sm ${
+          className={`group/a mb-1 hover:bg-primary-foreground flex justify-between py-2 px-3 cursor-pointer text-gray-500 hover:text-primary  rounded-sm ${
             level >= 3 ? "w-64" : "w-fit"
           }`}
         >
@@ -172,38 +172,38 @@ const MenuItem = ({
         </NavLink>
       )}
 
-      <div
-        className={`opacity-0 invisible rounded-md border absolute top-0 left-full bg-white h-fit ${
-          "menuItemChild" + level
-        }`}
-      >
-        <div className={`transition-[height] !h-full`}>
-          {Array.isArray(item[listName]) &&
-            (item[listName] as MenuItemObject[]).length >= 1 &&
-            (item[listName] as MenuItemObject[]).map((i, index) => {
-              return (
-                <MenuItem
-                  linkName={linkName}
-                  compact={compact}
-                  checkOpenChild={handleCheckOpen}
-                  key={level + index}
-                  level={level + 1}
-                  iconName={iconName}
-                  listName={listName}
-                  item={i}
-                  name={name}
-                ></MenuItem>
-              );
-            })}
+      {item[listName] && (
+        <div
+          className={`opacity-0 invisible rounded-md border absolute top-0 left-full bg-white h-fit ${
+            "menuItemChild" + level
+          }`}
+        >
+          <div className={`!h-full flex flex-col gap-y-1 relative py-2 px-2`}>
+            {Array.isArray(item[listName]) &&
+              (item[listName] as MenuItemObject[]).length >= 1 &&
+              (item[listName] as MenuItemObject[]).map((i, index) => {
+                return (
+                  <MenuItem
+                    linkName={linkName}
+                    compact={compact}
+                    checkOpenChild={handleCheckOpen}
+                    key={level + index}
+                    level={level + 1}
+                    iconName={iconName}
+                    listName={listName}
+                    item={i}
+                    name={name}
+                  ></MenuItem>
+                );
+              })}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   ) : (
     // Mở rộng menu
     <div
-      className={`relative ${"menuItem" + level} ${
-        compact ? "invisible opacity-0" : "visible opacity-100"
-      }`}
+      className={`relative ${"menuItem" + level} ${compact ? "w-0" : "w-full"}`}
     >
       {Array.isArray(item[listName]) ? (
         <div
@@ -268,34 +268,33 @@ const MenuItem = ({
         </NavLink>
       )}
       {/* Menu con   */}
-      <div
-        className={`${
-          open ? "w-full visible opacity-100" : "w-0 invisible opacity-0"
-        } border-l border-slate-200 ml-5 pl-2 transition-opacity pr-5`}
-      >
-        <div
-          ref={menuRef}
-          className={`h-0 ${"overflow-hidden"} max-h-full transition-[height]`}
-        >
-          {Array.isArray(item[listName]) &&
-            (item[listName] as MenuItemObject[]).length >= 1 &&
-            (item[listName] as MenuItemObject[]).map((i, index) => {
-              return (
-                <MenuItem
-                  compact={compact}
-                  linkName={linkName}
-                  checkOpenChild={handleCheckOpen}
-                  key={level + index}
-                  level={level + 1}
-                  iconName={iconName}
-                  listName={listName}
-                  item={i}
-                  name={name}
-                ></MenuItem>
-              );
-            })}
-        </div>
-      </div>
+      {Array.isArray(item[listName]) &&
+        (item[listName] as MenuItemObject[]).length >= 1 && (
+          <div className={`border-l border-slate-200 ml-5 pl-2 w-full pr-5`}>
+            <div
+              ref={menuRef}
+              className={`h-0 flex gap-y-1 flex-col overflow-hidden max-h-full transition-[height] duration-500`}
+            >
+              {Array.isArray(item[listName]) &&
+                (item[listName] as MenuItemObject[]).length >= 1 &&
+                (item[listName] as MenuItemObject[]).map((i, index) => {
+                  return (
+                    <MenuItem
+                      compact={compact}
+                      linkName={linkName}
+                      checkOpenChild={handleCheckOpen}
+                      key={level + index}
+                      level={level + 1}
+                      iconName={iconName}
+                      listName={listName}
+                      item={i}
+                      name={name}
+                    ></MenuItem>
+                  );
+                })}
+            </div>
+          </div>
+        )}
     </div>
   );
 };

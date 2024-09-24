@@ -12,7 +12,7 @@ const InputFormikForm = ({
 }: {
   label: string;
   important?: boolean;
-  disabled?: false;
+  disabled?: boolean;
   name: string;
   placeholder?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;

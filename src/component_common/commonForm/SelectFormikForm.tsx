@@ -66,7 +66,7 @@ const SelectFormikForm = ({
         {important && <span className="text-red-500">*</span>}
       </label>
       <div
-        className={`${
+        className={`bg-white ${
           meta.error && meta.touched ? "border-red-500" : "border-gray-200"
         } ${
           (disabled || loading) && "bg-slate-50"

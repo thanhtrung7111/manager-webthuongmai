@@ -87,10 +87,15 @@ export type CategoryObject = {
   LISTCODE: string;
 };
 
-export type DataExcelObject = {
+export type DataExcelPatternObject = {
   header: string;
   id: string;
   type: "list" | "single";
   dataDemo?: string | number;
   data?: string[];
+};
+
+export type DataExcelObject = {
+  header: string;
+  id: string;
 };

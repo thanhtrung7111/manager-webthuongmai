@@ -4,12 +4,16 @@ import React, { useState } from "react";
 const PasswordFormikForm = ({
   label,
   important = false,
+  disabled = false,
+  placeholder,
   name,
   ...props
 }: {
   label: string;
   name: string;
-  important: boolean;
+  disabled?: boolean;
+  important?: boolean;
+  placeholder?: string;
 }) => {
   const [field, meta, helpers] = useField(name);
   const [show, setShow] = useState(false);
@@ -27,6 +31,8 @@ const PasswordFormikForm = ({
         <input
           {...props}
           {...field}
+          disabled={disabled}
+          placeholder={placeholder}
           autoComplete="off"
           type={show ? "text" : "password"}
           className="outline-none flex-auto text-sm"

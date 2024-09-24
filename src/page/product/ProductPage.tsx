@@ -84,6 +84,7 @@ const ProductPage = () => {
     },
     {
       accessorKey: "PRDCNAME",
+      meta: "Tên sản phẩm",
       header: ({ column }) => {
         return (
           <Button
@@ -106,6 +107,7 @@ const ProductPage = () => {
     },
     {
       accessorKey: "QUOMNAME",
+      meta: "Đơn vị tính",
       header: ({ column }) => {
         return (
           <Button
@@ -139,7 +141,6 @@ const ProductPage = () => {
       enableHiding: false,
       cell: ({ row }) => {
         const payment = row.original;
-        console.log(payment);
         return (
           <div className="flex gap-x-2 justify-end">
             <ButtonForm
@@ -201,6 +202,7 @@ const ProductPage = () => {
           search={[
             { key: "PRDCCODE", name: "mã sản phẩm" },
             { key: "PRDCNAME", name: "tên sản phẩm" },
+            { key: "QUOMNAME", name: "đơn vị tính" },
           ]}
           isLoading={isFetching}
         ></TableCustom>

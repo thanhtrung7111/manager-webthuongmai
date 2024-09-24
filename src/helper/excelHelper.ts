@@ -1,8 +1,10 @@
-import { DataExcelObject } from "@/type/TypeCommon";
+import { DataExcelPatternObject } from "@/type/TypeCommon";
 import { dataTagSymbol } from "@tanstack/react-query";
 import Excel, { Workbook, Worksheet } from "exceljs";
 
-export const exportExcel = async (values: DataExcelObject[]): Promise<void> => {
+export const exportExcelPattern = async (
+  values: DataExcelPatternObject[]
+): Promise<void> => {
   const workbook = new Excel.Workbook();
   let lengtSheet = 0;
   const worksheet = workbook.addWorksheet("HEADER");
@@ -180,4 +182,14 @@ export const exportExcel = async (values: DataExcelObject[]): Promise<void> => {
     URL.revokeObjectURL(link.href);
     document.body.removeChild(link);
   }, 0);
+};
+
+export const exportExcelList = <TData extends { [key: string]: any }>(
+  list: TData[],
+  listProps: string[]
+) => {
+  const workbook = new Excel.Workbook();
+  const worksheet = workbook.addWorksheet("data");
+
+  console.log(list[0][listProps[0]]);
 };

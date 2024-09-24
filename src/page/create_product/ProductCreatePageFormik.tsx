@@ -18,7 +18,7 @@ import { Label } from "@/components/ui/label";
 import { useUserStore } from "@/store/userStore";
 import {
   CategoryObject,
-  DataExcelObject,
+  DataExcelPatternObject,
   ProductObject,
 } from "@/type/TypeCommon";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -28,7 +28,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import * as Yup from "yup";
 import Excel from "exceljs";
-import { exportExcel } from "@/helper/excelHelper";
+import { exportExcelPattern } from "@/helper/excelHelper";
 
 const breadBrumb = [
   {
@@ -367,7 +367,7 @@ const ProductCreatePageFormik = () => {
       ?.map((item: CategoryObject) => `${item.ITEMNAME}`)
       .join(",");
     console.log(arrayLstQUOM);
-    const dataExcelObject: DataExcelObject[] = [
+    const dataExcelObject: DataExcelPatternObject[] = [
       {
         id: "CompCode",
         type: "single",
@@ -702,7 +702,7 @@ const ProductCreatePageFormik = () => {
       },
     ];
 
-    await exportExcel(dataExcelObject);
+    await exportExcelPattern(dataExcelObject);
   };
 
   console.log(handlePostProduct.data);

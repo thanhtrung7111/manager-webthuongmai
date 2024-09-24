@@ -1,10 +1,7 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 import IconCompany from "@/assets/img/iconcompany.png";
 import {
-  Form,
   FormControl,
   FormDescription,
   FormField,
@@ -32,23 +29,27 @@ import {
 } from "@/components/ui/select";
 import { useUserStore } from "@/store/userStore";
 import { useNavigate } from "react-router-dom";
+import * as Yup from "yup";
+import { Form, Formik } from "formik";
+import InputFormikForm from "@/component_common/commonForm/InputFormikForm";
+import PasswordFormikForm from "@/component_common/commonForm/PasswordFormikForm";
+import ButtonForm from "@/component_common/commonForm/ButtonForm";
+import SelectFormikForm from "@/component_common/commonForm/SelectFormikForm";
 
-const formSchema = z.object({
-  username: z.string().min(6, {
-    message: "Tên đăng nhập không để trống và có ít nhất 6 kí tự!",
-  }),
-  password: z.string().min(6, {
-    message: "Mật khẩu không để trống và có ít nhất 6 kí tự!",
-  }),
+const formSchema = Yup.object().shape({
+  username: Yup.string().min(
+    6,
+    "Tên đăng nhập không để trống và có ít nhất 6 kí tự!"
+  ),
+  password: Yup.string().min(
+    6,
+    "Mật khẩu không để trống và có ít nhất 6 kí tự!"
+  ),
 });
 
-const formLocationSchema = z.object({
-  COMPCODE: z.string().min(1, {
-    message: "Chưa chọn công ty!",
-  }),
-  LCTNCODE: z.string().min(1, {
-    message: "Chưa chọn chi nhánh!",
-  }),
+const formLocationSchema = Yup.object().shape({
+  COMPCODE: Yup.string().min(1, "Chưa chọn công ty!"),
+  LCTNCODE: Yup.string().min(1, "Chưa chọn chi nhánh!"),
 });
 
 const LoginPage = () => {
@@ -65,6 +66,7 @@ const LoginPage = () => {
     mutationFn: (body: LoginObject) => loginUser(body),
     onSuccess: (data) => {
       setTokenUser(data?.TOKEN);
+      setLctnList(data?.COMPLIST[0]?.LCTNLIST);
     },
   });
 
@@ -78,23 +80,7 @@ const LoginPage = () => {
     },
   });
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      username: "",
-      password: "",
-    },
-  });
-
-  const formLocation = useForm<z.infer<typeof formLocationSchema>>({
-    resolver: zodResolver(formLocationSchema),
-    defaultValues: {
-      COMPCODE: "",
-      LCTNCODE: "",
-    },
-  });
-
-  const submitLogin = (values: z.infer<typeof formSchema>) => {
+  const submitLogin = (values: Yup.AnyObject) => {
     loginMutation.mutate({
       APP_CODE: "WSB",
       USERLGIN: values.username,
@@ -107,11 +93,11 @@ const LoginPage = () => {
     });
   };
 
-  const submitLocation = (values: z.infer<typeof formLocationSchema>) => {
+  const submitLocation = (values: any) => {
     loginLocationMutation.mutate(values);
   };
   console.log(lctnList);
-  console.log(loginLocationMutation.data);
+  console.log(loginMutation.data);
   return (
     <div className="w-[900px] h-[500px] grid grid-cols-2 justify-center border border-gray-200 shadow-lg">
       <div className="bg-gradient-to-r from-[#C7977C] to-[#09B291] h-full flex items-center justify-center">
@@ -128,182 +114,102 @@ const LoginPage = () => {
           } transition-transform duration-150`}
         >
           <div className="px-10">
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(submitLogin)}
-                className="flex flex-col gap-y-3"
-              >
-                <h5 className="text-center text-3xl mb-5 text-primary font-semibold">
-                  Đăng nhập
-                </h5>
-                <FormField
-                  control={form.control}
-                  name="username"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-600">
-                        Tên đăng nhập{" "}
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Nhập tên đăng nhập..."
-                          disabled={loginMutation.isPending}
-                          className="focus:!ring-0 focus:!ring-transparent text-gray-700"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage className="text-xs font-light" />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-600">Mật khẩu</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="Nhập mật khẩu..."
-                          disabled={loginMutation.isPending}
-                          {...field}
-                          className="focus:!ring-0 focus:!ring-transparent text-gray-700"
-                        />
-                      </FormControl>
-                      <FormMessage className="text-xs font-light" />
-                    </FormItem>
-                  )}
-                />
-                <Button
-                  disabled={loginMutation.isPending}
-                  type="submit"
-                  className="w-full disabled:bg-slate-600 mt-2"
-                >
-                  {loginMutation.isPending ? (
-                    <SpinnerLoading className="w-4 h-4 fill-primary"></SpinnerLoading>
-                  ) : (
-                    "Đăng nhập"
-                  )}
-                </Button>
-              </form>
-            </Form>
+            <Formik
+              initialValues={{ username: "", password: "" }}
+              validationSchema={formSchema}
+              onSubmit={(values) => {
+                submitLogin(values);
+              }}
+            >
+              {({}) => (
+                <Form id="formLogin" className="flex flex-col gap-y-3">
+                  <h5 className="text-center text-3xl mb-5 text-primary font-semibold">
+                    Đăng nhập
+                  </h5>
+                  <InputFormikForm
+                    label="Tên đăng nhập"
+                    name="username"
+                    disabled={loginMutation.isPending}
+                    placeholder="Nhập tên đăng nhập..."
+                  ></InputFormikForm>
+                  <PasswordFormikForm
+                    label="Mật khẩu"
+                    name="password"
+                    disabled={loginMutation.isPending}
+                    placeholder="Nhập mật khẩu..."
+                  ></PasswordFormikForm>
+                  <ButtonForm
+                    type="submit"
+                    label="Đăng nhập"
+                    loading={loginMutation.isPending}
+                  ></ButtonForm>
+                </Form>
+              )}
+            </Formik>
           </div>
           <div className="px-10">
-            <Form {...formLocation}>
-              <form
-                onSubmit={formLocation.handleSubmit(submitLocation)}
-                className="flex flex-col gap-y-3"
-              >
-                <h5 className="text-center text-3xl mb-5 text-primary font-semibold">
-                  Chọn chi nhánh
-                </h5>
-                <FormField
-                  control={formLocation.control}
-                  name="COMPCODE"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-600">
-                        Chọn công ty
-                      </FormLabel>
-                      <Select
-                        onValueChange={(value: string) => {
-                          setLctnList(
-                            loginMutation.data?.COMPLIST.find(
-                              (item: CompcodeObject) => item.COMPCODE == value
-                            )?.LCTNLIST
-                          );
-                          formLocation.setValue("COMPCODE", value);
-                          formLocation.setValue("LCTNCODE", "");
-                        }}
-                        defaultValue={field.value}
-                        disabled={loginLocationMutation.isPending}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
-                            <SelectValue className="" placeholder="Công ty" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {loginMutation.data &&
-                            loginMutation.isSuccess &&
-                            loginMutation.data?.COMPLIST.map(
-                              (item: CompcodeObject, index: number) => {
-                                return (
-                                  <SelectItem value={item.COMPCODE}>
-                                    {item.COMPNAME}
-                                  </SelectItem>
-                                );
-                              }
-                            )}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage className="text-xs font-light" />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={formLocation.control}
-                  name="LCTNCODE"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-600">
-                        Chọn chi nhánh
-                      </FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        disabled={loginLocationMutation.isPending}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="focus:!ring-0 focus:!ring-transparent">
-                            <SelectValue placeholder="Chi nhánh" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {lctnList.map(
-                            (item: LctnCodeObject, index: number) => {
-                              return (
-                                <SelectItem value={item.LCTNCODE}>
-                                  {item.LCTNNAME}
-                                </SelectItem>
-                              );
-                            }
-                          )}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage className="text-xs font-light" />
-                    </FormItem>
-                  )}
-                />
-                <div className="flex items-center gap-x-2 mt-2">
-                  <Button
-                    disabled={loginLocationMutation.isPending}
-                    type="button"
-                    onClick={() => {
-                      removeTokenUser();
-                      formLocation.resetField("COMPCODE");
-                      formLocation.resetField("LCTNCODE");
-                      loginMutation.reset();
+            <Formik
+              initialValues={{ username: "", password: "" }}
+              validationSchema={formSchema}
+              onSubmit={(values) => {
+                submitLocation(values);
+              }}
+            >
+              {({}) => (
+                <Form id="formLogin" className="flex flex-col gap-y-3">
+                  {" "}
+                  <h5 className="text-center text-3xl mb-5 text-primary font-semibold">
+                    Chọn chi nhánh
+                  </h5>
+                  <SelectFormikForm
+                    options={
+                      loginMutation.data && loginMutation.isSuccess
+                        ? loginMutation.data?.COMPLIST
+                        : []
+                    }
+                    itemKey={"COMPCODE"}
+                    itemValue={"COMPNAME"}
+                    important={true}
+                    name="COMPCODE"
+                    onChange={(e) => {
+                      console.log(e);
+                      setLctnList(
+                        loginMutation.data?.COMPLIST.find(
+                          (item: CompcodeObject) => item.COMPCODE == e.COMPCODE
+                        )?.LCTNLIST
+                      );
                     }}
-                    className="w-full disabled:bg-slate-600 bg-slate-600 hover:bg-slate-600"
-                  >
-                    Quay lại
-                  </Button>
-                  <Button
-                    disabled={loginLocationMutation.isPending}
-                    type="submit"
-                    className="w-full disabled:bg-slate-600"
-                  >
-                    {loginLocationMutation.isPending ? (
-                      <SpinnerLoading className="w-4 h-4 fill-primary"></SpinnerLoading>
-                    ) : (
-                      "Tiếp tục"
-                    )}
-                  </Button>
-                </div>
-              </form>
-            </Form>
+                    label={"Đơn vị tính"}
+                  ></SelectFormikForm>{" "}
+                  <SelectFormikForm
+                    options={lctnList}
+                    itemKey={"LCTNCODE"}
+                    itemValue={"LCTNNAME"}
+                    important={true}
+                    name="LCTNCODE"
+                    label={"Đơn vị tính"}
+                  ></SelectFormikForm>{" "}
+                  <div className="grid grid-cols-2 gap-x-2 mt-2">
+                    <ButtonForm
+                      type="button"
+                      label="Quay lại"
+                      onClick={() => {
+                        removeTokenUser();
+                        loginMutation.reset();
+                      }}
+                      className=" disabled:bg-slate-600 bg-slate-600 hover:bg-slate-600"
+                      disabled={loginLocationMutation.isPending}
+                    ></ButtonForm>
+                    <ButtonForm
+                      type="submit"
+                      label="Tiếp tục"
+                      className=" disabled:bg-slate-60"
+                      loading={loginLocationMutation.isPending}
+                    ></ButtonForm>
+                  </div>
+                </Form>
+              )}
+            </Formik>
           </div>
         </div>
       </div>
