@@ -104,7 +104,10 @@ const SelectFormikForm = ({
                 setShow(false);
               }}
               disabled={disabled || loading}
-              onChange={(e) => filterChange(e)}
+              onChange={(e) => {
+                setShow(true);
+                filterChange(e);
+              }}
               value={selected && selected[`${itemValue}`]}
               autoComplete="off"
               className="flex-auto outline-none disabled:bg-transparent"
@@ -134,7 +137,7 @@ const SelectFormikForm = ({
               Không có mục bạn tìm kiếm...
             </div>
           ) : (
-            dataFilter.map((item) => {
+            dataFilter.map((item,index) => {
               return (
                 <div
                   onClick={() => handleSelectItem(item)}

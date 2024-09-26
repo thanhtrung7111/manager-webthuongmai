@@ -25,8 +25,18 @@ const menu = [
       },
       {
         itemName: "Người dùng",
-        link: "/account",
         itemIcon: <i className="ri-shape-2-line"></i>,
+        itemList: [
+          {
+            itemName: "Danh sách sản phẩm",
+            itemIcon: <i className="ri-instance-line"></i>,
+          },
+          {
+            itemName: "Tạo mới",
+            itemIcon: <i className="ri-file-add-line"></i>,
+            link: "/create_product",
+          },
+        ],
       },
       {
         itemName: "Loại hàng",
@@ -81,7 +91,7 @@ const Sidebar = () => {
     <div
       className={`hidden shrink-0 lg:flex ${
         !open ? "w-20" : "w-72"
-      } border-r bg-white  flex-col justify-between border-gray-100 h-screen sticky top-0 transition-[width] duration-300 z-[999]`}
+      } border-r bg-white  flex-col justify-between border-gray-100 h-screen sticky top-0 transition-[width] duration-300 z-[20]`}
     >
       <div
         className={`absolute w-8 h-8 top-32 -translate-y-1/2 -translate-x-1/2 -right-6   border border-gray-300 rounded-sm flex items-center justify-center z-10 bg-white cursor-pointer`}

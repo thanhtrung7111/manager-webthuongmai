@@ -189,7 +189,7 @@ const TableCustom = <TData, TValue>({
           </DropdownMenu>
         </div>
       </div>
-      <Table className="bg-white relative z-0">
+      <Table id="table" className="bg-white relative z-0">
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow className="hover:bg-white" key={headerGroup.id}>
@@ -234,7 +234,7 @@ const TableCustom = <TData, TValue>({
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
+              <TableCell colSpan={columns.length} className="h-20 text-center">
                 No results.
               </TableCell>
             </TableRow>
@@ -247,7 +247,10 @@ const TableCustom = <TData, TValue>({
             size={table.getFilteredRowModel().rows.length}
             pageIndex={pageIndex + 1}
             pageSize={pageSize}
-            onPageChange={(value) => setPageIndex(value - 1)}
+            onPageChange={(value) => {
+              setPageIndex(value - 1);
+              // window.scrollTo("table");
+            }}
           ></PaginationCustom>
         </div>
       )}
