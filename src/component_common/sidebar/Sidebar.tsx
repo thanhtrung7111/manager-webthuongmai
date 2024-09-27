@@ -69,6 +69,11 @@ const menu = [
         itemIcon: <i className="ri-advertisement-line"></i>,
         link: "/advertisement",
       },
+      {
+        itemName: "Tin nhắn",
+        itemIcon: <i className="ri-advertisement-line"></i>,
+        link: "/messages",
+      },
     ],
   },
 ];

@@ -15,6 +15,7 @@ import SpinnerLoading from "./component_common/loading/SpinnerLoading";
 import ProductCreatePage from "./page/create_product/ProductCreatePage";
 import { Toaster } from "sonner";
 import ProductCreatePageFormik from "./page/create_product/ProductCreatePageFormik";
+import MessagesPage from "./page/message/MessagesPage";
 
 function App() {
   const { currentUser, tokenInitial, setTokenInitial } = useUserStore();
@@ -69,6 +70,10 @@ function App() {
             <Route
               element={<DashboardRevenuePage></DashboardRevenuePage>}
               path="/dashboard_revenue"
+            ></Route>
+            <Route
+              element={<MessagesPage></MessagesPage>}
+              path="/messages"
             ></Route>
           </Route>
           <Route
