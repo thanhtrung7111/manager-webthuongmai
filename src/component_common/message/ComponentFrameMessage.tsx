@@ -62,12 +62,13 @@ const ComponentFrameMessage = () => {
   console.log(messages);
   return (
     <div className="fixed bottom-0 right-0 z-20 flex items-end">
-      <div className="flex gap-x-2">
+      <div className="flex gap-x-2 items-end">
         {messages
           .filter((item) => item.minimizeFrame == true)
           .map((item: MessageObject) => {
             return (
               <MessageFrame
+                key={item.id}
                 name={"name"}
                 id={"id"}
                 messageObject={item}
@@ -99,8 +100,8 @@ const ComponentFrameMessage = () => {
 
         <Popover>
           <PopoverTrigger asChild>
-            <div className="relative cursor-pointer  bg-white">
-              <div className="size-12 flex items-center justify-center bg-gray-500 rounded-full">
+            <div className="relative cursor-pointer">
+              <div className="size-12 flex items-center justify-center shadow-md bg-gray-500 rounded-full">
                 <i className="ri-message-3-fill text-gray-100"></i>
               </div>
             </div>

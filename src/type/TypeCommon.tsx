@@ -91,8 +91,10 @@ export type DataExcelPatternObject = {
   header: string;
   id: string;
   type: "list" | "single";
+  dataKey?: string;
+  dataName?: string;
   dataDemo?: string | number;
-  data?: string[];
+  data?: any[];
 };
 
 export type DataExcelObject = {

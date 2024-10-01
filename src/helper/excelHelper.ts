@@ -8,6 +8,7 @@ export const exportExcelPattern = async (
   const workbook = new Excel.Workbook();
   let lengtSheet = 0;
   const worksheet = workbook.addWorksheet("HEADER");
+  const worksheetData = workbook.addWorksheet("sheetInput");
   const sheetFilter = workbook.addWorksheet("sheetFilter");
 
   const columns: any[] = [];
@@ -16,6 +17,7 @@ export const exportExcelPattern = async (
     columns.push({
       header: item.id,
       key: item.id,
+
       width: 30,
     });
   }
@@ -68,6 +70,58 @@ export const exportExcelPattern = async (
       },
     };
   });
+
+  // WORKISHEET DATA
+  worksheetData.columns = columns;
+
+  worksheetData.getRow(1).eachCell((cell) => {
+    cell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "059669" },
+    };
+    cell.font = {
+      bold: true, // In đậm
+      color: { argb: "FFFFFFFF" }, // Màu chữ (trắng)
+    };
+    cell.alignment = {
+      horizontal: "center",
+      vertical: "middle",
+    };
+    cell.border = {
+      right: {
+        color: {
+          argb: "FAFAFA",
+        },
+        style: "thin",
+      },
+    };
+  });
+  worksheetData.getRow(3).eachCell((cell) => {
+    cell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "059669" },
+    };
+    cell.font = {
+      bold: true, // In đậm
+      color: { argb: "FFFFFFFF" }, // Màu chữ (trắng)
+    };
+    cell.alignment = {
+      horizontal: "center",
+      vertical: "middle",
+    };
+    cell.border = {
+      right: {
+        color: {
+          argb: "FAFAFA",
+        },
+        style: "thin",
+      },
+    };
+  });
+
+  worksheetData.getRow(1).height = 30;
   worksheet.getRow(1).height = 30;
   sheetFilter.getRow(1).height = 30;
 
@@ -111,19 +165,64 @@ export const exportExcelPattern = async (
     horizontal: "center",
     vertical: "middle",
   };
+  values.forEach((item, index) => {
+    worksheetData.getCell(2, index + 1).value = "";
+  });
+  values.forEach((item, index) => {
+    worksheetData.getCell(3, index + 1).value = item.header;
+  });
+  worksheetData.getRow(2).height = 30;
+  worksheetData.getRow(2).font = {
+    bold: true, // In đậm
+    color: { argb: "059669" }, // Màu chữ (trắng)
+  };
+  worksheetData.getRow(2).alignment = {
+    horizontal: "center",
+    vertical: "middle",
+  };
+  worksheetData.getRow(3).height = 30;
+  worksheetData.getRow(3).fill = {
+    type: "pattern",
+    pattern: "solid",
+    fgColor: { argb: "059669" },
+  };
+
+  worksheetData.getRow(3).font = {
+    bold: true, // In đậm
+    color: { argb: "FFFFFFFF" }, // Màu chữ (trắng)
+  };
+  worksheetData.getRow(3).border = {
+    right: {
+      color: {
+        argb: "FAFAFA",
+      },
+      style: "thin",
+    },
+  };
+  worksheetData.getRow(3).alignment = {
+    horizontal: "center",
+    vertical: "middle",
+  };
   values.forEach((item) => {
     dataDemo.push(item.dataDemo);
   });
 
+  worksheetData.getRow(4).values = dataDemo;
+  worksheetData.getRow(5).values = dataDemo;
   worksheet.getRow(4).values = dataDemo;
   worksheet.getRow(5).values = dataDemo;
-  values.forEach((item) => {
+  values.forEach((item, index) => {
     if (item.type == "list") {
       lengtSheet++;
-      item.data?.forEach((i: string, index) => {
+      sheetFilter.getColumn(lengtSheet).border = {
+        left: {
+          style: "dashed",
+        },
+      };
+      item.data?.forEach((i: any, index) => {
         if (index + 1 == 1) {
           sheetFilter.getCell(index + 1, lengtSheet).value =
-            "Danh sách " + item.header.toLocaleLowerCase();
+            "Danh sách ID " + item.header.toLocaleLowerCase();
           sheetFilter.getCell(index + 1, lengtSheet).fill = {
             type: "pattern",
             pattern: "solid",
@@ -143,22 +242,82 @@ export const exportExcelPattern = async (
           };
           return;
         }
-        sheetFilter.getCell(index + 1, lengtSheet).value = i;
+        sheetFilter.getCell(index + 1, lengtSheet).value =
+          i[`${item.dataName}`];
       });
       sheetFilter.getColumn(lengtSheet).width = 30;
-      worksheet.getColumnKey(item.id).eachCell((cell, rowNumber) => {
+      lengtSheet++;
+      sheetFilter.getColumn(lengtSheet).border = {
+        right: {
+          style: "dashed",
+        },
+      };
+      item.data?.forEach((i: any, index) => {
+        if (index + 1 == 1) {
+          sheetFilter.getCell(index + 1, lengtSheet).value =
+            "Danh sách tên " + item.header.toLocaleLowerCase();
+          sheetFilter.getCell(index + 1, lengtSheet).fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "ef4444" },
+          };
+          sheetFilter.getCell(index + 1, lengtSheet).font = {
+            bold: true, // In đậm
+            color: { argb: "FFFFFFFF" }, // Màu chữ (trắng)
+          };
+          sheetFilter.getCell(index + 1, lengtSheet).border = {
+            right: {
+              color: {
+                argb: "FAFAFA",
+              },
+              style: "thin",
+            },
+          };
+          return;
+        }
+        sheetFilter.getCell(index + 1, lengtSheet).value = i[`${item.dataKey}`];
+      });
+      sheetFilter.getColumn(lengtSheet).width = 30;
+      worksheetData.getColumnKey(item.id).eachCell((cell, rowNumber) => {
         if (rowNumber > 3) {
           cell.dataValidation = {
             type: "list",
             allowBlank: true,
             formulae: [
-              `'sheetFilter'!${sheetFilter.getColumn(lengtSheet).letter}2:${
-                sheetFilter.getColumn(lengtSheet).letter
-              }${item.data?.length}`,
+              `'sheetFilter'!${
+                sheetFilter.getColumn(lengtSheet - 1).letter
+              }$2:${sheetFilter.getColumn(lengtSheet - 1).letter}$${
+                item.data?.length
+              }`,
             ], // Danh sách các giá trị, ngăn cách bởi dấu phẩy
             showErrorMessage: true,
             errorTitle: "Lựa chọn không có giá trị",
             error: "Vui lòng chọn trong danh sách",
+          };
+        }
+      });
+      worksheet.getColumnKey(item.id).eachCell((cell, rowNumber) => {
+        if (rowNumber > 3) {
+          console.log(lengtSheet, sheetFilter.getColumn(lengtSheet).letter);
+          cell.value = {
+            formula: `VLOOKUP('sheetInput'!${
+              worksheet.getColumnKey(item.id).letter
+            }${rowNumber}, 'sheetFilter'!${
+              sheetFilter.getColumn(lengtSheet - 1).letter
+            }$2:${sheetFilter.getColumn(lengtSheet).letter}$${
+              item.data?.length ? item.data?.length + 1 : 0
+            }, 2, FALSE)`, // Tra cứu chuỗi rút gọn từ cột C dựa trên ID trong cột A
+          };
+        }
+      });
+    } else {
+      worksheet.getColumnKey(item.id).eachCell((cell, rowNumber) => {
+        if (rowNumber > 3) {
+          console.log(worksheetData.getColumnKey(item.id).letter, rowNumber);
+          cell.value = {
+            formula: `'sheetInput'!${
+              worksheetData.getColumnKey(item.id).letter
+            }${rowNumber}`, // Tra cứu chuỗi rút gọn từ cột C dựa trên ID trong cột A
           };
         }
       });

@@ -16,6 +16,8 @@ import ProductCreatePage from "./page/create_product/ProductCreatePage";
 import { Toaster } from "sonner";
 import ProductCreatePageFormik from "./page/create_product/ProductCreatePageFormik";
 import MessagesPage from "./page/message/MessagesPage";
+import PromotionPage from "./page/promotion/PromotionPage";
+import NotifycationComponent from "./page/NotifycationComponent";
 
 function App() {
   const { currentUser, tokenInitial, setTokenInitial } = useUserStore();
@@ -74,6 +76,14 @@ function App() {
             <Route
               element={<MessagesPage></MessagesPage>}
               path="/messages"
+            ></Route>
+            <Route
+              element={<PromotionPage></PromotionPage>}
+              path="/promotion"
+            ></Route>
+              <Route
+              element={<NotifycationComponent></NotifycationComponent>}
+              path="/notify"
             ></Route>
           </Route>
           <Route

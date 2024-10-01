@@ -389,44 +389,37 @@ const ProductCreatePageFormik = () => {
       {
         id: "QUOMCODE",
         type: "list",
-        data: [
-          "",
-
-          ...lstQUOM.map((item: CategoryObject) => `${item.ITEMCODE}`),
-        ],
-        dataDemo: lstQUOM[0].ITEMCODE,
+        data: [null, ...lstQUOM],
+        dataKey: "ITEMCODE",
+        dataName: "ITEMNAME",
+        dataDemo: lstQUOM[0].ITEMNAME,
         header: "Đơn vị tính",
       },
       {
         id: "DCMNSBCD",
         type: "list",
-        data: [
-          "",
-          ...lstDcmnSbCd.map((item: CategoryObject) => `${item.ITEMCODE}`),
-        ],
-        dataDemo: lstDcmnSbCd[0].ITEMCODE,
+        data: [null, ...lstDcmnSbCd],
+        dataKey: "ITEMCODE",
+        dataName: "ITEMNAME",
+        dataDemo: lstDcmnSbCd[0].ITEMNAME,
         header: "Phân loại",
       },
       {
         id: "BRNDCODE",
         type: "list",
-        data: [
-          "",
-
-          ...lstProductBrand.map((item: CategoryObject) => `${item.ITEMCODE}`),
-        ],
-        dataDemo: lstProductBrand[0].ITEMCODE,
+        data: [null, ...lstProductBrand],
+        dataKey: "ITEMCODE",
+        dataName: "ITEMNAME",
+        dataDemo: lstProductBrand[0].ITEMNAME,
         header: "Thương hiệu",
       },
       {
         id: "COLRCODE",
         type: "list",
-        data: [
-          "",
-
-          ...lstColor.map((item: CategoryObject) => `${item.ITEMCODE}`),
-        ],
-        dataDemo: lstColor[0].ITEMCODE,
+        data: [null, ...lstColor],
+        dataKey: "ITEMCODE",
+        dataName: "ITEMNAME",
+        dataDemo: lstColor[0].ITEMNAME,
         header: "Màu sắc",
       },
       {
@@ -438,47 +431,37 @@ const ProductCreatePageFormik = () => {
       {
         id: "VAT_RATE",
         type: "list",
-        data: [
-          "",
-
-          ...lstSpndSgDt_Tax_RaNm.map(
-            (item: CategoryObject) => `${item.ITEMCODE}`
-          ),
-        ],
-        dataDemo: lstSpndSgDt_Tax_RaNm[0].ITEMCODE,
+        data: [null, ...lstSpndSgDt_Tax_RaNm],
+        dataKey: "ITEMCODE",
+        dataName: "ITEMNAME",
+        dataDemo: lstSpndSgDt_Tax_RaNm[0].ITEMNAME,
         header: "Thuế suất(%)",
       },
       {
         id: "PRDCOPTN",
         type: "list",
-        data: [
-          "",
-
-          ...lstEnum_PrdcOptn.map((item: CategoryObject) => `${item.ITEMCODE}`),
-        ],
-        dataDemo: lstEnum_PrdcOptn[0].ITEMCODE,
+        data: [null, ...lstEnum_PrdcOptn],
+        dataKey: "ITEMCODE",
+        dataName: "ITEMNAME",
+        dataDemo: lstEnum_PrdcOptn[0].ITEMNAME,
         header: "Tính chất sản phẩm",
       },
       {
         id: "SORTCODE",
         type: "list",
-        data: [
-          "",
-
-          ...lstSortCode.map((item: CategoryObject) => `${item.ITEMCODE}`),
-        ],
-        dataDemo: lstSortCode[0].ITEMCODE,
+        data: [null, ...lstSortCode],
+        dataKey: "ITEMCODE",
+        dataName: "ITEMNAME",
+        dataDemo: lstSortCode[0].ITEMNAME,
         header: "Loại hàng hóa",
       },
       {
         id: "GRPRCODE",
         type: "list",
-        data: [
-          "",
-
-          ...lstProductGroup.map((item: CategoryObject) => `${item.ITEMCODE}`),
-        ],
-        dataDemo: lstProductGroup[0].ITEMCODE,
+        data: [null, ...lstProductGroup],
+        dataKey: "ITEMCODE",
+        dataName: "ITEMNAME",
+        dataDemo: lstProductGroup[0].ITEMNAME,
         header: "Nhóm hàng",
       },
       {
@@ -496,12 +479,10 @@ const ProductCreatePageFormik = () => {
       {
         id: "SCTNCODE",
         type: "list",
-        data: [
-          "",
-
-          ...lstPrdcSection.map((item: CategoryObject) => `${item.ITEMCODE}`),
-        ],
-        dataDemo: lstPrdcSection[0].ITEMCODE,
+        data: [null, ...lstPrdcSection],
+        dataKey: "ITEMCODE",
+        dataName: "ITEMNAME",
+        dataDemo: lstPrdcSection[0].ITEMNAME,
         header: "Ngành hàng",
       },
       {
@@ -513,12 +494,10 @@ const ProductCreatePageFormik = () => {
       {
         id: "QUOMRPRT",
         type: "list",
-        data: [
-          "",
-
-          ...lstQUOM.map((item: CategoryObject) => `${item.ITEMCODE}`),
-        ],
-        dataDemo: lstQUOM[0].ITEMCODE,
+        data: [null, ...lstQUOM],
+        dataKey: "ITEMCODE",
+        dataName: "ITEMNAME",
+        dataDemo: lstQUOM[0].ITEMNAME,
         header: "Đơn vị báo cáo",
       },
       {
@@ -530,12 +509,10 @@ const ProductCreatePageFormik = () => {
       {
         id: "MNFRCOST",
         type: "list",
-        data: [
-          "",
-
-          ...lstPrdcMchn.map((item: CategoryObject) => `${item.ITEMCODE}`),
-        ],
-        dataDemo: lstPrdcMchn[0].ITEMCODE,
+        data: [null, ...lstPrdcMchn],
+        dataKey: "ITEMCODE",
+        dataName: "ITEMNAME",
+        dataDemo: lstPrdcMchn[0].ITEMNAME,
         header: "Loại gia công",
       },
       {
@@ -577,51 +554,37 @@ const ProductCreatePageFormik = () => {
       {
         id: "GRP_MNFR",
         type: "list",
-        data: [
-          "",
-
-          ...lstProductGroupMnfr.map(
-            (item: CategoryObject) => `${item.ITEMCODE}`
-          ),
-        ],
-        dataDemo: lstProductGroupMnfr[0].ITEMCODE,
+        data: [null, ...lstProductGroupMnfr],
+        dataKey: "ITEMCODE",
+        dataName: "ITEMNAME",
+        dataDemo: lstProductGroupMnfr[0].ITEMNAME,
         header: "Nhóm hàng sản xuẩt",
       },
       {
         id: "MNFRTYPE",
         type: "list",
-        data: [
-          "",
-
-          ...lstMnfrType_inpPrdcOdMt.map(
-            (item: CategoryObject) => `${item.ITEMCODE}`
-          ),
-        ],
-        dataDemo: lstMnfrType_inpPrdcOdMt[0].ITEMCODE,
+        data: [null, ...lstMnfrType_inpPrdcOdMt],
+        dataKey: "ITEMCODE",
+        dataName: "ITEMNAME",
+        dataDemo: lstMnfrType_inpPrdcOdMt[0].ITEMNAME,
         header: "Loại sản xuất",
       },
       {
         id: "STDRQUOM",
         type: "list",
-        data: [
-          "",
-
-          ...lstStdrQUOM.map((item: CategoryObject) => `${item.ITEMCODE}`),
-        ],
-        dataDemo: lstStdrQUOM[0].ITEMCODE,
+        data: [null, ...lstStdrQUOM],
+        dataKey: "ITEMCODE",
+        dataName: "ITEMNAME",
+        dataDemo: lstStdrQUOM[0].ITEMNAME,
         header: "Tính gia công sản xuất",
       },
       {
         id: "SET_MTRL",
         type: "list",
-        data: [
-          "",
-
-          ...lstProduct_Set_Mtrl.map(
-            (item: CategoryObject) => `${item.ITEMCODE}`
-          ),
-        ],
-        dataDemo: lstProduct_Set_Mtrl[0].ITEMCODE,
+        data: [null, ...lstProduct_Set_Mtrl],
+        dataKey: "ITEMCODE",
+        dataName: "ITEMNAME",
+        dataDemo: lstProduct_Set_Mtrl[0].ITEMNAME,
         header: "Khai báo định mức",
       },
       {
@@ -651,47 +614,37 @@ const ProductCreatePageFormik = () => {
       {
         id: "ASTPCODE",
         type: "list",
-        data: [
-          "",
-
-          ...lstAssetType.map((item: CategoryObject) => `${item.ITEMCODE}`),
-        ],
-        dataDemo: lstAssetType[0].ITEMCODE,
+        data: [null, ...lstAssetType],
+        dataKey: "ITEMCODE",
+        dataName: "ITEMNAME",
+        dataDemo: lstAssetType[0].ITEMNAME,
         header: "Loại tài sản",
       },
       {
         id: "SBTPCODE",
         type: "list",
-        data: [
-          "",
-
-          ...lstAssetSubType.map((item: CategoryObject) => `${item.ITEMCODE}`),
-        ],
-        dataDemo: lstAssetSubType[0].ITEMCODE,
+        data: [null, ...lstAssetSubType],
+        dataKey: "ITEMCODE",
+        dataName: "ITEMNAME",
+        dataDemo: lstAssetSubType[0].ITEMNAME,
         header: "Phân loại tài sản",
       },
       {
         id: "ATTRCODE",
         type: "list",
-        data: [
-          "",
-
-          ...lstAsstSgAt.map((item: CategoryObject) => `${item.ITEMCODE}`),
-        ],
-        dataDemo: lstAsstSgAt[0].ITEMCODE,
+        data: [null, ...lstAsstSgAt],
+        dataKey: "ITEMCODE",
+        dataName: "ITEMNAME",
+        dataDemo: lstAsstSgAt[0].ITEMNAME,
         header: "Nhóm tài sản quản lí",
       },
       {
         id: "ATTPCODE",
         type: "list",
-        data: [
-          "",
-
-          ...lstAssetAttribute.map(
-            (item: CategoryObject) => `${item.ITEMCODE}`
-          ),
-        ],
-        dataDemo: lstAssetAttribute[0].ITEMCODE,
+        data: [null, ...lstAssetAttribute],
+        dataKey: "ITEMCODE",
+        dataName: "ITEMNAME",
+        dataDemo: lstAssetAttribute[0].ITEMNAME,
         header: "Chủng loại tài sản",
       },
       {

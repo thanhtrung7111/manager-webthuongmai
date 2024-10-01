@@ -1,12 +1,16 @@
 import ComponentFrameMessage from "@/component_common/message/ComponentFrameMessage";
 import Navbar from "@/component_common/navbar/Navbar";
 import Sidebar from "@/component_common/sidebar/Sidebar";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 
 const AppCommon = () => {
+  const location = useLocation();
+
   return (
     <div className="block h-screen">
-      <ComponentFrameMessage></ComponentFrameMessage>
+      {location.pathname.indexOf("/messages") < 0 && (
+        <ComponentFrameMessage></ComponentFrameMessage>
+      )}
       <div className="flex h-full">
         <Sidebar></Sidebar>
         <div className="flex-auto h-screen overflow-y-scroll flex flex-col bg-slate-50">
