@@ -43,6 +43,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { any } from "zod";
+import ComboboxCustom from "../common_form/ComboboxCustom";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -104,7 +106,7 @@ const TableCustom = <TData, TValue>({
             </PopoverTrigger>
             <PopoverContent className="flex flex-col gap-y-2" align="start">
               {search.map((item: SearchObjectProduct) => {
-                return (
+                return item.type == "text" ? (
                   <input
                     placeholder={`Nhập ${item.name} tìm kiếm...`}
                     className="outline-none rounded-md border border-gray-300 text-sm py-2 px-3"
@@ -116,6 +118,21 @@ const TableCustom = <TData, TValue>({
                       setPageIndex(0);
                     }}
                   ></input>
+                ) : (
+                  <ComboboxCustom
+                    dataList={
+                      item.dataList && item.dataList?.length > 1
+                        ? item.dataList
+                        : []
+                    }
+                    dataKey={item.dataKey ? item.dataKey : ""}
+                    dataName={item.dataName ? item.dataName : ""}
+                    placeholder={item.name}
+                    onChange={(value) => {
+                      table.getColumn(`${item.key}`)?.setFilterValue(value);
+                      setPageIndex(0);
+                    }}
+                  ></ComboboxCustom>
                 );
               })}
             </PopoverContent>

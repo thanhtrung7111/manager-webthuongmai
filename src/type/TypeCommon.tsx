@@ -70,9 +70,17 @@ export type Payment = {
   email: string;
 };
 
+export type CommonObject = {
+  [key: string]: any;
+};
+
 export type SearchObjectProduct = {
   key: string;
   name: string;
+  type: "text" | "combobox";
+  dataList?: CommonObject[];
+  dataKey?: keyof CommonObject;
+  dataName?: keyof CommonObject;
 };
 
 export type CategoryObject = {
@@ -100,4 +108,21 @@ export type DataExcelPatternObject = {
 export type DataExcelObject = {
   header: string;
   id: string;
+};
+
+export type AdvertisementObject = {
+  COMPCODE: string;
+  LCTNCODE: string;
+  BANRCODE: string;
+  BANRNAME: string;
+  BANRTYPE: string;
+  OBJCTYPE: number;
+  OBJCCODE: string;
+  BANR_RUN: number;
+  DDDD: string;
+  ACCERGHT: number;
+  STTESIGN: number;
+  STTENAME: string;
+  KKKK0000: string;
+  DCMNFILE: any[];
 };

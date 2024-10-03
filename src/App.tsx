@@ -18,6 +18,7 @@ import ProductCreatePageFormik from "./page/create_product/ProductCreatePageForm
 import MessagesPage from "./page/message/MessagesPage";
 import PromotionPage from "./page/promotion/PromotionPage";
 import NotifycationComponent from "./page/NotifycationComponent";
+import AdvertisementCreatePage from "./page/advertisement/AdvertisementCreatePage";
 
 function App() {
   const { currentUser, tokenInitial, setTokenInitial } = useUserStore();
@@ -66,6 +67,10 @@ function App() {
               path="/advertisement"
             ></Route>
             <Route
+              element={<AdvertisementCreatePage></AdvertisementCreatePage>}
+              path="/create_advertisement"
+            ></Route>
+            <Route
               element={<DashboardProductPage></DashboardProductPage>}
               path="/dashboard_product"
             ></Route>
@@ -81,7 +86,7 @@ function App() {
               element={<PromotionPage></PromotionPage>}
               path="/promotion"
             ></Route>
-              <Route
+            <Route
               element={<NotifycationComponent></NotifycationComponent>}
               path="/notify"
             ></Route>

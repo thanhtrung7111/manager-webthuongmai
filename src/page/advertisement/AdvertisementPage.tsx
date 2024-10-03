@@ -1,14 +1,67 @@
+import { fetchCategory, fetchDataCondition } from "@/api/commonApi";
 import BreadcrumbCustom from "@/component_common/breadcrumb/BreadcrumbCustom";
 import ButtonForm from "@/component_common/commonForm/ButtonForm";
 import TableCustom from "@/component_common/table/TableCustom";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ProductObject } from "@/type/TypeCommon";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  AdvertisementObject,
+  CategoryObject,
+  ProductObject,
+} from "@/type/TypeCommon";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { ColumnDef } from "@tanstack/react-table";
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { any } from "zod";
+import DialogCreateAdvertisement from "./component/DialogCreateAdvertisement";
 
 const AdvertisementPage = () => {
+  const {
+    data: dataAdvertisement,
+    isFetching: isFetchingAdvertisement,
+    isError: isErrorAdvertisement,
+    isSuccess: isSuccessAdvertisement,
+  } = useQuery({
+    queryKey: ["advertisement"],
+    queryFn: () =>
+      fetchDataCondition({
+        DCMNCODE: "inpBanner",
+        PAGELINE: "0",
+        PAGENUMB: "1",
+      }),
+  });
+
+  const {
+    data: dataBannerType,
+    isFetching: isFetchingBannerType,
+    isError: isErrorBannerType,
+    isSuccess: isSuccessBannerType,
+  } = useQuery({
+    queryKey: ["lstBannerType"],
+    queryFn: () => fetchCategory("lstBannerType"),
+  });
+
+  const {
+    data: dataBannerDataType,
+    isFetching: isFetchingBannerDataType,
+    isError: isErrorBannerDataType,
+    isSuccess: isSuccessBannerDataType,
+  } = useQuery({
+    queryKey: ["lstBannerDataType"],
+    queryFn: () => fetchCategory("lstBannerDataType"),
+  });
+
   const navigate = useNavigate();
   const breadBrumb = [
     {
@@ -19,7 +72,11 @@ const AdvertisementPage = () => {
       itemLink: "/advertisement",
     },
   ];
-  const columns: ColumnDef<ProductObject>[] = [
+
+  const [detailBanner, setDetailBanner] = useState(null);
+  const [openDetailBanner, setOpenDetailBanner] = useState(false);
+  const [bannerID, setBannerID] = useState<string>("");
+  const columns: ColumnDef<AdvertisementObject>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -43,8 +100,8 @@ const AdvertisementPage = () => {
       enableHiding: false,
     },
     {
-      accessorKey: "PRDCCODE",
-      meta: "Mã sản phẩm",
+      accessorKey: "BANRCODE",
+      meta: "Mã quảng cáo",
       header: ({ column }) => {
         return (
           <Button
@@ -61,19 +118,20 @@ const AdvertisementPage = () => {
         );
       },
       cell: ({ row }) => (
-        <div className="capitalize">{row.getValue("PRDCCODE")}</div>
+        <div className="capitalize">{row.getValue("BANRCODE")}</div>
       ),
       enableHiding: true,
     },
     {
-      accessorKey: "PRDCNAME",
+      accessorKey: "BANRNAME",
+      meta: "Tên quảng cáo",
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Tên sản phẩm
+            Tên quảng cáo
             {column.getIsSorted() === "asc" ? (
               <i className="ri-arrow-up-line"></i>
             ) : (
@@ -83,19 +141,20 @@ const AdvertisementPage = () => {
         );
       },
       cell: ({ row }) => (
-        <div className="capitalize">{row.getValue("PRDCNAME")}</div>
+        <div className="capitalize">{row.getValue("BANRNAME")}</div>
       ),
       enableHiding: true,
     },
     {
-      accessorKey: "QUOMNAME",
+      accessorKey: "BANRTYPE",
+      meta: "Loại quảng cáo",
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Đơn vị tính
+            Loại quảng cáo
             {column.getIsSorted() === "asc" ? (
               <i className="ri-arrow-up-line"></i>
             ) : (
@@ -105,11 +164,99 @@ const AdvertisementPage = () => {
         );
       },
       cell: ({ row }) => (
-        <div
-          className="capitalize"
-          onClick={() => row.toggleSelected(!row?.getIsSelected())}
-        >
-          {row.getValue("QUOMNAME")}
+        <div className="capitalize">
+          {dataBannerType
+            ? dataBannerType.find(
+                (item: CategoryObject) =>
+                  item.ITEMCODE == row.getValue("BANRTYPE")
+              )?.ITEMNAME
+            : ""}
+        </div>
+      ),
+      enableHiding: true,
+    },
+    {
+      accessorKey: "OBJCCODE",
+      meta: "Mã đối tượng quảng cáo",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Mã đối tượng quảng cáo
+            {column.getIsSorted() === "asc" ? (
+              <i className="ri-arrow-up-line"></i>
+            ) : (
+              <i className="ri-arrow-down-line"></i>
+            )}
+          </Button>
+        );
+      },
+      cell: ({ row }) => (
+        <div className="capitalize">{row.getValue("OBJCCODE")}</div>
+      ),
+      enableHiding: true,
+    },
+    {
+      accessorKey: "OBJCTYPE",
+      meta: "Loại đối tượng",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Loại đối tượng
+            {column.getIsSorted() === "asc" ? (
+              <i className="ri-arrow-up-line"></i>
+            ) : (
+              <i className="ri-arrow-down-line"></i>
+            )}
+          </Button>
+        );
+      },
+      cell: ({ row }) => (
+        <div className="capitalize">
+          {dataBannerDataType
+            ? dataBannerDataType.find(
+                (item: CategoryObject) =>
+                  item.ITEMCODE == row.getValue("OBJCTYPE")
+              )?.ITEMNAME
+            : ""}
+        </div>
+      ),
+      enableHiding: true,
+    },
+    {
+      accessorKey: "BANR_RUN",
+      meta: "Trạng thái",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Trạng thái
+            {column.getIsSorted() === "asc" ? (
+              <i className="ri-arrow-up-line"></i>
+            ) : (
+              <i className="ri-arrow-down-line"></i>
+            )}
+          </Button>
+        );
+      },
+      cell: ({ row }) => (
+        <div className="capitalize">
+          {row.getValue("BANR_RUN") == 1 ? (
+            <div className="text-sm text-green-500 px-3 w-fit py-2 rounded-md flex items-center justify-center">
+              Đang chạy
+            </div>
+          ) : (
+            <div className="text-sm text-red-500 px-3 w-fit py-2 rounded-md flex items-center justify-center">
+              Không hoạt động
+            </div>
+          )}
         </div>
       ),
       enableHiding: true,
@@ -126,14 +273,18 @@ const AdvertisementPage = () => {
         return (
           <div className="flex gap-x-2 justify-end">
             <ButtonForm
-              className="!bg-yellow-500 !w-28"
+              onClick={() => {
+                setBannerID(row.getValue("BANRCODE"));
+                setOpenDetailBanner(true);
+              }}
+              className="!bg-yellow-500 !w-28 text-sm"
               type="button"
               icon={<i className="ri-error-warning-line"></i>}
               label="Xem chi tiết"
             ></ButtonForm>
 
             <ButtonForm
-              className="!bg-red-500 !w-20"
+              className="!bg-red-500 !w-20  text-sm"
               type="button"
               icon={<i className="ri-delete-bin-line"></i>}
               label="Xóa"
@@ -143,51 +294,87 @@ const AdvertisementPage = () => {
       },
     },
   ];
+  const dataListStatus: any[] = [
+    { ITEMCODE: 1, ITEMNAME: "Đang chạy" },
+    { ITEMCODE: 0, ITEMNAME: "Ngừng hoạt động" },
+  ];
   return (
-    <div className="flex flex-col gap-y-2">
-      <div className="mb-3">
-        <BreadcrumbCustom
-          linkList={breadBrumb}
-          itemName={"itemName"}
-          itemLink={"itemLink"}
-        ></BreadcrumbCustom>
-      </div>
-
-      {/* Action  */}
-      <div className="flex justify-between items-center">
-        <h4 className="text-xl font-medium text-gray-600">
-          Danh sách quảng cáo
-        </h4>
-        <div className="flex gap-x-2">
-          <ButtonForm
-            className="!bg-primary !w-28"
-            type="button"
-            icon={<i className="ri-download-2-line"></i>}
-            label="Xuất excel"
-          ></ButtonForm>
-          <ButtonForm
-            className="!bg-secondary !w-28"
-            type="button"
-            icon={<i className="ri-file-add-line"></i>}
-            onClick={() => navigate("/create_advertisement")}
-            label="Thêm mới"
-          ></ButtonForm>
+    <>
+      {/* Dialog detail  */}
+      <DialogCreateAdvertisement
+        id={bannerID}
+        open={openDetailBanner}
+        onClose={() => setOpenDetailBanner(false)}
+      ></DialogCreateAdvertisement>
+      <div className="flex flex-col gap-y-2">
+        <div className="mb-3">
+          <BreadcrumbCustom
+            linkList={breadBrumb}
+            itemName={"itemName"}
+            itemLink={"itemLink"}
+          ></BreadcrumbCustom>
         </div>
-      </div>
 
-      {/* table */}
-      <div className="rounded-md p-5 bg-white border-gray-200 border shadow-md">
-        <TableCustom
-          data={[]}
-          columns={columns}
-          search={[
-            { key: "PRDCCODE", name: "mã sản phẩm" },
-            { key: "PRDCNAME", name: "tên sản phẩm" },
-          ]}
-          // isLoading={isFetching}
-        ></TableCustom>
-      </div>
-    </div>
+        {/* Action  */}
+        <div className="flex justify-between items-center">
+          <h4 className="text-xl font-medium text-gray-600">
+            Danh sách quảng cáo
+          </h4>
+          <div className="flex gap-x-2">
+            <ButtonForm
+              className="!bg-primary !w-28"
+              type="button"
+              icon={<i className="ri-download-2-line"></i>}
+              label="Xuất excel"
+            ></ButtonForm>
+            <ButtonForm
+              className="!bg-secondary !w-28"
+              type="button"
+              icon={<i className="ri-file-add-line"></i>}
+              onClick={() => navigate("/create_advertisement")}
+              label="Thêm mới"
+            ></ButtonForm>
+          </div>
+        </div>
+
+        {/* table */}
+        <div className="rounded-md p-5 bg-white border-gray-200 border shadow-md">
+          <TableCustom
+            data={isSuccessAdvertisement ? dataAdvertisement : []}
+            columns={columns}
+            search={[
+              { key: "BANRCODE", name: "mã quảng cáo", type: "text" },
+              { key: "BANRNAME", name: "tên quảng cáo", type: "text" },
+              {
+                key: "BANRTYPE",
+                name: "Loại quảng cáo",
+                type: "combobox",
+                dataKey: "ITEMCODE",
+                dataName: "ITEMNAME",
+                dataList: dataBannerType,
+              },
+              {
+                key: "OBJCTYPE",
+                name: "Loại đối tượng",
+                type: "combobox",
+                dataKey: "ITEMCODE",
+                dataName: "ITEMNAME",
+                dataList: dataBannerDataType,
+              },
+              {
+                key: "BANR_RUN",
+                name: "Trạng thái",
+                type: "combobox",
+                dataKey: "ITEMCODE",
+                dataName: "ITEMNAME",
+                dataList: dataListStatus,
+              },
+            ]}
+            isLoading={isFetchingAdvertisement}
+          ></TableCustom>
+        </div>
+      </div>{" "}
+    </>
   );
 };
 

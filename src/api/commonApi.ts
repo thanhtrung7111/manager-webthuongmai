@@ -25,6 +25,29 @@ export const fetchDataCondition = async (body: { [key: string]: any }) => {
   return response.data?.RETNDATA;
 };
 
+export const fetchDetailData = async (body: { [key: string]: any }) => {
+  const response = await axios.post(
+    "https://api-dev.firstems.com/Api/data/runApi_Data?run_Code=DTA004",
+    body,
+    {
+      headers: {
+        token: useUserStore.getState().tokenLocation,
+      },
+    }
+  );
+
+  console.log(response);
+  // Kiểm tra nếu phản hồi không hợp lệ
+  if (response.status != 200) {
+    throw new Error("Failed to fetch data");
+  }
+  // Nếu dữ liệu trả về là undefined hoặc null, ném lỗi
+  if (!response.data?.RETNCODE) {
+    throw new Error("No data found");
+  }
+  return response.data?.RETNDATA;
+};
+
 // Tải dữ liệu danh mục
 export const fetchCategory = async (category: string) => {
   const response = await axios.post(
