@@ -104,7 +104,10 @@ const TableCustom = <TData, TValue>({
                 </div>
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="flex flex-col gap-y-2" align="start">
+            <PopoverContent
+              className="grid grid-cols-2 gap-2 w-[600px]"
+              align="start"
+            >
               {search.map((item: SearchObjectProduct) => {
                 return item.type == "text" ? (
                   <input
