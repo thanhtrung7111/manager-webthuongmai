@@ -33,7 +33,7 @@ const AdvertisementPage = () => {
     isError: isErrorAdvertisement,
     isSuccess: isSuccessAdvertisement,
   } = useQuery({
-    queryKey: ["advertisement"],
+    queryKey: ["advertisements"],
     queryFn: () =>
       fetchDataCondition({
         DCMNCODE: "inpBanner",

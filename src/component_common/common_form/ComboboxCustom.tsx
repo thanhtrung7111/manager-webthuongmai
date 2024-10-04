@@ -55,7 +55,9 @@ const ComboboxCustom = ({
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState<any>("");
   useEffect(() => {
-    if (onChange) onChange(value);
+    if (value != "" && value != null) {
+      if (onChange) onChange(value);
+    }
   }, [value]);
   console.log(dataList);
   return (

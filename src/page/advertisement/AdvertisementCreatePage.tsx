@@ -1,4 +1,9 @@
-import { fetchCategory, postImage } from "@/api/commonApi";
+import {
+  fetchCategory,
+  fetchDataCondition,
+  postData,
+  postImage,
+} from "@/api/commonApi";
 import BreadcrumbCustom from "@/component_common/breadcrumb/BreadcrumbCustom";
 import ButtonForm from "@/component_common/commonForm/ButtonForm";
 import InputFormikForm from "@/component_common/commonForm/InputFormikForm";
@@ -14,7 +19,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { exportExcelPattern } from "@/helper/excelHelper";
 import { useUserStore } from "@/store/userStore";
-import { CategoryObject, DataExcelPatternObject } from "@/type/TypeCommon";
+import {
+  AdvertisementObject,
+  CategoryObject,
+  DataExcelPatternObject,
+} from "@/type/TypeCommon";
 import { Label } from "@radix-ui/react-label";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Form, Formik } from "formik";
@@ -61,29 +70,66 @@ const AdvertisementCreatePage = () => {
     queryKey: ["lstBannerDataType"],
     queryFn: () => fetchCategory("lstBannerDataType"),
   });
+
+  const {
+    data: dataProducts,
+    isLoading: isLoadingProducts,
+    isFetching: isFetchingProducts,
+    isError: isErrorProducts,
+    isSuccess: isSuccessProducts,
+  } = useQuery({
+    queryKey: ["products"],
+    queryFn: () =>
+      fetchDataCondition({
+        DCMNCODE: "appPrdcList",
+        PARACODE: "001",
+        LCTNCODE: "001",
+        CURRDATE: "2024-09-17",
+        CUSTCODE: "%",
+        SHOPCODE: "%",
+        KEY_WORD: "%",
+      }),
+  });
+
+  const handlePostBanner = useMutation({
+    mutationFn: (body: { [key: string]: any }) => postData(body),
+    onSuccess: (data: AdvertisementObject[]) => {
+      if (queryClient.getQueryData(["products"])) {
+        queryClient.setQueryData(
+          ["advertisements"],
+          (oldData: AdvertisementObject[]) => {
+            const resultData = data[0];
+            console.log(resultData);
+            return [resultData, ...oldData];
+          }
+        );
+      }
+    },
+  });
+
+  const handlePostImage = useMutation({
+    mutationFn: (body: FormData) => postImage(body),
+  });
   const validationSchema = Yup.object().shape({
-    PRDCCODE: Yup.string(),
-    MPRDCNME: Yup.string()
-      .min(8, "Tên sản phẩm ít nhất 8 kí tự!")
-      .max(400, "Tên sản phẩm có nhiều nhất 400 kí tự!")
-      .required("Không để trống!"),
-    QUOMCODE: Yup.number().required("Không để trống phân loại!"),
-    DCMNSBCD: Yup.string().required("Không để trống phân loại!"),
-    BRNDCODE: Yup.string().required("Không để trống thương hiệu!"),
+    COMPCODE: Yup.string(),
+    LCTNCODE: Yup.string(),
+    BANRNAME: Yup.string().required("Không để tên quảng cáo!"),
+    BANRTYPE: Yup.string().required("Không để trống loại quảng cáo!"),
+    OBJCTYPE: Yup.string().required("Không để trống loại đối tượng quảng cáo!"),
+    BANR_RUN: Yup.number().required("Không để trống trạng thái quảng cáo!"),
+    OBJCCODE: Yup.string().required("Không để trống đối tượng quảng cáo!"),
+    IMAGE_BANR: Yup.string().required("Không để trống hình ảnh!"),
   });
 
   const initialValue = {
-    PRDCCODE: "",
-    MPRDCNME: "", //
-    QUOMCODE: 0, //
-    DCMNSBCD: "", //
-    MQUOMNME: "",
-    MDCSBNME: "",
+    COMPCODE: "PMC",
+    LCTNCODE: "001", //
+    BANRNAME: "", //
+    BANRTYPE: "", //
+    OBJCTYPE: "",
+    BANR_RUN: "",
     // LCTNCODE: currentUser?.LCTNCODE, //
-    BRNDCODE: "", //
-    COLRCODE: "", //
-    MDELPRDC: "", //
-    VAT_RATE: 0, //
+    IMAGE_BANR: "",
   };
 
   const extractExcel = async () => {
@@ -92,23 +138,39 @@ const AdvertisementCreatePage = () => {
     await exportExcelPattern(dataExcelObject);
   };
 
-  const handlePostImage = useMutation({
-    mutationFn: (body: FormData) => postImage(body),
-  });
-
   const dataStatus: any[] = [
     { itemCode: 1, itemName: "Đang chạy" },
     { itemCode: 0, itemName: "Ngừng chạy" },
   ];
+
+  const handleSubmitBanner = async (values: any) => {
+    console.log(values);
+    setOpenDialog(true);
+    setInfoLoading("Đang tải dữ liệu...");
+    const data = await handlePostBanner.mutateAsync({
+      DCMNCODE: "inpBanner",
+      HEADER: [{ ...values, PRDCPICT: "" }],
+    });
+    setInfoLoading("Đang thêm hình ảnh...");
+    const resultData: any = data[0];
+    const formData: FormData = new FormData();
+    formData.append("DCMNCODE", "inpBanner");
+    formData.append("KEY_CODE", resultData?.KKKK0000);
+    formData.append("FILE_SRC", "1");
+    formData.append("FILE_GRP", "1");
+    // formData.append("FILE_GRP", "1");s
+    formData.append("Files[0]", image != null ? image : "");
+    const imageResult = await handlePostImage.mutateAsync(formData);
+    setInfoLoading("Hoàn thành...");
+    console.log(imageResult);
+  };
+
   return (
     <div className="flex flex-col gap-y-2">
       <Dialog
         open={openDialog}
         onOpenChange={() => {
-          if (
-            !handlePostImage.isPending
-            // && !handlePostProduct.isPending
-          ) {
+          if (!handlePostImage.isPending && !handlePostBanner.isPending) {
             setOpenDialog(false);
           }
         }}
@@ -119,9 +181,8 @@ const AdvertisementCreatePage = () => {
             <div className="w-full overflow-hidden">
               <div
                 className={`${
-                  handlePostImage.isSuccess
-                    ? // && handlePostProduct.isSuccess
-                      "-translate-x-1/2"
+                  handlePostImage.isSuccess && handlePostBanner.isSuccess
+                    ? "-translate-x-1/2"
                     : "translate-x-0"
                 } w-[200%] grid grid-cols-2 transition-transform`}
               >
@@ -145,7 +206,7 @@ const AdvertisementCreatePage = () => {
                       type="button"
                       className="!w-32 bg-secondary"
                       label="Xem danh sách"
-                      onClick={() => navigate("/product")}
+                      onClick={() => navigate("/advertisement")}
                     ></ButtonForm>
 
                     <ButtonForm
@@ -154,7 +215,7 @@ const AdvertisementCreatePage = () => {
                       label="Thêm mới"
                       onClick={() => {
                         setOpenDialog(false);
-                        // handlePostProduct.reset();
+                        handlePostBanner.reset();
                         handlePostImage.reset();
                       }}
                     ></ButtonForm>
@@ -185,7 +246,7 @@ const AdvertisementCreatePage = () => {
         validationSchema={validationSchema}
         onSubmit={(values) => {
           console.log(values);
-          // handleSubmitProduct(values);
+          handleSubmitBanner(values);
         }}
       >
         {({ setFieldValue, handleChange, values, errors, touched }) => (
@@ -209,8 +270,7 @@ const AdvertisementCreatePage = () => {
                   type="submit"
                   className="bg-primary !w-36"
                   disabled={
-                    // handlePostProduct.isPending ||
-                    handlePostImage.isPending
+                    handlePostBanner.isPending || handlePostImage.isPending
                   }
                   icon={<i className="ri-download-2-line"></i>}
                 ></ButtonForm>
@@ -226,8 +286,7 @@ const AdvertisementCreatePage = () => {
                   type="submit"
                   className="bg-secondary !w-16"
                   loading={
-                    // handlePostProduct.isPending ||
-                    handlePostImage.isPending
+                    handlePostBanner.isPending || handlePostImage.isPending
                   }
                 ></ButtonForm>
               </div>
@@ -241,14 +300,38 @@ const AdvertisementCreatePage = () => {
                   <div className="flex flex-col gap-y-2">
                     <div className="bg-slate-400 h-7"></div>
                     <div className="flex gap-x-2">
-                      <div className="bg-slate-400 h-40 flex-auto"></div>
+                      {values.BANRTYPE == "001" && image != null ? (
+                        <img
+                          className="h-40 w-full object-top object-cover"
+                          src={URL.createObjectURL(image)}
+                          alt=""
+                        />
+                      ) : (
+                        <div className="h-40 flex-auto bg-slate-400"></div>
+                      )}
                       <div className="flex flex-col gap-y-2">
                         <div className="w-52 flex-auto bg-slate-400"></div>
                         <div className="w-52 flex-auto bg-slate-400"></div>
                       </div>
                     </div>
-                    <div className="bg-slate-400 h-40 flex-auto"></div>
-                    <div className="bg-slate-400 h-32 flex-auto"></div>
+                    {values.BANRTYPE == "002" && image != null ? (
+                      <img
+                        className="h-40 w-full object-top object-cover"
+                        src={URL.createObjectURL(image)}
+                        alt=""
+                      />
+                    ) : (
+                      <div className="h-40 flex-auto bg-slate-400"></div>
+                    )}
+                    {values.BANRTYPE == "003" && image != null ? (
+                      <img
+                        className="h-40 w-full object-top object-cover"
+                        src={URL.createObjectURL(image)}
+                        alt=""
+                      />
+                    ) : (
+                      <div className="h-40 flex-auto bg-slate-400"></div>
+                    )}
                     <div className="bg-slate-400 h-20 flex-auto"></div>
                   </div>
                 </div>
@@ -257,32 +340,58 @@ const AdvertisementCreatePage = () => {
                   <InputFormikForm
                     placeholder="Nhập tên quảng cáo..."
                     disabled={false}
-                    name="MPRDCNME"
+                    name="BANRNAME"
                     label={"Tên quảng cáo"}
                     // disabled={isLoadingLogin}
                     important={true}
                     // placeholder="Nhập tài khoản..."
                   ></InputFormikForm>
-                  <div className="grid w-full items-center gap-1.5">
+                  <div className="flex flex-col">
                     <Label
                       htmlFor="picture"
-                      className="text-gray-700 text-sm font-medium"
+                      className="text-gray-700 text-sm font-medium mb-2"
                     >
                       Hình ảnh
                     </Label>
-                    <Input id="picture" type="file" className="w-full" />
+                    <Input
+                      id="picture"
+                      onChange={(e) => {
+                        setImage(
+                          e.target.files && e.target.files?.length > 0
+                            ? e.target.files[0]
+                            : null
+                        );
+                        setFieldValue(
+                          "IMAGE_BANR",
+                          e.target.files && e.target.files.length > 0
+                            ? e.target.files[0].name
+                            : ""
+                        );
+                      }}
+                      type="file"
+                      className={`w-full mb-1 ${
+                        errors.IMAGE_BANR &&
+                        touched.IMAGE_BANR &&
+                        "border border-red-500"
+                      }`}
+                    />
+                    {errors.IMAGE_BANR && touched.IMAGE_BANR && (
+                      <span className="text-red-500 text-xs">
+                        Không để trống hình ảnh
+                      </span>
+                    )}
                   </div>
-                  {/* ĐƠn vị tính  */}
+                  {/* Loại quảng cáo  */}
                   <SelectFormikForm
                     options={dataBannerType ? dataBannerType : []}
                     loading={isFetchingBannerType}
                     itemKey={"ITEMCODE"}
                     itemValue={"ITEMNAME"}
                     important={true}
-                    name="adasd"
+                    name="BANRTYPE"
                     // onChange={(e) => {
                     //   setFieldValue(
-                    //     "MQUOMNME",
+                    //     "BANRTYPE",
                     //     dataBannerType.find(
                     //       (item: CategoryObject) => item.ITEMCODE == e.ITEMCODE
                     //     ).ITEMNAME
@@ -291,30 +400,33 @@ const AdvertisementCreatePage = () => {
                     label={"Loại quảng cáo"}
                   ></SelectFormikForm>
 
+                  {/* Loại đối tượng quản cáo  */}
                   <SelectFormikForm
                     options={dataBannerDataType ? dataBannerDataType : []}
                     loading={isFetchingBannerDataType}
                     itemKey={"ITEMCODE"}
                     itemValue={"ITEMNAME"}
                     important={true}
-                    name="aa"
+                    name="OBJCTYPE"
                     // onChange={(e) => {
                     //   setFieldValue(
-                    //     "MQUOMNME",
-                    //     dataBannerType.find(
+                    //     "BANRTYPE",
+                    //     dataBannerDataType.find(
                     //       (item: CategoryObject) => item.ITEMCODE == e.ITEMCODE
                     //     ).ITEMNAME
                     //   );
                     // }}
                     label={"Loại đối tượng quảng cáo"}
                   ></SelectFormikForm>
+
+                  {/* Loại quảng cáo  */}
                   <SelectFormikForm
-                    options={dataBannerDataType ? dataBannerDataType : []}
-                    loading={isFetchingBannerDataType}
-                    itemKey={"ITEMCODE"}
-                    itemValue={"ITEMNAME"}
+                    options={dataProducts ? dataProducts : []}
+                    loading={isFetchingProducts}
+                    itemKey={"PRDCCODE"}
+                    itemValue={"PRDCNAME"}
                     important={true}
-                    name="ss"
+                    name="OBJCCODE"
                     // onChange={(e) => {
                     //   setFieldValue(
                     //     "MQUOMNME",
@@ -325,13 +437,15 @@ const AdvertisementCreatePage = () => {
                     // }}
                     label={"Đối tượng quảng cáo"}
                   ></SelectFormikForm>
+
+                  {/* Trạng thái của quảng cáo  */}
                   <SelectFormikForm
                     options={dataStatus}
                     // loading={}
                     itemKey={"itemCode"}
                     itemValue={"itemName"}
                     important={true}
-                    name="a"
+                    name="BANR_RUN"
                     // onChange={(e) => {
                     //   setFieldValue(
                     //     "ss",

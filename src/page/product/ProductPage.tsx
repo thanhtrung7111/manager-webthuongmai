@@ -2,7 +2,7 @@ import BreadcrumbCustom from "@/component_common/breadcrumb/BreadcrumbCustom";
 import { Button } from "@/components/ui/button";
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchDataCondition } from "@/api/commonApi";
+import { fetchCategory, fetchDataCondition } from "@/api/commonApi";
 import { error } from "console";
 import TableCustom from "@/component_common/table/TableCustom";
 import { payments } from "@/component_common/data/data";
@@ -26,6 +26,14 @@ const ProductPage = () => {
         SHOPCODE: "%",
         KEY_WORD: "%",
       }),
+  });
+  const {
+    data: lstQUOM,
+    isFetching: isFetchingLstQUOM,
+    isSuccess: isSuccessLstQUOM,
+  } = useQuery({
+    queryKey: ["lstQUOM"],
+    queryFn: () => fetchCategory("lstQUOM"),
   });
   const breadBrumb = [
     {
@@ -200,9 +208,16 @@ const ProductPage = () => {
           data={isSuccess ? data : []}
           columns={columns}
           search={[
-            { key: "PRDCCODE", name: "mã sản phẩm" },
-            { key: "PRDCNAME", name: "tên sản phẩm" },
-            { key: "QUOMNAME", name: "đơn vị tính" },
+            { key: "PRDCCODE", name: "mã sản phẩm", type: "text" },
+            { key: "PRDCNAME", name: "tên sản phẩm", type: "text" },
+            {
+              key: "QUOMNAME",
+              name: "đơn vị tính",
+              type: "combobox",
+              dataList: lstQUOM,
+              dataKey: "ITEMNAME",
+              dataName: "ITEMNAME",
+            },
           ]}
           isLoading={isFetching}
         ></TableCustom>

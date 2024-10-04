@@ -1,9 +1,16 @@
 import { FieldHookConfig, useField, useFormikContext } from "formik";
-import React, { useEffect, useState } from "react";
-
+import React, { memo, useCallback, useEffect, useState } from "react";
+import { areEqual, FixedSizeList as List } from "react-window";
+import { any } from "zod";
 type ObjectSelect = {
   [key: string]: any;
 };
+
+// This helper function memoizes incoming props,
+// To avoid causing unnecessary re-renders pure Row components.
+// This is only needed since we are passing multiple props with a wrapper object.
+// If we were only passing a single, stable value (e.g. items),
+// We could just pass the value directly.
 
 const SelectFormikForm = ({
   label,
@@ -59,6 +66,25 @@ const SelectFormikForm = ({
     setShow(false);
   }, [options]);
 
+  // const renderItem = useCallback(
+  //   ({ index, style }: { index: number; style: any }) => {
+  //     const item = dataFilter[index];
+  //     const isSelected = selected[itemKey] === item[itemKey];
+
+  //     return (
+  //       <ListItem
+  //         key={item[itemKey]} // Thêm key ở đây
+  //         item={item}
+  //         onClick={() => handleSelectItem(item)} // Gọi hàm xử lý ở đây
+  //         isSelected={isSelected}
+  //         itemKey={itemKey}
+  //         itemValue={itemValue}
+  //         style={style} // Đảm bảo sử dụng style để định vị item
+  //       />
+  //     );
+  //   },
+  //   [dataFilter, handleSelectItem, selected, itemKey, itemValue]
+  // );
   return (
     <div className="flex flex-col gap-y-1 w-full">
       <label htmlFor="">
@@ -125,19 +151,50 @@ const SelectFormikForm = ({
           onClick={() => setShow(!show)}
           className="ri-arrow-down-s-line cursor-pointer"
         ></i>
-        <div
+
+        <List
+          height={400}
+          itemCount={dataFilter.length}
+          itemSize={35}
+          width="100%"
           className={`${
-            show == true ? "visible opacity-100" : "opacity-0 invisible"
-          } absolute w-full  z-50 top-[90%] right-0 max-h-60 min-h-24 ${
-            options?.length > 5 && "overflow-y-scroll"
+            show ? "visible opacity-100" : "opacity-0 invisible"
+          } !absolute w-full z-50 top-[90%] right-0 max-h-60 min-h-24 ${
+            dataFilter.length > 5 ? "overflow-y-scroll" : ""
           } bg-white rounded-md border border-gray-300 custom-scrollbar-wider overflow-hidden transition-all duration-150`}
         >
-          {dataFilter.length <= 0 ? (
+          {/* {renderItem} */}
+          {({ index, style, isScrolling }) => (
+            <div style={style}>
+              <div
+                onMouseDown={(e) => {
+                  handleSelectItem(dataFilter[index]);
+                  console.log(dataFilter[index]);
+                }}
+                className={`px-2 py-2 ${
+                  isScrolling && "animate-pulse"
+                } cursor-pointer w-full h-full hover:bg-slate-100 ${
+                  selected[`${itemKey}`] == dataFilter[index][`${itemKey}`]
+                    ? "bg-slate-100"
+                    : "bg-white"
+                }`}
+              >
+                <p
+                  className=" line-clamp-1"
+                  title={dataFilter[index][`${itemValue}`]}
+                >
+                  {dataFilter[index][`${itemValue}`]}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* {dataFilter.length <= 0 ? (
             <div className="text-sm px-2 py-2">
               Không có mục bạn tìm kiếm...
             </div>
           ) : (
-            dataFilter.map((item,index) => {
+            dataFilter.map((item, index) => {
               return (
                 <div
                   onClick={() => handleSelectItem(item)}
@@ -151,8 +208,8 @@ const SelectFormikForm = ({
                 </div>
               );
             })
-          )}
-        </div>
+          )} */}
+        </List>
       </div>
       {meta.error && meta.touched && (
         <span className="text-red-500 text-xs">{meta.error}</span>
