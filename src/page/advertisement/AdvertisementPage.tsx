@@ -1,4 +1,4 @@
-import { fetchCategory, fetchDataCondition } from "@/api/commonApi";
+import { deleteData, fetchCategory, fetchDataCondition } from "@/api/commonApi";
 import BreadcrumbCustom from "@/component_common/breadcrumb/BreadcrumbCustom";
 import ButtonForm from "@/component_common/commonForm/ButtonForm";
 import TableCustom from "@/component_common/table/TableCustom";
@@ -19,14 +19,36 @@ import {
   CategoryObject,
   ProductObject,
 } from "@/type/TypeCommon";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ColumnDef } from "@tanstack/react-table";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { any } from "zod";
 import DialogCreateAdvertisement from "./component/DialogCreateAdvertisement";
 
 const AdvertisementPage = () => {
+  const queryClient = useQueryClient();
+
+  const navigate = useNavigate();
+  const breadBrumb = [
+    {
+      itemName: "Quản lí chung",
+    },
+    {
+      itemName: "Danh sách quảng cáo",
+      itemLink: "/advertisement",
+    },
+  ];
+
+  const [detailBanner, setDetailBanner] = useState(null);
+  const [openDetailBanner, setOpenDetailBanner] = useState(false);
+  const [bannerID, setBannerID] = useState<string>("");
+  const [bodyDelete, setBodyDelete] = useState<string>("");
+
+  const dataListStatus: any[] = [
+    { ITEMCODE: 1, ITEMNAME: "Đang chạy" },
+    { ITEMCODE: 0, ITEMNAME: "Ngừng hoạt động" },
+  ];
   const {
     data: dataAdvertisement,
     isFetching: isFetchingAdvertisement,
@@ -62,20 +84,29 @@ const AdvertisementPage = () => {
     queryFn: () => fetchCategory("lstBannerDataType"),
   });
 
-  const navigate = useNavigate();
-  const breadBrumb = [
-    {
-      itemName: "Quản lí chung",
+  const handleDelete = useMutation({
+    mutationFn: (body: { [key: string]: any }) => deleteData(body),
+    onSuccess: async (data: AdvertisementObject[], body) => {
+      if (queryClient.getQueryData(["advertisements"])) {
+        queryClient.setQueryData(
+          ["advertisements"],
+          (oldData: AdvertisementObject[]) => {
+            if (!oldData) return [];
+            const resultData = data[0];
+            console.log(body);
+            console.log(
+              oldData.filter((item) => item.KKKK0000 !== resultData.KKKK0000)
+            );
+            return oldData.filter((item) => item.KKKK0000 !== body.KEY_CODE);
+          }
+        );
+      }
     },
-    {
-      itemName: "Danh sách quảng cáo",
-      itemLink: "/advertisement",
+    onError: (error) => {
+      console.log(error);
     },
-  ];
+  });
 
-  const [detailBanner, setDetailBanner] = useState(null);
-  const [openDetailBanner, setOpenDetailBanner] = useState(false);
-  const [bannerID, setBannerID] = useState<string>("");
   const columns: ColumnDef<AdvertisementObject>[] = [
     {
       id: "select",
@@ -269,13 +300,13 @@ const AdvertisementPage = () => {
       enableHiding: false,
       cell: ({ row }) => {
         const payment = row.original;
-        console.log(payment);
+
         return (
           <div className="flex gap-x-2 justify-end">
             <ButtonForm
               onClick={() => {
-                setBannerID(row.getValue("BANRCODE"));
-                setOpenDetailBanner(true);
+                console.log(row.original.KKKK0000, "Payment");
+                navigate("/update_advertisement/" + row.original.KKKK0000);
               }}
               className="!bg-yellow-500 !w-28 text-sm"
               type="button"
@@ -284,8 +315,21 @@ const AdvertisementPage = () => {
             ></ButtonForm>
 
             <ButtonForm
-              className="!bg-red-500 !w-20  text-sm"
+              className="!bg-red-500 !w-20  text-sm disabled:!bg-slate-500"
               type="button"
+              // disabled={handleDelete.isPending}
+              loading={
+                row.original.KKKK0000 == bodyDelete && handleDelete.isPending
+              }
+              onClick={async () => {
+                console.log(row.original.KKKK0000);
+                setBodyDelete(row.original.KKKK0000);
+                await handleDelete.mutateAsync({
+                  DCMNCODE: "inpBanner",
+                  KEY_CODE: row.original.KKKK0000,
+                });
+                handleDelete.reset();
+              }}
               icon={<i className="ri-delete-bin-line"></i>}
               label="Xóa"
             ></ButtonForm>
@@ -294,18 +338,9 @@ const AdvertisementPage = () => {
       },
     },
   ];
-  const dataListStatus: any[] = [
-    { ITEMCODE: 1, ITEMNAME: "Đang chạy" },
-    { ITEMCODE: 0, ITEMNAME: "Ngừng hoạt động" },
-  ];
+
   return (
     <>
-      {/* Dialog detail  */}
-      <DialogCreateAdvertisement
-        id={bannerID}
-        open={openDetailBanner}
-        onClose={() => setOpenDetailBanner(false)}
-      ></DialogCreateAdvertisement>
       <div className="flex flex-col gap-y-2">
         <div className="mb-3">
           <BreadcrumbCustom

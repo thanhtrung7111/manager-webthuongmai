@@ -37,9 +37,8 @@ const SelectFormikForm = ({
   const [field, meta, helpers] = useField(name);
   const [dataFilter, setDataFilter] = useState(options);
   const [show, setShow] = useState(false);
-  const [selected, setSelected] = useState(options[0]);
+  const [selected, setSelected] = useState<ObjectSelect>(options[0]);
   const handleSelectItem = (item: ObjectSelect) => {
-    setSelected(item);
     helpers.setValue(item[`${itemKey}`]);
     if (onChange) onChange(item);
     setShow(false);
@@ -57,15 +56,33 @@ const SelectFormikForm = ({
   };
   useEffect(() => {
     if (options.length >= 1 && !loading) {
-      setSelected(options[0]);
-      helpers.setValue(options[0][`${itemKey}`]);
-      setDataFilter(options);
+      if (!field.value) {
+        setSelected(options[0]);
+        helpers.setValue(options[0][`${itemKey}`]);
+      } else {
+        const findItem = options.find((item: ObjectSelect) => {
+          console.log(item[itemKey], name + itemKey);
+          console.log(field.value, name + itemValue);
+          return item[itemKey] == field.value;
+        });
+        console.log(findItem, name);
+        setSelected(findItem ? findItem : options[0]);
+        helpers.setValue(
+          findItem ? findItem[itemKey] : options[0][`${itemKey}`]
+        );
+      }
+      setDataFilter([...options]);
     } else {
       setDataFilter([]);
     }
     setShow(false);
   }, [options]);
-
+  useEffect(() => {
+    const findItem = options.find(
+      (item: ObjectSelect) => item[itemKey] == field.value
+    );
+    if (findItem) setSelected(findItem);
+  }, [field.value]);
   // const renderItem = useCallback(
   //   ({ index, style }: { index: number; style: any }) => {
   //     const item = dataFilter[index];
@@ -134,7 +151,7 @@ const SelectFormikForm = ({
                 setShow(true);
                 filterChange(e);
               }}
-              value={selected && selected[`${itemValue}`]}
+              value={selected ? selected[`${itemValue}`] : ""}
               autoComplete="off"
               className="flex-auto outline-none disabled:bg-transparent"
             />
@@ -174,6 +191,7 @@ const SelectFormikForm = ({
                 className={`px-2 py-2 ${
                   isScrolling && "animate-pulse"
                 } cursor-pointer w-full h-full hover:bg-slate-100 ${
+                  selected &&
                   selected[`${itemKey}`] == dataFilter[index][`${itemKey}`]
                     ? "bg-slate-100"
                     : "bg-white"

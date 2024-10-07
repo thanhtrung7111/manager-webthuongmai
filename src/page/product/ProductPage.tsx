@@ -1,8 +1,8 @@
 import BreadcrumbCustom from "@/component_common/breadcrumb/BreadcrumbCustom";
 import { Button } from "@/components/ui/button";
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
-import { fetchCategory, fetchDataCondition } from "@/api/commonApi";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { deleteData, fetchCategory, fetchDataCondition } from "@/api/commonApi";
 import { error } from "console";
 import TableCustom from "@/component_common/table/TableCustom";
 import { payments } from "@/component_common/data/data";
@@ -14,6 +14,7 @@ import ButtonForm from "@/component_common/commonForm/ButtonForm";
 
 const ProductPage = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { data, isLoading, isFetching, error, isSuccess } = useQuery({
     queryKey: ["products"],
     queryFn: () =>
@@ -34,6 +35,23 @@ const ProductPage = () => {
   } = useQuery({
     queryKey: ["lstQUOM"],
     queryFn: () => fetchCategory("lstQUOM"),
+  });
+
+  const handleDelete = useMutation({
+    mutationFn: (body: { [key: string]: any }) => deleteData(body),
+    onSuccess: async (data: ProductObject[], body) => {
+      if (queryClient.getQueryData(["products"])) {
+        queryClient.setQueryData(["products"], (oldData: ProductObject[]) => {
+          if (!oldData) return [];
+          console.log(data);
+          console.log(body);
+          return oldData.filter((item) => item.KKKK0000 !== body.KEY_CODE);
+        });
+      }
+    },
+    onError: (error) => {
+      console.log(error);
+    },
   });
   const breadBrumb = [
     {
@@ -163,6 +181,12 @@ const ProductPage = () => {
               type="button"
               icon={<i className="ri-delete-bin-line"></i>}
               label="Xóa"
+              onClick={() => {
+                handleDelete.mutateAsync({
+                  DCMNCODE: "inpProduct",
+                  KEY_CODE: row.original.KKKK0000,
+                });
+              }}
             ></ButtonForm>
           </div>
         );

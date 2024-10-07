@@ -116,7 +116,7 @@ export type AdvertisementObject = {
   BANRCODE: string;
   BANRNAME: string;
   BANRTYPE: string;
-  OBJCTYPE: number;
+  OBJCTYPE: string;
   OBJCCODE: string;
   BANR_RUN: number;
   DDDD: string;
@@ -124,5 +124,18 @@ export type AdvertisementObject = {
   STTESIGN: number;
   STTENAME: string;
   KKKK0000: string;
-  DCMNFILE: any[];
+  DCMNFILE: { [key: string]: any }[];
+};
+
+export type AdvertisementUpdateObject = {
+  KKKK0000: string;
+  COMPCODE: string;
+  LCTNCODE: string;
+  BANRCODE: string;
+  BANRNAME: string;
+  BANRTYPE: string;
+  OBJCCODE: string;
+  OBJCTYPE: string;
+  BANR_RUN: number;
+  IMAGE_BANR: string;
 };

@@ -1,6 +1,10 @@
 import {
+  deleteData,
+  deleteImage,
   fetchCategory,
   fetchDataCondition,
+  fetchDetailData,
+  fetchImage,
   postData,
   postImage,
   updateData,
@@ -22,14 +26,15 @@ import { exportExcelPattern } from "@/helper/excelHelper";
 import { useUserStore } from "@/store/userStore";
 import {
   AdvertisementObject,
+  AdvertisementUpdateObject,
   CategoryObject,
   DataExcelPatternObject,
 } from "@/type/TypeCommon";
 import { Label } from "@radix-ui/react-label";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Form, Formik } from "formik";
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import * as Yup from "yup";
 
 const breadBrumb = [
@@ -41,21 +46,20 @@ const breadBrumb = [
     itemLink: "/advertisement",
   },
   {
-    itemName: "Tạo mới",
+    itemName: "Cập nhật",
     itemLink: "/create_advertisement",
   },
 ];
-const AdvertisementCreatePage = ({
-  statusPage = "new",
-}: {
-  statusPage?: string;
-}) => {
-  const [progress, setProgress] = useState<number>(0);
+
+const AdvertisementUpdatePage = () => {
+  const { id } = useParams();
+  console.log(id);
   const [infoLoading, setInfoLoading] = useState<string>("");
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [image, setImage] = useState<File | null>(null);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [openDialogDelete, setOpenDialogDelete] = useState<boolean>(false);
   const {
     data: dataBannerType,
     isFetching: isFetchingBannerType,
@@ -96,26 +100,6 @@ const AdvertisementCreatePage = ({
       }),
   });
 
-  const handlePostBanner = useMutation({
-    mutationFn: (body: { [key: string]: any }) => postData(body),
-    onSuccess: (data: AdvertisementObject[]) => {
-      if (queryClient.getQueryData(["advertisements"])) {
-        queryClient.setQueryData(
-          ["advertisements"],
-          (oldData: AdvertisementObject[]) => {
-            const resultData = data[0];
-            console.log(resultData);
-            return [resultData, ...oldData];
-          }
-        );
-      } else {
-        queryClient.invalidateQueries({
-          predicate: (query) => query.queryKey[0] === "advertisements",
-        });
-      }
-    },
-  });
-
   const handleUpdateBanner = useMutation({
     mutationFn: (body: { [key: string]: any }) => updateData(body),
     onSuccess: (data: AdvertisementObject[]) => {
@@ -124,7 +108,6 @@ const AdvertisementCreatePage = ({
           ["advertisements"],
           (oldData: AdvertisementObject[]) => {
             const resultData = data[0];
-            console.log(resultData);
             return [
               resultData,
               ...oldData.filter((item) => item.KKKK0000 != resultData.KKKK0000),
@@ -139,9 +122,83 @@ const AdvertisementCreatePage = ({
     },
   });
 
+  console.log(handleUpdateBanner.data);
+
+  const handleDelete = useMutation({
+    mutationFn: (body: { [key: string]: any }) => deleteData(body),
+    onSuccess: async (data: AdvertisementObject[], body) => {
+      if (queryClient.getQueryData(["advertisements"])) {
+        queryClient.setQueryData(
+          ["advertisements"],
+          (oldData: AdvertisementObject[]) => {
+            if (!oldData) return [];
+            const resultData = data[0];
+            console.log(body);
+            console.log(
+              oldData.filter((item) => item.KKKK0000 !== resultData.KKKK0000)
+            );
+            return oldData.filter((item) => item.KKKK0000 !== body.KEY_CODE);
+          }
+        );
+      }
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
+  const fetchDetailBanner = useMutation({
+    mutationFn: (body: { [key: string]: any }) => fetchDetailData(body),
+    onSuccess: (data: AdvertisementObject[], variables) => {
+      const resultData = data[0];
+      console.log(resultData.BANR_RUN, "Fetch banner");
+      console.log(variables);
+      setInitialValue({
+        COMPCODE: resultData.COMPCODE,
+        KKKK0000: resultData.KKKK0000,
+        LCTNCODE: resultData.LCTNCODE,
+        BANRCODE: resultData.BANRCODE,
+        BANRNAME: resultData.BANRNAME,
+        BANRTYPE: resultData.BANRTYPE,
+        OBJCTYPE: resultData.OBJCTYPE,
+        OBJCCODE: resultData.OBJCCODE,
+        BANR_RUN: resultData.BANR_RUN,
+        IMAGE_BANR: resultData.DCMNFILE[0].FILENAME,
+      });
+    },
+  });
+
+  const fetchImagebanner = useQuery({
+    queryKey: ["imageBanner" + id],
+    queryFn: () =>
+      fetchImage(
+        fetchDetailBanner.data
+          ? fetchDetailBanner.data[0].DCMNFILE[0].FILE_URL
+          : ""
+      ),
+    enabled: fetchDetailBanner.isSuccess,
+  });
+
+  console.log(fetchDetailBanner.data);
+  useEffect(() => {
+    if (fetchDetailBanner.isSuccess) {
+      fetchImagebanner.refetch();
+    }
+  }, [fetchDetailBanner.isSuccess]);
+
   const handlePostImage = useMutation({
     mutationFn: (body: FormData) => postImage(body),
+    onSuccess: (data, variables) => {
+      console.log(data);
+    },
   });
+
+  const deleteBannerImage = useMutation({
+    mutationFn: (body: FormData) => deleteImage(body),
+  });
+
+  console.log(fetchImagebanner.data);
+
   const validationSchema = Yup.object().shape({
     COMPCODE: Yup.string(),
     LCTNCODE: Yup.string(),
@@ -153,16 +210,17 @@ const AdvertisementCreatePage = ({
     IMAGE_BANR: Yup.string().required("Không để trống hình ảnh!"),
   });
 
-  const [initialValue, setInitialValue] = useState({
-    COMPCODE: "PMC",
-    LCTNCODE: "001", //
-    BANRNAME: "", //
-    BANRTYPE: "", //
+  const [initialValue, setInitialValue] = useState<AdvertisementUpdateObject>({
+    COMPCODE: "",
+    KKKK0000: "",
+    LCTNCODE: "",
+    BANRCODE: "",
+    BANRNAME: "",
+    BANRTYPE: "",
     OBJCTYPE: "",
-    BANR_RUN: "",
+    OBJCCODE: "",
+    BANR_RUN: 0,
     IMAGE_BANR: "",
-    // KKKK0000: "",
-    // DCMNFILE: null,
   });
 
   const extractExcel = async () => {
@@ -172,38 +230,167 @@ const AdvertisementCreatePage = ({
   };
 
   const dataStatus: any[] = [
-    { itemCode: 1, itemName: "Đang chạy" },
     { itemCode: 0, itemName: "Ngừng chạy" },
+    { itemCode: 1, itemName: "Đang chạy" },
   ];
 
   const handleSubmitBanner = async (values: any) => {
     console.log(values);
     setOpenDialog(true);
-    setInfoLoading("Đang lưu dữ liệu...");
-    const data = await handlePostBanner.mutateAsync({
+    setInfoLoading("Đang cập nhật dữ liệu...");
+    const data = await handleUpdateBanner.mutateAsync({
       DCMNCODE: "inpBanner",
-      HEADER: [{ ...values, PRDCPICT: "" }],
+      HEADER: [{ ...values }],
     });
-    setInfoLoading("Đang thêm hình ảnh...");
-    const resultData: any = data[0];
-    const formData: FormData = new FormData();
-    formData.append("DCMNCODE", "inpBanner");
-    formData.append("KEY_CODE", resultData?.KKKK0000);
-    formData.append("FILE_SRC", "1");
-    formData.append("FILE_GRP", "1");
-    // formData.append("FILE_GRP", "1");s
-    formData.append("Files[0]", image != null ? image : "");
-    const imageResult = await handlePostImage.mutateAsync(formData);
+    if (image != null) {
+      setInfoLoading("Đang thêm hình ảnh...");
+      if (
+        fetchDetailBanner.data &&
+        fetchDetailBanner.data[0].DCMNFILE[0].FILECODE
+      ) {
+        const formDataDelete: FormData = new FormData();
+        formDataDelete.append("DCMNCODE", "inpBanner");
+        formDataDelete.append("KEY_CODE", values.KKKK0000);
+        formDataDelete.append(
+          "FILECODE",
+          fetchDetailBanner.data[0].DCMNFILE[0].FILECODE
+        );
+        await deleteBannerImage.mutateAsync(formDataDelete);
+      }
+
+      const formData: FormData = new FormData();
+      formData.append("DCMNCODE", "inpBanner");
+      formData.append("KEY_CODE", values.KKKK0000);
+      formData.append("FILE_SRC", "1");
+      formData.append("FILE_GRP", "1");
+      // formData.append("FILE_GRP", "1");s
+      formData.append("Files[0]", image != null ? image : "");
+      const imageResult = await handlePostImage.mutateAsync(formData);
+    }
     setInfoLoading("Hoàn thành...");
-    console.log(imageResult);
   };
 
+  useEffect(() => {
+    const handleFetchDetailBanner = async () => {
+      console.log(id, "205 detail");
+      await fetchDetailBanner.mutateAsync({
+        DCMNCODE: "inpBanner",
+        KEY_CODE: id,
+      });
+    };
+    if (id != null && id != "") {
+      handleFetchDetailBanner();
+    }
+  }, [id]);
+
+  useEffect(() => {
+    fetchDetailBanner.reset();
+    const handleFetchDetailBanner = async () => {
+      console.log(id, "205 detail");
+      await fetchDetailBanner.mutateAsync({
+        DCMNCODE: "inpBanner",
+        KEY_CODE: id,
+      });
+    };
+    if (id != null && id != "") {
+      handleFetchDetailBanner();
+    }
+  }, [handleDelete.isSuccess]);
   return (
     <div className="flex flex-col gap-y-2">
       <Dialog
+        open={openDialogDelete}
+        onOpenChange={() => {
+          if (!handleDelete.isSuccess && !handleDelete.isPending) {
+            setOpenDialogDelete(false);
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Thông báo</DialogTitle>
+            <div className="w-full overflow-hidden">
+              <div
+                className={`${
+                  handleDelete.isSuccess ? "-translate-x-1/2" : "translate-x-0"
+                } w-[200%] grid grid-cols-2 transition-transform`}
+              >
+                <div className="flex flex-col">
+                  <DialogDescription className="flex items-center mb-5 justify-center gap-x-2 py-6">
+                    {handleDelete.isPending ? (
+                      <>
+                        <SpinnerLoading className="w-6 h-6 fill-primary"></SpinnerLoading>
+                        <span className="text-gray-700 text-base">
+                          Đang xóa sản phẩm...
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <i className="ri-delete-bin-line text-gray-700 text-xl"></i>
+                        <span className="text-gray-700 text-base">
+                          Bạn có muốn xóa quảng cáo này!
+                        </span>
+                      </>
+                    )}
+                  </DialogDescription>
+                  <div className="flex gap-x-2 justify-end">
+                    <ButtonForm
+                      type="button"
+                      className="!w-28 !bg-primary"
+                      label="Xác nhận"
+                      onClick={async () => {
+                        if (fetchDetailBanner.data)
+                          handleDelete.mutateAsync({
+                            DCMNCODE: "inpBanner",
+                            KEY_CODE: fetchDetailBanner.data[0].KKKK0000,
+                          });
+                      }}
+                    ></ButtonForm>
+                    <ButtonForm
+                      type="button"
+                      className="!w-28 !bg-red-500"
+                      label="Đóng"
+                      onClick={() => {
+                        setOpenDialogDelete(false);
+                      }}
+                    ></ButtonForm>
+                  </div>
+                </div>
+                <div className="flex flex-col">
+                  <DialogDescription className="flex items-center mb-5 justify-center gap-x-2 py-6">
+                    <i className="ri-checkbox-line text-gray-700 text-xl"></i>{" "}
+                    <span className="text-gray-700 text-base">
+                      Xóa thành công!
+                    </span>
+                  </DialogDescription>
+                  <div className="flex gap-x-2 justify-end">
+                    <ButtonForm
+                      type="button"
+                      className="!w-28 !bg-slate-500"
+                      label="Danh sách"
+                      onClick={() => {
+                        navigate("/advertisement");
+                      }}
+                    ></ButtonForm>
+                    <ButtonForm
+                      type="button"
+                      className="!w-28 !bg-red-500"
+                      label="Thêm mới"
+                      onClick={() => {
+                        navigate("/create_advertisement");
+                      }}
+                    ></ButtonForm>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+      <Dialog
         open={openDialog}
         onOpenChange={() => {
-          if (!handlePostImage.isPending && !handlePostBanner.isPending) {
+          if (!handlePostImage.isPending && !handleUpdateBanner.isPending) {
             setOpenDialog(false);
           }
         }}
@@ -214,7 +401,7 @@ const AdvertisementCreatePage = ({
             <div className="w-full overflow-hidden">
               <div
                 className={`${
-                  handlePostImage.isSuccess && handlePostBanner.isSuccess
+                  handleUpdateBanner.isSuccess
                     ? "-translate-x-1/2"
                     : "translate-x-0"
                 } w-[200%] grid grid-cols-2 transition-transform`}
@@ -231,23 +418,17 @@ const AdvertisementCreatePage = ({
                   <DialogDescription className="flex items-center mb-5 justify-center gap-x-2 py-6">
                     <i className="ri-checkbox-line text-gray-700 text-xl"></i>{" "}
                     <span className="text-gray-700 text-base">
-                      Thêm quảng cáo thành công!
+                      Cập nhật thành công!
                     </span>
                   </DialogDescription>
                   <div className="flex gap-x-2 justify-end">
                     <ButtonForm
                       type="button"
-                      className="!w-32 bg-secondary"
-                      label="Xem danh sách"
-                      onClick={() => navigate("/advertisement")}
-                    ></ButtonForm>
-
-                    <ButtonForm
-                      type="button"
-                      className="!w-28"
-                      label="Thêm mới"
+                      className="!w-28 !bg-red-500"
+                      label="Đóng"
                       onClick={() => {
-                        handlePostBanner.reset();
+                        setOpenDialog(false);
+                        handleUpdateBanner.reset();
                         handlePostImage.reset();
                       }}
                     ></ButtonForm>
@@ -259,11 +440,11 @@ const AdvertisementCreatePage = ({
         </DialogContent>
       </Dialog>
       {/* <Progress value={progress} className="w-[60%]" />
-    <Button
-      onClick={() => {
-        setProgress(50);
-      }}
-    ></Button> */}
+      <Button
+        onClick={() => {
+          setProgress(50);
+        }}
+      ></Button> */}
       <div className="mb-3">
         <BreadcrumbCustom
           linkList={breadBrumb}
@@ -273,7 +454,7 @@ const AdvertisementCreatePage = ({
       </div>
 
       <Formik
-        key={"formLogin"}
+        key={"formUpdateBanner"}
         initialValues={initialValue}
         enableReinitialize={true}
         validationSchema={validationSchema}
@@ -289,22 +470,29 @@ const AdvertisementCreatePage = ({
               <div className="flex items-end gap-x-2">
                 <div
                   className="text-gray-500 cursor-pointer"
-                  onClick={() => navigate("/advertisement")}
+                  onClick={() => navigate(-1)}
                 >
                   <i className="ri-logout-box-line text-xl"></i>
                 </div>
                 <h4 className="text-xl font-medium text-gray-600">
-                  Thêm quảng cáo
+                  Cập nhật quảng cáo
                 </h4>
               </div>
               <div className="flex gap-x-2 shrink-0">
                 <ButtonForm
-                  label="Lưu"
+                  label="Cập nhật"
                   type="submit"
-                  className="bg-secondary !w-16"
-                  loading={
-                    handlePostBanner.isPending || handlePostImage.isPending
-                  }
+                  className="bg-secondary !w-fit px-3"
+                  icon={<i className="ri-save-3-line"></i>}
+                  loading={handleUpdateBanner.isPending}
+                ></ButtonForm>
+                <ButtonForm
+                  label="Xóa"
+                  type="button"
+                  className="bg-red-500 !w-20"
+                  onClick={() => setOpenDialogDelete(true)}
+                  disabled={handleUpdateBanner.isPending}
+                  icon={<i className="ri-delete-bin-line"></i>}
                 ></ButtonForm>
               </div>
             </div>
@@ -315,52 +503,97 @@ const AdvertisementCreatePage = ({
               <div className="grid grid-cols-2 gap-3 mb-5">
                 <div className="relative w-full overflow-hidden border border-gray-200 rounded-md p-3">
                   <div className="flex flex-col gap-y-2">
-                    <div className="bg-slate-400 h-7"></div>
+                    <div className="bg-slate-200 h-7"></div>
                     <div className="flex gap-x-2">
-                      {values.BANRTYPE == "001" && image != null ? (
+                      {(values.BANRTYPE == "001" && image != null) ||
+                      (values.BANRTYPE == "001" &&
+                        fetchImagebanner.data != null &&
+                        fetchDetailBanner.isSuccess) ? (
                         <img
                           className="h-72 w-full border shadow-md object-top object-cover"
-                          src={URL.createObjectURL(image)}
+                          src={
+                            image == null
+                              ? URL.createObjectURL(fetchImagebanner.data)
+                              : URL.createObjectURL(image)
+                          }
                           alt=""
                         />
                       ) : (
-                        <div className="h-72 flex-auto bg-slate-400"></div>
+                        <div className="h-72 flex-auto bg-slate-200 flex items-center justify-center">
+                          {fetchDetailBanner.isPending && (
+                            <SpinnerLoading className="w-6 h-6 fill-slate-500"></SpinnerLoading>
+                          )}
+                        </div>
                       )}
                       <div className="grid grid-rows-3 h-72 gap-y-2">
-                        {values.BANRTYPE == "004" && image != null ? (
+                        {(values.BANRTYPE == "004" && image != null) ||
+                        (values.BANRTYPE == "004" &&
+                          fetchImagebanner.data != null &&
+                          fetchDetailBanner.isSuccess) ? (
                           <div>
                             <img
-                              className="h-full w-52 border shadow-md object-top object-cover"
-                              src={URL.createObjectURL(image)}
+                              className="w-52 h-full border shadow-md object-top object-cover"
+                              src={
+                                image == null
+                                  ? URL.createObjectURL(fetchImagebanner.data)
+                                  : URL.createObjectURL(image)
+                              }
                               alt=""
                             />
                           </div>
                         ) : (
-                          <div className="w-52 bg-slate-400"></div>
+                          <div className="w-52 bg-slate-200 flex items-center justify-center">
+                            {fetchDetailBanner.isPending && (
+                              <SpinnerLoading className="w-6 h-6 fill-slate-500"></SpinnerLoading>
+                            )}
+                          </div>
                         )}
-                        <div className="w-52 bg-slate-400"></div>
-                        <div className="w-52 bg-slate-400"></div>
+                        <div className="w-52 bg-slate-200"></div>
+                        <div className="w-52 bg-slate-200"></div>
                       </div>
                     </div>
-                    {values.BANRTYPE == "002" && image != null ? (
+                    {(values.BANRTYPE == "002" && image != null) ||
+                    (values.BANRTYPE == "002" &&
+                      fetchImagebanner.data != null &&
+                      fetchDetailBanner.isSuccess) ? (
                       <img
                         className="h-44 w-full border shadow-md object-top object-cover"
-                        src={URL.createObjectURL(image)}
+                        src={
+                          image == null
+                            ? URL.createObjectURL(fetchImagebanner.data)
+                            : URL.createObjectURL(image)
+                        }
                         alt=""
                       />
                     ) : (
-                      <div className="h-44 flex-auto bg-slate-400"></div>
+                      <div className="h-44 flex-auto bg-slate-200 flex items-center justify-center">
+                        {" "}
+                        {fetchDetailBanner.isPending && (
+                          <SpinnerLoading className="w-6 h-6 fill-slate-500"></SpinnerLoading>
+                        )}
+                      </div>
                     )}
-                    {values.BANRTYPE == "003" && image != null ? (
+                    {(values.BANRTYPE == "003" && image != null) ||
+                    (values.BANRTYPE == "003" &&
+                      fetchImagebanner.data != null &&
+                      fetchDetailBanner.isSuccess) ? (
                       <img
-                        className="h-72 w-full border shadow-md object-center object-cover"
-                        src={URL.createObjectURL(image)}
+                        className="h-72 w-full border shadow-md object-top object-cover"
+                        src={
+                          image == null
+                            ? URL.createObjectURL(fetchImagebanner.data)
+                            : URL.createObjectURL(image)
+                        }
                         alt=""
                       />
                     ) : (
-                      <div className="h-72 flex-auto bg-slate-400"></div>
+                      <div className="h-72 flex-auto bg-slate-200 flex items-center justify-center">
+                        {fetchDetailBanner.isPending && (
+                          <SpinnerLoading className="w-6 h-6 fill-slate-500"></SpinnerLoading>
+                        )}
+                      </div>
                     )}
-                    <div className="bg-slate-400 h-7 flex-auto"></div>
+                    <div className="bg-slate-200 h-7 flex-auto"></div>
                   </div>
                 </div>
                 <div className="flex flex-col gap-y-3 h-fit">
@@ -371,6 +604,7 @@ const AdvertisementCreatePage = ({
                     name="BANRNAME"
                     label={"Tên quảng cáo"}
                     // disabled={isLoadingLogin}
+
                     important={true}
                     // placeholder="Nhập tài khoản..."
                   ></InputFormikForm>
@@ -379,7 +613,7 @@ const AdvertisementCreatePage = ({
                       htmlFor="picture"
                       className="text-gray-700 text-sm font-medium mb-2"
                     >
-                      Hình ảnh
+                      Chọn ảnh cập nhật
                     </Label>
                     <Input
                       id="picture"
@@ -412,7 +646,9 @@ const AdvertisementCreatePage = ({
                   {/* Loại quảng cáo  */}
                   <SelectFormikForm
                     options={dataBannerType ? dataBannerType : []}
-                    loading={isFetchingBannerType}
+                    loading={
+                      isFetchingBannerType || fetchDetailBanner.isPending
+                    }
                     itemKey={"ITEMCODE"}
                     itemValue={"ITEMNAME"}
                     important={true}
@@ -431,7 +667,9 @@ const AdvertisementCreatePage = ({
                   {/* Loại đối tượng quản cáo  */}
                   <SelectFormikForm
                     options={dataBannerDataType ? dataBannerDataType : []}
-                    loading={isFetchingBannerDataType}
+                    loading={
+                      isFetchingBannerDataType || fetchDetailBanner.isPending
+                    }
                     itemKey={"ITEMCODE"}
                     itemValue={"ITEMNAME"}
                     important={true}
@@ -450,7 +688,7 @@ const AdvertisementCreatePage = ({
                   {/* Loại quảng cáo  */}
                   <SelectFormikForm
                     options={dataProducts ? dataProducts : []}
-                    loading={isFetchingProducts}
+                    loading={isFetchingProducts || fetchDetailBanner.isPending}
                     itemKey={"PRDCCODE"}
                     itemValue={"PRDCNAME"}
                     important={true}
@@ -468,7 +706,7 @@ const AdvertisementCreatePage = ({
 
                   {/* Trạng thái của quảng cáo  */}
                   <SelectFormikForm
-                    options={dataStatus}
+                    options={dataStatus ? dataStatus : []}
                     // loading={}
                     itemKey={"itemCode"}
                     itemValue={"itemName"}
@@ -490,14 +728,14 @@ const AdvertisementCreatePage = ({
 
               {/* Chiều dài */}
               {/* <NumberFormikForm
-                  unit="cm"
-                  placeholder="Nhập chiều dài sản phẩm..."
-                  disabled={false}
-                  name="PRDCLONG"
-                  label={"Chiều dài"}
-                  // disabled={isLoadingLogin}
-                  important={true}
-                ></NumberFormikForm> */}
+                    unit="cm"
+                    placeholder="Nhập chiều dài sản phẩm..."
+                    disabled={false}
+                    name="PRDCLONG"
+                    label={"Chiều dài"}
+                    // disabled={isLoadingLogin}
+                    important={true}
+                  ></NumberFormikForm> */}
               {/* Chiều rộng */}
 
               {/*Ghi chú sản xuất*/}
@@ -509,4 +747,4 @@ const AdvertisementCreatePage = ({
   );
 };
 
-export default AdvertisementCreatePage;
+export default AdvertisementUpdatePage;
