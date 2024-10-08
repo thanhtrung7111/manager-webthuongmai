@@ -1,6 +1,6 @@
 import BreadcrumbCustom from "@/component_common/breadcrumb/BreadcrumbCustom";
 import { Button } from "@/components/ui/button";
-import React from "react";
+import React, { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { deleteData, fetchCategory, fetchDataCondition } from "@/api/commonApi";
 import { error } from "console";
@@ -11,10 +11,20 @@ import { Payment, ProductObject } from "@/type/TypeCommon";
 import { ColumnDef } from "@tanstack/react-table";
 import { useNavigate } from "react-router-dom";
 import ButtonForm from "@/component_common/commonForm/ButtonForm";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import SpinnerLoading from "@/component_common/loading/SpinnerLoading";
 
 const ProductPage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [openDialogDelete, setOpentDialogDelete] = useState(false);
+  const [objectDelete, setObjectDelete] = useState<ProductObject | null>(null);
   const { data, isLoading, isFetching, error, isSuccess } = useQuery({
     queryKey: ["products"],
     queryFn: () =>
@@ -182,10 +192,12 @@ const ProductPage = () => {
               icon={<i className="ri-delete-bin-line"></i>}
               label="Xóa"
               onClick={() => {
-                handleDelete.mutateAsync({
-                  DCMNCODE: "inpProduct",
-                  KEY_CODE: row.original.KKKK0000,
-                });
+                setObjectDelete(row.original);
+                setOpentDialogDelete(true);
+                // handleDelete.mutateAsync({
+                //   DCMNCODE: "inpProduct",
+                //   KEY_CODE: row.original.KKKK0000,
+                // });
               }}
             ></ButtonForm>
           </div>
@@ -195,58 +207,154 @@ const ProductPage = () => {
   ];
   console.log(data);
   return (
-    <div className="flex flex-col gap-y-2">
-      <div className="mb-3">
-        <BreadcrumbCustom
-          linkList={breadBrumb}
-          itemName={"itemName"}
-          itemLink={"itemLink"}
-        ></BreadcrumbCustom>
-      </div>
-
-      {/* Action  */}
-      <div className="flex justify-between items-center">
-        <h4 className="text-xl font-medium text-gray-600">
-          Danh sách sản phẩm
-        </h4>
-        <div className="flex gap-x-2">
-          <ButtonForm
-            className="!bg-primary !w-28"
-            type="button"
-            icon={<i className="ri-download-2-line"></i>}
-            label="Xuất excel"
-          ></ButtonForm>
-          <ButtonForm
-            className="!bg-secondary !w-28"
-            type="button"
-            icon={<i className="ri-file-add-line"></i>}
-            onClick={() => navigate("/create_product")}
-            label="Thêm mới"
-          ></ButtonForm>
+    <>
+      <Dialog
+        open={openDialogDelete}
+        onOpenChange={() => {
+          if (!handleDelete.isPending) {
+            setOpentDialogDelete(false);
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Thông báo</DialogTitle>
+            <div className="w-full overflow-hidden">
+              <div
+                className={`${
+                  handleDelete.isSuccess ? "-translate-x-1/2" : "translate-x-0"
+                } w-[200%] grid grid-cols-2 transition-transform`}
+              >
+                <div className="flex flex-col">
+                  <DialogDescription className="flex items-center mb-5 justify-center gap-x-2 py-6">
+                    {handleDelete.isPending ? (
+                      <>
+                        <SpinnerLoading className="w-6 h-6 fill-primary"></SpinnerLoading>
+                        <span className="text-gray-700 text-base">
+                          Đang xóa sản phẩm...
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <i className="ri-delete-bin-line text-gray-700 text-xl"></i>
+                        <span className="text-gray-700 text-base">
+                          Bạn có muốn xóa quảng cáo{" "}
+                          <b className="text-gray-500">
+                            {" "}
+                            {objectDelete?.PRDCNAME}
+                          </b>{" "}
+                          ?
+                        </span>
+                      </>
+                    )}
+                  </DialogDescription>
+                  <div className="flex gap-x-2 justify-end">
+                    <ButtonForm
+                      type="button"
+                      className="!w-28 !bg-secondary"
+                      label="Xác nhận"
+                      onClick={async () => {
+                        if (objectDelete != null)
+                          handleDelete.mutateAsync({
+                            DCMNCODE: "inpProduct",
+                            KEY_CODE: objectDelete?.KKKK0000,
+                          });
+                      }}
+                    ></ButtonForm>
+                    <ButtonForm
+                      type="button"
+                      className="!w-28 !bg-red-500"
+                      label="Đóng"
+                      onClick={() => {
+                        setOpentDialogDelete(false);
+                      }}
+                    ></ButtonForm>
+                  </div>
+                </div>
+                <div className="flex flex-col">
+                  <DialogDescription className="flex items-center mb-5 justify-center gap-x-2 py-6">
+                    <i className="ri-checkbox-line text-gray-700 text-xl"></i>{" "}
+                    <span className="text-gray-700 text-base">
+                      Xóa thành công!
+                    </span>
+                  </DialogDescription>
+                  <div className="flex gap-x-2 justify-end">
+                    <ButtonForm
+                      type="button"
+                      className="!w-28 !bg-secondary"
+                      label="Thêm mới"
+                      onClick={() => {
+                        navigate("/create_product");
+                      }}
+                    ></ButtonForm>
+                    <ButtonForm
+                      type="button"
+                      className="!w-28 !bg-red-500"
+                      label="Đóng"
+                      onClick={() => {
+                        setOpentDialogDelete(false);
+                      }}
+                    ></ButtonForm>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+      <div className="flex flex-col gap-y-2">
+        <div className="mb-3">
+          <BreadcrumbCustom
+            linkList={breadBrumb}
+            itemName={"itemName"}
+            itemLink={"itemLink"}
+          ></BreadcrumbCustom>
         </div>
-      </div>
 
-      {/* table */}
-      <div className="rounded-md p-5 bg-white border-gray-200 border shadow-md">
-        <TableCustom
-          data={isSuccess ? data : []}
-          columns={columns}
-          search={[
-            { key: "PRDCCODE", name: "mã sản phẩm", type: "text" },
-            { key: "PRDCNAME", name: "tên sản phẩm", type: "text" },
-            {
-              key: "QUOMNAME",
-              name: "đơn vị tính",
-              type: "combobox",
-              dataList: lstQUOM,
-              dataKey: "ITEMNAME",
-              dataName: "ITEMNAME",
-            },
-          ]}
-          isLoading={isFetching}
-        ></TableCustom>
-      </div>
-    </div>
+        {/* Action  */}
+        <div className="flex justify-between items-center">
+          <h4 className="text-xl font-medium text-gray-600">
+            Danh sách sản phẩm
+          </h4>
+          <div className="flex gap-x-2">
+            <ButtonForm
+              className="!bg-primary !w-28"
+              type="button"
+              icon={<i className="ri-download-2-line"></i>}
+              label="Xuất excel"
+            ></ButtonForm>
+            <ButtonForm
+              className="!bg-secondary !w-28"
+              type="button"
+              icon={<i className="ri-file-add-line"></i>}
+              onClick={() => navigate("/create_product")}
+              label="Thêm mới"
+            ></ButtonForm>
+          </div>
+        </div>
+
+        {/* table */}
+        <div className="rounded-md p-5 bg-white border-gray-200 border shadow-md">
+          <TableCustom
+            data={isSuccess ? data : []}
+            columns={columns}
+            search={[
+              { key: "PRDCCODE", name: "mã sản phẩm", type: "text" },
+              { key: "PRDCNAME", name: "tên sản phẩm", type: "text" },
+              {
+                key: "QUOMNAME",
+                name: "đơn vị tính",
+                type: "combobox",
+                dataList: lstQUOM,
+                dataKey: "ITEMNAME",
+                dataName: "ITEMNAME",
+              },
+            ]}
+            isLoading={isFetching}
+          ></TableCustom>
+        </div>
+      </div>{" "}
+    </>
   );
 };
 

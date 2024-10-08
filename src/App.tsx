@@ -20,6 +20,8 @@ import PromotionPage from "./page/promotion/PromotionPage";
 import NotifycationComponent from "./page/NotifycationComponent";
 import AdvertisementCreatePage from "./page/advertisement/AdvertisementCreatePage";
 import AdvertisementUpdatePage from "./page/advertisement/AdvertisementUpdatePage";
+import PostPage from "./page/post/PostPage";
+import PostCreatePage from "./page/post/PostCreatePage";
 
 function App() {
   const { currentUser, tokenInitial, setTokenInitial } = useUserStore();
@@ -55,6 +57,14 @@ function App() {
           >
             <Route element={<HomePage></HomePage>} path="/"></Route>
             <Route
+              element={<DashboardProductPage></DashboardProductPage>}
+              path="/dashboard_product"
+            ></Route>
+            <Route
+              element={<DashboardRevenuePage></DashboardRevenuePage>}
+              path="/dashboard_revenue"
+            ></Route>
+            <Route
               element={<ProductPage></ProductPage>}
               path="/product"
             ></Route>
@@ -75,13 +85,10 @@ function App() {
               element={<AdvertisementUpdatePage></AdvertisementUpdatePage>}
               path="/update_advertisement/:id"
             ></Route>
+            <Route element={<PostPage></PostPage>} path="/post"></Route>
             <Route
-              element={<DashboardProductPage></DashboardProductPage>}
-              path="/dashboard_product"
-            ></Route>
-            <Route
-              element={<DashboardRevenuePage></DashboardRevenuePage>}
-              path="/dashboard_revenue"
+              element={<PostCreatePage></PostCreatePage>}
+              path="/create_post"
             ></Route>
             <Route
               element={<MessagesPage></MessagesPage>}

@@ -298,6 +298,8 @@ const AdvertisementUpdatePage = () => {
   }, [handleDelete.isSuccess]);
   return (
     <div className="flex flex-col gap-y-2">
+      {/* Thông báo xóa  */}
+
       <Dialog
         open={openDialogDelete}
         onOpenChange={() => {
@@ -387,6 +389,9 @@ const AdvertisementUpdatePage = () => {
           </DialogHeader>
         </DialogContent>
       </Dialog>
+
+      {/* Thông báo cập nhật  */}
+
       <Dialog
         open={openDialog}
         onOpenChange={() => {
@@ -502,9 +507,9 @@ const AdvertisementUpdatePage = () => {
             <div className="rounded-md p-5 bg-white border-gray-200 border shadow-md">
               <div className="grid grid-cols-2 gap-3 mb-5">
                 <div className="relative w-full overflow-hidden border border-gray-200 rounded-md p-3">
-                  <div className="flex flex-col gap-y-2">
+                  <div className="flex flex-col gap-y-2 px-20">
                     <div className="bg-slate-200 h-7"></div>
-                    <div className="flex gap-x-2">
+                    <div className="grid grid-cols-[3fr_1fr] gap-2">
                       {(values.BANRTYPE == "001" && image != null) ||
                       (values.BANRTYPE == "001" &&
                         fetchImagebanner.data != null &&

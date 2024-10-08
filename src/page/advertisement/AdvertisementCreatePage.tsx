@@ -172,8 +172,8 @@ const AdvertisementCreatePage = ({
   };
 
   const dataStatus: any[] = [
-    { itemCode: 1, itemName: "Đang chạy" },
     { itemCode: 0, itemName: "Ngừng chạy" },
+    { itemCode: 1, itemName: "Đang chạy" },
   ];
 
   const handleSubmitBanner = async (values: any) => {
@@ -314,9 +314,9 @@ const AdvertisementCreatePage = ({
             <div className="rounded-md p-5 bg-white border-gray-200 border shadow-md">
               <div className="grid grid-cols-2 gap-3 mb-5">
                 <div className="relative w-full overflow-hidden border border-gray-200 rounded-md p-3">
-                  <div className="flex flex-col gap-y-2">
-                    <div className="bg-slate-400 h-7"></div>
-                    <div className="flex gap-x-2">
+                  <div className="flex flex-col gap-y-2 px-20">
+                    <div className="bg-slate-400 h-7 "></div>
+                    <div className="grid grid-cols-[3fr_1fr] gap-2">
                       {values.BANRTYPE == "001" && image != null ? (
                         <img
                           className="h-72 w-full border shadow-md object-top object-cover"
