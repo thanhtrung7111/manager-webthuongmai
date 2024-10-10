@@ -4,7 +4,7 @@ import moment from "moment";
 // Tải dữ liệu theo điều kiện
 export const fetchDataCondition = async (body: { [key: string]: any }) => {
   const response = await axios.post(
-    "",
+    "https://api-dev.firstems.com/Api/data/runApi_Data?run_Code=DTA004",
     body,
     {
       headers: {
@@ -27,7 +27,7 @@ export const fetchDataCondition = async (body: { [key: string]: any }) => {
 
 export const fetchDetailData = async (body: { [key: string]: any }) => {
   const response = await axios.post(
-    "",
+    "https://api-dev.firstems.com/Api/data/runApi_Data?run_Code=DTA005",
     body,
     {
       headers: {
@@ -51,7 +51,7 @@ export const fetchDetailData = async (body: { [key: string]: any }) => {
 // Tải dữ liệu danh mục
 export const fetchCategory = async (category: string) => {
   const response = await axios.post(
-    "",
+    "https://api-dev.firstems.com/Api/data/runApi_Data?run_Code=DTA002",
     {
       LISTCODE: category,
     },
@@ -97,7 +97,7 @@ export const fetchImage = async (url: string) => {
 // Thêm mới dữ liệu
 export const postData = async (body: { [key: string]: any }) => {
   const response = await axios.post(
-    "",
+    "https://api-dev.firstems.com/Api/data/runApi_Data?run_Code=DTA007",
     body,
     {
       headers: {
@@ -121,7 +121,7 @@ export const postData = async (body: { [key: string]: any }) => {
 // Cập nhật dữ liệu
 export const updateData = async (body: { [key: string]: any }) => {
   const response = await axios.post(
-    "",
+    "https://api-dev.firstems.com/Api/data/runApi_Data?run_Code=DTA008",
     body,
     {
       headers: {
@@ -145,7 +145,7 @@ export const updateData = async (body: { [key: string]: any }) => {
 // Xóa chứng từ
 export const deleteData = async (body: { [key: string]: any }) => {
   const response = await axios.post(
-    "",
+    "https://api-dev.firstems.com/Api/data/runApi_Data?run_Code=DTA009",
     body,
     {
       headers: {
@@ -169,7 +169,7 @@ export const deleteData = async (body: { [key: string]: any }) => {
 // Thêm mới hình ảnh
 export const postImage = async (body: FormData) => {
   const response = await axios.post(
-    "",
+    "https://api-dev.firstems.com/Api/data/runApi_File?run_Code=DTA011",
     body,
     {
       headers: {
@@ -193,7 +193,7 @@ export const postImage = async (body: FormData) => {
 // Thêm mới hình ảnh
 export const deleteImage = async (body: FormData) => {
   const response = await axios.post(
-    "",
+    "https://api-dev.firstems.com/Api/data/runApi_File?run_Code=DTA012",
     body,
     {
       headers: {

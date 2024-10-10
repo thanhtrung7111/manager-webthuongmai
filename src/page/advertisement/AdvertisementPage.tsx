@@ -50,8 +50,8 @@ const AdvertisementPage = () => {
     useState<AdvertisementObject | null>(null);
 
   const dataListStatus: any[] = [
-    { ITEMCODE: 1, ITEMNAME: "Đang chạy" },
     { ITEMCODE: 0, ITEMNAME: "Ngừng hoạt động" },
+    { ITEMCODE: 1, ITEMNAME: "Đang chạy" },
   ];
   const {
     data: dataAdvertisement,

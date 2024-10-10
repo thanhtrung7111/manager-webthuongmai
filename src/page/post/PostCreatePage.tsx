@@ -1,7 +1,7 @@
 import BreadcrumbCustom from "@/component_common/breadcrumb/BreadcrumbCustom";
 import ButtonForm from "@/component_common/commonForm/ButtonForm";
 import InputFormikForm from "@/component_common/commonForm/InputFormikForm";
-import { Dialog } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-label";
 import { Form, Formik, useFormikContext } from "formik";
@@ -31,6 +31,7 @@ interface ReactQuillRef {
 }
 const PostCreatePage = () => {
   const [value, setValue] = useState("");
+  const [valueFile, setValueFile] = useState("");
   // const { values } = useFormikContext() ?? Ơ;
   const [valueChang, setValueChange] = useState("");
   const quillRef = useRef<ReactQuillRef | null>(null);
@@ -240,21 +241,75 @@ const PostCreatePage = () => {
                   ></ButtonForm> */}
                   <ButtonForm
                     label="Lưu"
-                    type="submit"
+                    type="button"
                     className="bg-secondary !w-16"
                     // loading={
                     //   handlePostProduct.isPending || handlePostImage.isPending
                     // }
+                    onClick={() => {
+                      const content = document.getElementById("content");
+                      const blob = new Blob(
+                        [content?.innerHTML ? content?.innerHTML : ""],
+                        {
+                          type: "text/plain",
+                        }
+                      );
+                      const url = window.URL.createObjectURL(blob);
+                      const a = document.createElement("a");
+                      a.href = url;
+                      a.download = "file.txt"; // Tên file khi tải về
+                      a.click(); // Kích hoạt sự kiện click để tải file
+
+                      // Giải phóng bộ nhớ URL tạm
+                      window.URL.revokeObjectURL(url);
+                    }}
                   ></ButtonForm>
                 </div>
               </div>
 
               {/* table */}
-              <div className="gap-x-2 grid grid-cols-2">
-                <div className="rounded-md p-5 h-full bg-white border-gray-200 border shadow-md flex flex-col gap-y-3">
-                  <div className="text-gray-600 text-xl pb-2 border-gray-400 border-b">
-                    Chỉnh sửa bài viết
+              <div className="gap-x-2">
+                <div className="rounded-md p-5 h-fit bg-white border-gray-200 border shadow-md flex flex-col gap-y-3">
+                  <div className="flex items-center justify-between pb-2 border-gray-400 border-b">
+                    <div className="text-gray-600 text-xl">
+                      Chỉnh sửa bài viết
+                    </div>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <div className="p-3 cursor-pointer border w-8 h-8 flex items-center justify-center bg-white rounded-lg -left-2">
+                          <i className="ri-eye-line text-gray-600"></i>
+                        </div>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-[1200px]">
+                        <div className="relative rounded-md p-5 bg-white border-gray-200 border shadow-md flex flex-col gap-y-3 h-[850px] overflow-y-scroll custom-scrollbar-wider">
+                          {/* <div className="text-gray-600 text-xl pb-2 border-gray-400 border-b">
+                    Review bài viết
+                  </div> */}
+                          <div
+                            id="content"
+                            dangerouslySetInnerHTML={{
+                              __html: addTailwindClasses(
+                                `<h1>${
+                                  values.PRDCCODE
+                                    ? values.PRDCCODE
+                                    : "Chưa có tiêu đề..."
+                                }</h1>` +
+                                  `<h5 style='font-size:14px'><span style='color:#484848;font-weight:500'>Ngày tạo:</span> ${moment(
+                                    Date.now()
+                                  ).format("DD/MM/yyyy HH:mm:ss")}</h5>` +
+                                  `<h5 style='font-size:14px'> <span style='color:#484848;font-weight:500'>Slug bài viết:</span>  ${createSlug(
+                                    values.PRDCCODE
+                                  )}</h5>` +
+                                  value
+                              ),
+                            }}
+                            className="w-full ql-review"
+                          ></div>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </div>
+
                   <InputFormikForm
                     placeholder="Nhập tiêu đề bài viết"
                     disabled={false}
@@ -280,7 +335,7 @@ const PostCreatePage = () => {
                     >
                       Thumbnail <span className="text-red-400">*</span>
                     </Label>
-                    <Label htmlFor="thumbnail">
+                    <Label htmlFor="thumbnail" className="w-fit cursor-pointer">
                       <img
                         src=""
                         className="h-40 w-44 border border-gray-100 shadow-sm"
@@ -289,7 +344,7 @@ const PostCreatePage = () => {
                     </Label>
                     <Input id="thumbnail" type="file" className="hidden" />
                   </div>
-                  <div className="h-96 flex flex-col gap-y-1">
+                  <div className="h-96 flex flex-col gap-y-1 overflow-hidden">
                     {/* <div id="toolbar">
                       <div className="ql-formats">
                         <select className="ql-header">
@@ -316,34 +371,31 @@ const PostCreatePage = () => {
                     />
                   </div>
                 </div>
-                <div className="relative rounded-md p-5 bg-white border-gray-200 border shadow-md flex flex-col gap-y-3">
-                  {/* <div className="absolute p-3 border w-8 h-8 flex items-center justify-center bg-white rounded-lg -left-2">
-                    <i className="ri-arrow-left-s-line text-gray-600"></i>
-                  </div> */}
-                  <div className="text-gray-600 text-xl pb-2 border-gray-400 border-b">
-                    Review bài viết
-                  </div>
-                  <div
-                    dangerouslySetInnerHTML={{
-                      __html: addTailwindClasses(
-                        `<h1>${
-                          values.PRDCCODE
-                            ? values.PRDCCODE
-                            : "Chưa có tiêu đề..."
-                        }</h1>` +
-                          `<h5 style='font-size:14px'><span style='color:#484848;font-weight:500'>Ngày tạo:</span> ${moment(
-                            Date.now()
-                          ).format("DD/MM/yyyy HH:mm:ss")}</h5>` +
-                          `<h5 style='font-size:14px'> <span style='color:#484848;font-weight:500'>Slug bài viết:</span>  ${createSlug(
-                            values.PRDCCODE
-                          )}</h5>` +
-                          value
-                      ),
-                    }}
-                    className="w-full ql-review"
-                  ></div>
-                </div>
               </div>
+
+              <input
+                type="file"
+                accept=".txt"
+                onChange={(e) => {
+                  const file = e.target.files ? e.target.files[0] : ""; // Lấy file đầu tiên trong danh sách
+
+                  if (file) {
+                    const reader = new FileReader(); // Tạo đối tượng FileReader
+
+                    // Hàm sẽ được gọi khi file được đọc xong
+                    reader.onload = (event) => {
+                      const text = event.target?.result; // Nội dung của file
+                      if (typeof text === "string") {
+                        // Kiểm tra kiểu dữ liệu
+                        setValue(text); // Cập nhật nội dung vào state
+                      } // Cập nhật nội dung vào state
+                    };
+
+                    // Đọc file dưới dạng text
+                    reader.readAsText(file);
+                  }
+                }}
+              />
 
               {/*Mã sản phẩm */}
               {/* <InputFormikForm
@@ -381,6 +433,11 @@ const PostCreatePage = () => {
             </Form>
           )}
         </Formik>
+        <div
+          dangerouslySetInnerHTML={{
+            __html: `${value}`,
+          }}
+        ></div>
       </div>
     </>
   );
