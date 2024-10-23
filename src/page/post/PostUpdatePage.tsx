@@ -16,28 +16,25 @@ import React, { ReactNode, useEffect, useRef, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import "./css/quillCustomStyles.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import * as Yup from "yup";
 import Quill from "quill";
 import moment from "moment";
 import { createSlug } from "@/helper/commonHelper";
 import MultiTagSelect from "./component/MultiTagSelect";
 import { toast } from "sonner";
-import { postData, postImage } from "@/api/commonApi";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  deleteImage,
+  fetchDetailData,
+  fetchImage,
+  postData,
+  postImage,
+  updateData,
+} from "@/api/commonApi";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import SpinnerLoading from "@/component_common/loading/SpinnerLoading";
-type PostCreateObject = {
-  COMPCODE: string | undefined | null;
-  LCTNCODE: string | undefined | null;
-  image: string | undefined | null;
-  newImage?: File | undefined | null;
-  content?: string | undefined | null;
-  newContent?: File | undefined | null;
-  // POSTCODE: "",
-  POSTTITL: string | undefined | null;
-  POSTSLUG: string | undefined | null;
-  POST_TAG: string | undefined | null;
-};
+import { DcmnFileObject, PostUpdateObject } from "@/type/TypeCommon";
+
 const breadBrumb = [
   {
     itemName: "Quản lí chung",
@@ -54,8 +51,11 @@ const breadBrumb = [
 interface ReactQuillRef {
   getEditor: () => Quill;
 }
-const PostCreatePage = () => {
+const PostUpdatePage = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [value, setValue] = useState("");
+  const [contentInitial, setContentInitial] = useState("");
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
   const [infoLoading, setInfoLoading] = useState<string>("");
@@ -65,15 +65,53 @@ const PostCreatePage = () => {
   const [valueChang, setValueChange] = useState("");
   const quillRef = useRef<ReactQuillRef | null>(null);
   const cursorPositionRef = useRef<number | null>(null);
+  const [initialValue, setInitialValue] = useState<
+    PostUpdateObject & { newImage?: File | null; image?: string }
+  >({
+    image: "",
+    newImage: null,
+    COMPCODE: "",
+    LCTNCODE: "",
+    POSTCODE: "",
+    POSTTITL: "",
+    POSTSLUG: "",
+    POST_TAG: "",
+    DDDD: "",
+    ACCERGHT: 0,
+    STTESIGN: 0,
+    STTENAME: "",
+    KKKK0000: "",
+    DCMNFILE: [],
+  });
+
+  const handleFetchPostDetail = useMutation({
+    mutationFn: (body: any) => fetchDetailData(body),
+    onSuccess: (value) => {
+      setInitialValue({ ...value });
+    },
+  });
+
+  const fetchImageThumnail = useMutation({
+    mutationFn: (body: string) => fetchImage(body),
+  });
+
+  const fetchContentFile = useMutation({
+    mutationFn: (body: string) => fetchImage(body),
+  });
   const handlePost = useMutation({
-    mutationFn: (body: { [key: string]: any }) => postData(body),
+    mutationFn: (body: { [key: string]: any }) => updateData(body),
     onSuccess: (data: any) => {
       if (queryClient.getQueryData(["posts"])) {
         queryClient.setQueryData(["posts"], (oldData: any[]) => {
           const resultData = data[0];
-          console.log(resultData);
-          return [resultData, ...oldData];
+          return [
+            resultData,
+            ...oldData.filter((item) => item.POSTCODE != resultData.POSTCODE),
+          ];
         });
+        if (id != undefined) {
+          queryClient.invalidateQueries({ queryKey: ["postDetail", id] });
+        }
       } else {
         queryClient.invalidateQueries({
           predicate: (query) => query.queryKey[0] === "posts",
@@ -82,25 +120,13 @@ const PostCreatePage = () => {
     },
   });
 
-  const navigate = useNavigate();
   const validationSchema = Yup.object().shape({
     POSTTITL: Yup.string().required("Không để trống tiêu đề bài viết!"),
     POSTSLUG: Yup.string().required("Không để trống slug bài viết!"),
     POST_TAG: Yup.string().required("Tag dữ liệu có ít nhất là một!"),
     image: Yup.string().required("Không để trống thumbnail bài viết!"),
   });
-  const [initialValue, setInitialState] = useState({
-    COMPCODE: "PMC",
-    LCTNCODE: "001",
-    image: "",
-    newImage: null,
-    content: "",
-    newContent: "",
-    // POSTCODE: "",
-    POSTTITL: "",
-    POSTSLUG: "",
-    POST_TAG: "",
-  });
+
   const modules = {
     toolbar: [
       ["bold", "italic", "underline", "strike"], // toggled buttons
@@ -129,18 +155,25 @@ const PostCreatePage = () => {
 
   const handlePostImage = useMutation({
     mutationFn: (body: FormData) => postImage(body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["contentPost", id] });
+      queryClient.invalidateQueries({ queryKey: ["imageThumnail", id] });
+    },
   });
 
-  const addTailwindClasses = (html: any) => {
-    let modifiedHtml = html;
-    return modifiedHtml;
-  };
+  const handleRemoveFile = useMutation({
+    mutationFn: (body: FormData) => deleteImage(body),
+  });
 
   const handleChangeContent = (values: any) => {
     setValue(values);
   };
 
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (
+    values: PostUpdateObject & { newImage?: File | null }
+  ) => {
+    console.log(values);
+    // return;
     if (value == "") {
       toast("Thông báo", {
         description: "Bạn chưa thêm nôi dung bài viết!",
@@ -155,8 +188,10 @@ const PostCreatePage = () => {
       HEADER: [
         {
           //== Nhóm chính thể hiện - Mã nhóm: 01
+          POSTCODE: values.POSTCODE,
           COMPCODE: values.COMPCODE,
           LCTNCODE: values.LCTNCODE,
+          KKKK0000: values.KKKK0000,
           // "POSTCODE": "<(String) POSTCODE>",
           POSTTITL: values.POSTTITL,
           POSTSLUG: values.POSTSLUG,
@@ -164,17 +199,8 @@ const PostCreatePage = () => {
         },
       ],
     });
-    if (values.newImage != null && value != "") {
+    if (values.newImage != null || contentInitial != value) {
       setInfoLoading("Đang thêm hình ảnh...");
-      const newFileThumnail = new File([values.newImage], "thumnailPost.png", {
-        type: values.newImage.type,
-      });
-      const blob = new Blob([value], {
-        type: "text/plain",
-      });
-      const newContentThumnail = new File([blob], "contentPost.txt", {
-        type: blob.type,
-      });
 
       const resultData: any = data[0];
       const formData: FormData = new FormData();
@@ -183,8 +209,43 @@ const PostCreatePage = () => {
       formData.append("FILE_SRC", "1");
       formData.append("FILE_GRP", "1");
       // formData.append("FILE_GRP", "1");s
-      formData.append("Files[0]", newFileThumnail);
-      formData.append("Files[1]", newContentThumnail);
+      if (values.newImage != null) {
+        const formData1: FormData = new FormData();
+        const findDcmnFile = values.DCMNFILE.find(
+          (item) => item.FILENAME == "thumnailPost"
+        )?.FILECODE;
+        formData1.append("DCMNCODE", "inpSalePost");
+        formData1.append("KEY_CODE", resultData?.KKKK0000);
+        formData1.append("FILECODE", findDcmnFile ? findDcmnFile : "");
+        await handleRemoveFile.mutateAsync(formData1);
+
+        const newFileThumnail = new File(
+          [values.newImage],
+          "thumnailPost.png",
+          {
+            type: values.newImage.type,
+          }
+        );
+        formData.append("Files[0]", newFileThumnail);
+      }
+      if (contentInitial != value) {
+        const findDcmnFile = values.DCMNFILE.find(
+          (item) => item.FILENAME == "contentPost"
+        )?.FILECODE;
+        const formData1: FormData = new FormData();
+        formData1.append("DCMNCODE", "inpSalePost");
+        formData1.append("KEY_CODE", resultData?.KKKK0000);
+        formData1.append("FILECODE", findDcmnFile ? findDcmnFile : "");
+        await handleRemoveFile.mutateAsync(formData1);
+        const blob = new Blob([value], {
+          type: "text/plain",
+        });
+        const newContentThumnail = new File([blob], "contentPost.txt", {
+          type: blob.type,
+        });
+
+        formData.append("Files[1]", newContentThumnail);
+      }
       await handlePostImage.mutateAsync(formData);
     }
 
@@ -192,6 +253,83 @@ const PostCreatePage = () => {
     setIsLoading(false);
   };
 
+  useEffect(() => {
+    if (
+      fetchImageThumnail.isSuccess &&
+      fetchImageThumnail.data &&
+      handleFetchPostDetail.data
+    ) {
+      setInitialValue({
+        ...handleFetchPostDetail.data[0],
+        image: fetchImageThumnail.data,
+      });
+    }
+  }, [fetchImageThumnail.isSuccess]);
+
+  useEffect(() => {
+    if (fetchContentFile.isSuccess && fetchContentFile.data) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const textContent = e.target ? e.target.result : null;
+        console.log(textContent); // Kết quả dưới dạng văn bảns
+        setValue(textContent as string);
+        setContentInitial(textContent as string);
+      };
+      reader.readAsText(fetchContentFile.data);
+    }
+  }, [fetchContentFile.isSuccess]);
+
+  //   useEffect(() => {
+  //     refetch();
+  //   }, [id]);
+  //   useEffect(() => {
+  //     console.log(data, "Inital value ....");
+  //     if (data) {
+  //       console.log(data[0], "Initial value...");
+  //       setInitialValue({ ...data[0] });
+  //     }
+  //     if (fetchContentFile.data) {
+  //       const reader = new FileReader();
+  //       reader.onload = function (e) {
+  //         const textContent = e.target ? e.target.result : null;
+  //         console.log(textContent); // Kết quả dưới dạng văn bảns
+  //         setValue(textContent as string);
+  //         setContentInitial(textContent as string);
+  //       };
+  //       reader.readAsText(fetchContentFile.data);
+  //     }
+  //     if (fetchImageThumnail.data) {
+  //       setInitialValue({ ...initialValue, image: fetchImageThumnail.data });
+  //     }
+  //   }, []);
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await handleFetchPostDetail.mutateAsync({
+        DCMNCODE: "inpSalePost",
+        KEY_CODE: id,
+      });
+      await fetchImageThumnail.mutateAsync(
+        data[0].DCMNFILE.find(
+          (item: DcmnFileObject) => item.FILENAME == "thumnailPost"
+        ).FILE_URL
+          ? data[0].DCMNFILE.find(
+              (item: DcmnFileObject) => item.FILENAME == "thumnailPost"
+            ).FILE_URL
+          : ""
+      );
+      await fetchContentFile.mutateAsync(
+        data[0].DCMNFILE.find(
+          (item: DcmnFileObject) => item.FILENAME == "contentPost"
+        ).FILE_URL
+          ? data[0].DCMNFILE.find(
+              (item: DcmnFileObject) => item.FILENAME == "contentPost"
+            ).FILE_URL
+          : ""
+      );
+    };
+    fetchData();
+  }, [id]);
+  console.log(initialValue, "Initial value");
   return (
     <>
       <Dialog
@@ -208,9 +346,7 @@ const PostCreatePage = () => {
             <div className="w-full overflow-hidden">
               <div
                 className={`${
-                  handlePostImage.isSuccess && handlePost.isSuccess
-                    ? "-translate-x-1/2"
-                    : "translate-x-0"
+                  handlePost.isSuccess ? "-translate-x-1/2" : "translate-x-0"
                 } w-[200%] grid grid-cols-2 transition-transform`}
               >
                 <div className="flex flex-col">
@@ -225,37 +361,18 @@ const PostCreatePage = () => {
                   <DialogDescription className="flex items-center mb-5 justify-center gap-x-2 py-6">
                     <i className="ri-checkbox-line text-gray-700 text-xl"></i>{" "}
                     <span className="text-gray-700 text-base">
-                      Thêm quảng bài viết thành công!
+                      Cập nhật thành công!
                     </span>
                   </DialogDescription>
                   <div className="flex gap-x-2 justify-end">
                     <ButtonForm
                       type="button"
-                      className="!w-32 bg-secondary"
-                      label="Xem danh sách"
-                      onClick={() => navigate("/post")}
-                    ></ButtonForm>
-
-                    <ButtonForm
-                      type="button"
-                      className="!w-28"
-                      label="Thêm mới"
+                      className="!w-28 !bg-red-500"
+                      label="Hủy"
                       onClick={() => {
                         handlePost.reset();
                         setOpenDialog(false);
                         handlePostImage.reset();
-                        setInitialState({
-                          COMPCODE: "PMC",
-                          LCTNCODE: "001",
-                          image: "",
-                          newImage: null,
-                          content: "",
-                          newContent: "",
-                          // POSTCODE: "",
-                          POSTTITL: "",
-                          POSTSLUG: "",
-                          POST_TAG: "",
-                        });
                       }}
                     ></ButtonForm>
                   </div>
@@ -283,6 +400,7 @@ const PostCreatePage = () => {
         <Formik
           key={"formLogin"}
           initialValues={initialValue}
+          enableReinitialize={true}
           validationSchema={validationSchema}
           onSubmit={(values) => {
             console.log(values);
@@ -357,17 +475,16 @@ const PostCreatePage = () => {
                           <div
                             id="content"
                             dangerouslySetInnerHTML={{
-                              __html: addTailwindClasses(
+                              __html:
                                 `<h1>${
                                   values.POSTTITL
                                     ? values.POSTTITL
                                     : "Chưa có tiêu đề..."
                                 }</h1>` +
-                                  `<h5 style='font-size:14px'><span style='color:#484848;font-weight:500'>Ngày đăng:</span> ${moment(
-                                    Date.now()
-                                  ).format("DD/MM/yyyy HH:mm:ss")}</h5>` +
-                                  value
-                              ),
+                                `<h5 style='font-size:14px'><span style='color:#484848;font-weight:500'>Ngày đăng:</span> ${moment(
+                                  Date.now()
+                                ).format("DD/MM/yyyy HH:mm:ss")}</h5>` +
+                                value,
                             }}
                             className="w-full ql-review"
                           ></div>
@@ -382,7 +499,10 @@ const PostCreatePage = () => {
                     name="POSTTITL"
                     label={"Tiêu đề bài viết"}
                     onBlur={() => {
-                      setFieldValue("POSTSLUG", createSlug(values.POSTTITL));
+                      setFieldValue(
+                        "POSTSLUG",
+                        createSlug(values.POSTTITL ? values.POSTTITL : "")
+                      );
                     }}
                     important={true}
                     // placeholder="Nhập tài khoản..."
@@ -403,7 +523,7 @@ const PostCreatePage = () => {
                       Tag bài viết <span className="text-red-400">*</span>
                     </Label>
                     <MultiTagSelect
-                      value={values.POST_TAG}
+                      value={values.POST_TAG ? values.POST_TAG : ""}
                       onChange={(value) => setFieldValue("POST_TAG", value)}
                     ></MultiTagSelect>
                   </div>
@@ -423,14 +543,13 @@ const PostCreatePage = () => {
                     >
                       Thumbnail <span className="text-red-400">*</span>
                     </Label>
-                    <Label
-                      htmlFor="thumbnail"
-                      className="w-fit cursor-pointer  border border-gray-700 rounded-md overflow-hidden"
-                    >
+                    <Label htmlFor="thumbnail" className="w-fit cursor-pointer">
                       <img
                         src={
                           values.newImage
                             ? URL.createObjectURL(values.newImage)
+                            : fetchImageThumnail.data
+                            ? URL.createObjectURL(fetchImageThumnail.data)
                             : "https://media.istockphoto.com/id/1472933890/vector/no-image-vector-symbol-missing-available-icon-no-gallery-for-this-moment-placeholder.jpg?s=612x612&w=0&k=20&c=Rdn-lecwAj8ciQEccm0Ep2RX50FCuUJOaEM8qQjiLL0="
                         }
                         className="h-40 w-44 object-cover object-center border border-gray-100 shadow-sm"
@@ -529,4 +648,4 @@ const PostCreatePage = () => {
   );
 };
 
-export default PostCreatePage;
+export default PostUpdatePage;

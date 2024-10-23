@@ -139,3 +139,31 @@ export type AdvertisementUpdateObject = {
   BANR_RUN: number;
   IMAGE_BANR: string;
 };
+
+export type PostUpdateObject = {
+  COMPCODE: string | undefined | null;
+  LCTNCODE: string | undefined | null;
+  POSTCODE: string | undefined | null;
+  POSTTITL: string | undefined | null;
+  POSTSLUG: string | undefined | null;
+  POST_TAG: string | undefined | null;
+  DDDD: string | undefined | null;
+  ACCERGHT: number | undefined | null;
+  STTESIGN: number | undefined | null;
+  STTENAME: string | undefined | null;
+  KKKK0000: string | undefined | null;
+  DCMNFILE: DcmnFileObject[] | [];
+};
+
+export type DcmnFileObject = {
+  DCMNCODE: string | undefined | null;
+  KEY_CODE: string | undefined | null;
+  FILECODE: string | undefined | null;
+  FILE_GRP: number | undefined | null;
+  FILE_SRC: number | undefined | null;
+  FILETYPE: string | undefined | null;
+  FILENAME: string | undefined | null;
+  FILE_URL: string | undefined | null;
+  FILEDATA: string | undefined | null;
+  KKKK0001: string | undefined | null;
+};

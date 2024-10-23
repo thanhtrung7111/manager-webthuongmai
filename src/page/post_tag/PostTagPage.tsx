@@ -1,10 +1,16 @@
-import { deleteData, fetchDataCondition } from "@/api/commonApi";
 import BreadcrumbCustom from "@/component_common/breadcrumb/BreadcrumbCustom";
-import ButtonForm from "@/component_common/commonForm/ButtonForm";
-import SpinnerLoading from "@/component_common/loading/SpinnerLoading";
-import TableCustom from "@/component_common/table/TableCustom";
 import { Button } from "@/components/ui/button";
+import React, { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { deleteData, fetchCategory, fetchDataCondition } from "@/api/commonApi";
+import { error } from "console";
+import TableCustom from "@/component_common/table/TableCustom";
+import { payments } from "@/component_common/data/data";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Payment, ProductObject } from "@/type/TypeCommon";
+import { ColumnDef } from "@tanstack/react-table";
+import { useNavigate } from "react-router-dom";
+import ButtonForm from "@/component_common/commonForm/ButtonForm";
 import {
   Dialog,
   DialogContent,
@@ -12,43 +18,30 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { PostUpdateObject, ProductObject } from "@/type/TypeCommon";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ColumnDef } from "@tanstack/react-table";
-import { Badge } from "lucide-react";
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-const breadBrumb = [
-  {
-    itemName: "Quản lí chung",
-  },
-  {
-    itemName: "Danh sách bài viết",
-    itemLink: "/post",
-  },
-];
-const PostPage = () => {
-  const navigate = useNavigate();
-  const [openDialogDelete, setOpentDialogDelete] = useState(false);
-  const queryClient = useQueryClient();
-  const [objectDelete, setObjectDelete] = useState<PostUpdateObject | null>(
-    null
-  );
+import SpinnerLoading from "@/component_common/loading/SpinnerLoading";
+import PostTagCreateDialog from "./component/PostTagCreateDialog";
 
+const PostTagPage = () => {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [openDialogDelete, setOpentDialogDelete] = useState(false);
+  const [openCreate, setOpenCreate] = useState(false);
+  const [objectDelete, setObjectDelete] = useState<ProductObject | null>(null);
   const { data, isLoading, isFetching, error, isSuccess } = useQuery({
-    queryKey: ["posts"],
+    queryKey: ["postTags"],
     queryFn: () =>
       fetchDataCondition({
-        DCMNCODE: "inpSalePost",
+        DCMNCODE: "inpPostTag",
         PAGELINE: "0",
         PAGENUMB: "1",
       }),
   });
+
   const handleDelete = useMutation({
     mutationFn: (body: { [key: string]: any }) => deleteData(body),
-    onSuccess: async (data: PostUpdateObject[], body) => {
-      if (queryClient.getQueryData(["posts"])) {
-        queryClient.setQueryData(["posts"], (oldData: PostUpdateObject[]) => {
+    onSuccess: async (data: ProductObject[], body) => {
+      if (queryClient.getQueryData(["postTags"])) {
+        queryClient.setQueryData(["postTags"], (oldData: ProductObject[]) => {
           if (!oldData) return [];
           console.log(data);
           console.log(body);
@@ -60,7 +53,19 @@ const PostPage = () => {
       console.log(error);
     },
   });
-  const columns: ColumnDef<PostUpdateObject>[] = [
+  const breadBrumb = [
+    {
+      itemName: "Quản lí chung",
+    },
+    {
+      itemName: "Bài viết",
+    },
+    {
+      itemName: "Tag bài viết",
+      itemLink: "/post_tag",
+    },
+  ];
+  const columns: ColumnDef<ProductObject>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -84,15 +89,15 @@ const PostPage = () => {
       enableHiding: false,
     },
     {
-      accessorKey: "POSTCODE",
-      meta: "Mã bài viết",
+      accessorKey: "TAG_CODE",
+      meta: "Mã tag bài viết",
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Mã bài viết
+            Mã tag bài viết
             {column.getIsSorted() === "asc" ? (
               <i className="ri-arrow-up-line"></i>
             ) : (
@@ -102,20 +107,20 @@ const PostPage = () => {
         );
       },
       cell: ({ row }) => (
-        <div className="capitalize">{row.getValue("POSTCODE")}</div>
+        <div className="capitalize">{row.getValue("TAG_CODE")}</div>
       ),
       enableHiding: true,
     },
     {
-      accessorKey: "POSTTITL",
-      meta: "Tiêu đề",
+      accessorKey: "TAG_NAME",
+      meta: "Tên tag bài viết",
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Tiêu đề
+            Tên tag bài viết
             {column.getIsSorted() === "asc" ? (
               <i className="ri-arrow-up-line"></i>
             ) : (
@@ -125,35 +130,7 @@ const PostPage = () => {
         );
       },
       cell: ({ row }) => (
-        <div className="capitalize">{row.getValue("POSTTITL")}</div>
-      ),
-      enableHiding: true,
-    },
-    {
-      accessorKey: "POST_TAG",
-      meta: "Tag bài viết",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Tag bài viết
-            {column.getIsSorted() === "asc" ? (
-              <i className="ri-arrow-up-line"></i>
-            ) : (
-              <i className="ri-arrow-down-line"></i>
-            )}
-          </Button>
-        );
-      },
-      cell: ({ row }) => (
-        <div
-          className="capitalize"
-          onClick={() => row.toggleSelected(!row?.getIsSelected())}
-        >
-          {row.getValue("POST_TAG") as string}
-        </div>
+        <div className="capitalize">{row.getValue("TAG_NAME")}</div>
       ),
       enableHiding: true,
     },
@@ -167,15 +144,12 @@ const PostPage = () => {
         const payment = row.original;
         return (
           <div className="flex gap-x-2 justify-end">
-            <ButtonForm
+            {/* <ButtonForm
               className="!bg-yellow-500 !w-28"
               type="button"
               icon={<i className="ri-error-warning-line"></i>}
               label="Xem chi tiết"
-              onClick={() => {
-                navigate("/update_post/" + row.original.KKKK0000);
-              }}
-            ></ButtonForm>
+            ></ButtonForm> */}
 
             <ButtonForm
               className="!bg-red-500 !w-20"
@@ -185,6 +159,10 @@ const PostPage = () => {
               onClick={() => {
                 setObjectDelete(row.original);
                 setOpentDialogDelete(true);
+                // handleDelete.mutateAsync({
+                //   DCMNCODE: "inpProduct",
+                //   KEY_CODE: row.original.KKKK0000,
+                // });
               }}
             ></ButtonForm>
           </div>
@@ -192,8 +170,13 @@ const PostPage = () => {
       },
     },
   ];
+  console.log(data);
   return (
     <>
+      <PostTagCreateDialog
+        onClose={() => setOpenCreate(false)}
+        open={openCreate}
+      ></PostTagCreateDialog>
       <Dialog
         open={openDialogDelete}
         onOpenChange={() => {
@@ -227,7 +210,7 @@ const PostPage = () => {
                           Bạn có muốn xóa tag
                           <b className="text-gray-500">
                             {" "}
-                            {objectDelete?.POSTTITL}
+                            {objectDelete?.TAG_NAME}
                           </b>{" "}
                           ?
                         </span>
@@ -242,7 +225,7 @@ const PostPage = () => {
                       onClick={async () => {
                         if (objectDelete != null)
                           handleDelete.mutateAsync({
-                            DCMNCODE: "inpSalePost",
+                            DCMNCODE: "inpProduct",
                             KEY_CODE: objectDelete?.KKKK0000,
                           });
                       }}
@@ -270,7 +253,7 @@ const PostPage = () => {
                       className="!w-28 !bg-secondary"
                       label="Thêm mới"
                       onClick={() => {
-                        navigate("/create_post");
+                        navigate("/create_product");
                       }}
                     ></ButtonForm>
                     <ButtonForm
@@ -300,7 +283,7 @@ const PostPage = () => {
         {/* Action  */}
         <div className="flex justify-between items-center">
           <h4 className="text-xl font-medium text-gray-600">
-            Danh sách bài viết
+            Danh sách sản phẩm
           </h4>
           <div className="flex gap-x-2">
             <ButtonForm
@@ -313,7 +296,7 @@ const PostPage = () => {
               className="!bg-secondary !w-28"
               type="button"
               icon={<i className="ri-file-add-line"></i>}
-              onClick={() => navigate("/create_post")}
+              onClick={() => setOpenCreate(true)}
               label="Thêm mới"
             ></ButtonForm>
           </div>
@@ -322,26 +305,26 @@ const PostPage = () => {
         {/* table */}
         <div className="rounded-md p-5 bg-white border-gray-200 border shadow-md">
           <TableCustom
-            data={data ? data : []}
+            data={isSuccess ? data : []}
             columns={columns}
             search={[
-              { key: "PRDCCODE", name: "mã sản phẩm", type: "text" },
-              // { key: "PRDCNAME", name: "tên sản phẩm", type: "text" },
-              // {
-              //   key: "QUOMNAME",
-              //   name: "đơn vị tính",
-              //   type: "combobox",
-              //   dataList: lstQUOM,
-              //   dataKey: "ITEMNAME",
-              //   dataName: "ITEMNAME",
-              // },
+              { key: "TAG_CODE", name: "mã tag bài viết", type: "text" },
+              { key: "TAG_NAME", name: "tên tag bài viết", type: "text" },
+              //   {
+              //     key: "QUOMNAME",
+              //     name: "đơn vị tính",
+              //     type: "combobox",
+              //     dataList: lstQUOM,
+              //     dataKey: "ITEMNAME",
+              //     dataName: "ITEMNAME",
+              //   },
             ]}
-            //   isLoading={isFetching}
+            isLoading={isFetching}
           ></TableCustom>
         </div>
-      </div>
+      </div>{" "}
     </>
   );
 };
 
-export default PostPage;
+export default PostTagPage;

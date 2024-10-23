@@ -6,6 +6,7 @@ const InputFormikForm = ({
   important = false,
   disabled = false,
   onChange,
+  onBlur,
   name,
   placeholder,
   ...props
@@ -16,6 +17,7 @@ const InputFormikForm = ({
   name: string;
   placeholder?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onBlur?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) => {
   const [field, meta, helpers] = useField(name);
   return (
@@ -34,6 +36,7 @@ const InputFormikForm = ({
           helpers.setValue(e.target.value);
           if (onChange) onChange(e);
         }}
+        onBlur={onBlur}
         placeholder={placeholder}
         disabled={disabled}
         className={`${

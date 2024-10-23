@@ -72,9 +72,22 @@ const menu: any[] = [
       },
       {
         itemName: "Bài viết",
-        itemIcon: <i className="ri-newspaper-line"></i>,
-        link: "/post",
+        itemIcon: <i className="ri-instance-line"></i>,
+        itemList: [
+          {
+            itemName: "Bài viết",
+            itemIcon: <i className="ri-instance-line"></i>,
+            link: "/post",
+          },
+
+          {
+            itemName: "Tag bài viết",
+            itemIcon: <i className="ri-file-add-line"></i>,
+            link: "/post_tag",
+          },
+        ],
       },
+
       {
         itemName: "Khuyến mãi",
         itemIcon: <i className="ri-ticket-2-line"></i>,

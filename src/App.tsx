@@ -22,6 +22,8 @@ import AdvertisementCreatePage from "./page/advertisement/AdvertisementCreatePag
 import AdvertisementUpdatePage from "./page/advertisement/AdvertisementUpdatePage";
 import PostPage from "./page/post/PostPage";
 import PostCreatePage from "./page/post/PostCreatePage";
+import PostTagPage from "./page/post_tag/PostTagPage";
+import PostUpdatePage from "./page/post/PostUpdatePage";
 
 function App() {
   const { currentUser, tokenInitial, setTokenInitial } = useUserStore();
@@ -89,6 +91,14 @@ function App() {
             <Route
               element={<PostCreatePage></PostCreatePage>}
               path="/create_post"
+            ></Route>
+            <Route
+              element={<PostUpdatePage></PostUpdatePage>}
+              path="/update_post/:id"
+            ></Route>
+            <Route
+              element={<PostTagPage></PostTagPage>}
+              path="/post_tag"
             ></Route>
             <Route
               element={<MessagesPage></MessagesPage>}

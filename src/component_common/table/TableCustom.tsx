@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/popover";
 import { any } from "zod";
 import ComboboxCustom from "../common_form/ComboboxCustom";
+import ButtonForm from "../commonForm/ButtonForm";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -113,7 +114,14 @@ const TableCustom = <TData, TValue>({
                   <input
                     placeholder={`Nhập ${item.name} tìm kiếm...`}
                     className="outline-none rounded-md border border-gray-300 text-sm py-2 px-3"
-                    onChange={(e) => {
+                    // onChange={(e) => {
+                    //   table
+                    //     .getColumn(`${item.key}`)
+                    //     ?.setFilterValue(e.target.value);
+
+                    //   setPageIndex(0);
+                    // }}
+                    onBlur={(e) => {
                       table
                         .getColumn(`${item.key}`)
                         ?.setFilterValue(e.target.value);
@@ -138,6 +146,11 @@ const TableCustom = <TData, TValue>({
                   ></ComboboxCustom>
                 );
               })}
+              <ButtonForm
+                className="Tìm kiếm"
+                label="Tìm kiếm"
+                type="submit"
+              ></ButtonForm>
             </PopoverContent>
           </Popover>
           <TooltipProvider>

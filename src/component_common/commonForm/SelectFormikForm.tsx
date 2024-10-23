@@ -79,8 +79,9 @@ const SelectFormikForm = ({
   }, [options]);
   useEffect(() => {
     const findItem = options.find(
-      (item: ObjectSelect) => item[itemKey] == field.value
+      (item: ObjectSelect) => item[itemKey] + "item" == field.value + "item"
     );
+    console.log(findItem);
     if (findItem) setSelected(findItem);
   }, [field.value]);
   // const renderItem = useCallback(

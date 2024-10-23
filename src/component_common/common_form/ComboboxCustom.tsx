@@ -41,12 +41,14 @@ const frameworks = [
 ];
 const ComboboxCustom = ({
   onChange,
+  onBlur,
   dataList = [],
   dataKey,
   dataName,
   placeholder,
 }: {
   onChange?: (item: any) => void;
+  onBlur?: (item: any) => void;
   dataList: CommonObject[];
   dataKey: keyof CommonObject;
   dataName: keyof CommonObject;
