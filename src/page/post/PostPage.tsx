@@ -325,8 +325,8 @@ const PostPage = () => {
             data={data ? data : []}
             columns={columns}
             search={[
-              { key: "PRDCCODE", name: "mã sản phẩm", type: "text" },
-              // { key: "PRDCNAME", name: "tên sản phẩm", type: "text" },
+              { key: "POSTCODE", name: "mã bài viết", type: "text" },
+              { key: "POSTTITL", name: "tiêu đề", type: "text" },
               // {
               //   key: "QUOMNAME",
               //   name: "đơn vị tính",

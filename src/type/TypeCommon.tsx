@@ -63,6 +63,36 @@ export type ProductObject = {
   [key: string]: any;
 };
 
+export type ProductUpdateObject = {
+  COMPCODE: string | null | undefined;
+  PRDCCODE: string | null | undefined;
+  LCTNCODE: string | null | undefined;
+  MPRDCNME: string | null | undefined;
+  SCTNCODE: string | null | undefined;
+  GRPRCODE: string | null | undefined;
+  BRNDCODE: string | null | undefined;
+  COLRCODE: string | null | undefined;
+  MDELPRDC: string | null | undefined;
+  BRIFNAME: string | null | undefined;
+  QUOMCODE: number | null | undefined;
+  VAT_RATE: number | null | undefined;
+  STDRQUOM: number | null | undefined;
+  MNFRTYPE: number | null | undefined;
+  PRDCPICT: string | null | undefined;
+  CURRCODE: string | null | undefined;
+  SORTCODE: number | null | undefined;
+  GRP_MNFR: string | null | undefined;
+  DCMNSBCD: string | null | undefined;
+  DDDD: string | null | undefined;
+  ACCERGHT: number | null | undefined;
+  STTESIGN: number | null | undefined;
+  STTENAME: string | null | undefined;
+  QRC_DATA: string | null | undefined;
+  KKKK0000: string | null | undefined;
+  DETAIL: any[];
+  DCMNFILE: DcmnFileObject[];
+};
+
 export type Payment = {
   id: string;
   amount: number;

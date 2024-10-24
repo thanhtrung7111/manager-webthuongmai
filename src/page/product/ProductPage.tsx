@@ -184,6 +184,9 @@ const ProductPage = () => {
               type="button"
               icon={<i className="ri-error-warning-line"></i>}
               label="Xem chi tiết"
+              onClick={() =>
+                navigate("/update_product/" + row.original.KKKK0000)
+              }
             ></ButtonForm>
 
             <ButtonForm
@@ -238,10 +241,10 @@ const ProductPage = () => {
                       <>
                         <i className="ri-delete-bin-line text-gray-700 text-xl"></i>
                         <span className="text-gray-700 text-base">
-                          Bạn có muốn xóa quảng cáo{" "}
+                          Bạn có muốn xóa tag
                           <b className="text-gray-500">
                             {" "}
-                            {objectDelete?.PRDCNAME}
+                            {objectDelete?.TAG_NAME}
                           </b>{" "}
                           ?
                         </span>

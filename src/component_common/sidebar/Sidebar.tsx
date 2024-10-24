@@ -66,11 +66,6 @@ const menu: any[] = [
         ],
       },
       {
-        itemName: "Quảng cáo",
-        itemIcon: <i className="ri-advertisement-line"></i>,
-        link: "/advertisement",
-      },
-      {
         itemName: "Bài viết",
         itemIcon: <i className="ri-instance-line"></i>,
         itemList: [
@@ -86,6 +81,11 @@ const menu: any[] = [
             link: "/post_tag",
           },
         ],
+      },
+      {
+        itemName: "Quảng cáo",
+        itemIcon: <i className="ri-advertisement-line"></i>,
+        link: "/advertisement",
       },
 
       {

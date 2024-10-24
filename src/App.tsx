@@ -24,6 +24,7 @@ import PostPage from "./page/post/PostPage";
 import PostCreatePage from "./page/post/PostCreatePage";
 import PostTagPage from "./page/post_tag/PostTagPage";
 import PostUpdatePage from "./page/post/PostUpdatePage";
+import ProductUpdatePage from "./page/product/component/ProductUpdatePage";
 
 function App() {
   const { currentUser, tokenInitial, setTokenInitial } = useUserStore();
@@ -74,7 +75,10 @@ function App() {
               element={<ProductCreatePageFormik></ProductCreatePageFormik>}
               path="/create_product"
             ></Route>
-
+            <Route
+              element={<ProductUpdatePage></ProductUpdatePage>}
+              path="/update_product/:id"
+            ></Route>
             <Route
               element={<AdvertisementPage></AdvertisementPage>}
               path="/advertisement"

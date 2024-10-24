@@ -419,7 +419,7 @@ const PostUpdatePage = () => {
                     <i className="ri-logout-box-line text-xl"></i>
                   </div>
                   <h4 className="text-xl font-medium text-gray-600">
-                    Thêm bài viết mới
+                    Cập nhật bài viết
                   </h4>
                 </div>
                 <div className="flex gap-x-2 shrink-0">
@@ -543,7 +543,10 @@ const PostUpdatePage = () => {
                     >
                       Thumbnail <span className="text-red-400">*</span>
                     </Label>
-                    <Label htmlFor="thumbnail" className="w-fit cursor-pointer">
+                    <Label
+                      htmlFor="thumbnail"
+                      className="w-fit cursor-pointer border-gray-400 border rounded-md"
+                    >
                       <img
                         src={
                           values.newImage
