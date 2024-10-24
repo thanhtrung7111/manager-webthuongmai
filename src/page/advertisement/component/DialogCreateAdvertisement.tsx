@@ -6,8 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import React, { useEffect } from "react";
-import { any } from "zod";
+import  { useEffect } from "react";
 
 const DialogCreateAdvertisement = ({
   open,
