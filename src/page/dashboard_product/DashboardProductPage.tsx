@@ -9,11 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ProductObject } from "@/type/TypeCommon";
 import { ColumnDef } from "@tanstack/react-table";
-import React from "react";
 import { useNavigate } from "react-router-dom";
 
 const DashboardProductPage = () => {
-  const navigate = useNavigate();
   const breadBrumb = [
     {
       itemName: "Biểu đồ",
@@ -262,11 +260,13 @@ const DashboardProductPage = () => {
         <TableCustom
           data={[]}
           columns={columns}
-          search={[
-            { key: "PRDCCODE", name: "mã sản phẩm" },
-            { key: "PRDCNAME", name: "tên sản phẩm" },
-            { key: "QUOMNAME", name: "đơn vị tính" },
-          ]}
+          search={
+            [
+              // { key: "PRDCCODE", name: "mã sản phẩm" },
+              // { key: "PRDCNAME", name: "tên sản phẩm" },
+              // { key: "QUOMNAME", name: "đơn vị tính" },
+            ]
+          }
           // isLoading={isFetching}
         ></TableCustom>
       </div>

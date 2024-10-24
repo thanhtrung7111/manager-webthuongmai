@@ -3,11 +3,8 @@ import {
   PaginationContent,
   PaginationEllipsis,
   PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
 } from "@/components/ui/pagination";
-import React, { useState } from "react";
+import React from "react";
 import { usePanigation, DOTS } from "./usePagination";
 
 const PaginationCustom = ({

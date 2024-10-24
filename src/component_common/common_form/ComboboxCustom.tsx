@@ -16,29 +16,6 @@ import { cn } from "@/lib/utils";
 import { CommonObject } from "@/type/TypeCommon";
 import { Check, ChevronsUpDown } from "lucide-react";
 import React, { useEffect } from "react";
-import { any } from "zod";
-const frameworks = [
-  {
-    value: "next.js",
-    label: "Next.js",
-  },
-  {
-    value: "sveltekit",
-    label: "SvelteKit",
-  },
-  {
-    value: "nuxt.js",
-    label: "Nuxt.js",
-  },
-  {
-    value: "remix",
-    label: "Remix",
-  },
-  {
-    value: "astro",
-    label: "Astro",
-  },
-];
 const ComboboxCustom = ({
   onChange,
   onBlur,

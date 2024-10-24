@@ -4,7 +4,6 @@ import SpinnerLoading from "../loading/SpinnerLoading";
 const ButtonForm = ({
   type = "button",
   label,
-  labelLoading = "",
   loading = false,
   disabled = false,
   className = "",
@@ -13,7 +12,6 @@ const ButtonForm = ({
 }: {
   type: "button" | "submit";
   label?: string;
-  labelLoading?: string;
   loading?: boolean;
   disabled?: boolean;
   className?: string;

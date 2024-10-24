@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/dialog";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Form, Formik } from "formik";
-import React, { useState } from "react";
 import * as Yup from "yup";
 
 const PostTagCreateDialog = ({
@@ -76,14 +75,7 @@ const PostTagCreateDialog = ({
             handleSubmit(values);
           }}
         >
-          {({
-            setFieldValue,
-            handleChange,
-            values,
-            errors,
-            touched,
-            resetForm,
-          }) => (
+          {({ resetForm }) => (
             <Form id="formCreateProduct">
               <DialogHeader>
                 <DialogTitle className="mb-5">

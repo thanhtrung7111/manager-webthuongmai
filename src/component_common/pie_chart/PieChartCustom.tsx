@@ -6,7 +6,6 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import React from "react";
 import { LabelList, Pie, PieChart } from "recharts";
 
 const PieChartCustom = () => {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import HomePage from "@/page/home/HomePage";
 import AppCommon from "./template/AppCommon";
@@ -12,7 +12,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchInitialToken } from "./api/authApi";
 import { useUserStore } from "./store/userStore";
 import SpinnerLoading from "./component_common/loading/SpinnerLoading";
-import ProductCreatePage from "./page/create_product/ProductCreatePage";
+// import ProductCreatePage from "./page/create_product/ProductCreatePage";
 import { Toaster } from "sonner";
 import ProductCreatePageFormik from "./page/create_product/ProductCreatePageFormik";
 import MessagesPage from "./page/message/MessagesPage";
@@ -27,8 +27,8 @@ import PostUpdatePage from "./page/post/PostUpdatePage";
 import ProductUpdatePage from "./page/product/component/ProductUpdatePage";
 
 function App() {
-  const { currentUser, tokenInitial, setTokenInitial } = useUserStore();
-  const { data, isError, isLoading, isFetching, isSuccess } = useQuery({
+  const { currentUser, setTokenInitial } = useUserStore();
+  const { data, isFetching, isSuccess } = useQuery({
     queryKey: ["tokenInitial"],
     queryFn: async () => await fetchInitialToken(),
   });

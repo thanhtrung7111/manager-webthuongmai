@@ -1,12 +1,11 @@
-import { FieldHookConfig, useField } from "formik";
-import React, { useEffect, useState } from "react";
+import { useField } from "formik";
+import { useEffect, useState } from "react";
 import Datepicker from "react-tailwindcss-datepicker";
 const DatePickerFormikForm = ({
   label,
   important = false,
   disabled = false,
   name,
-  ...props
 }: {
   label: string;
   important: boolean;

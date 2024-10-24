@@ -1,13 +1,11 @@
 import BreadcrumbCustom from "@/component_common/breadcrumb/BreadcrumbCustom";
 import { Button } from "@/components/ui/button";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { deleteData, fetchCategory, fetchDataCondition } from "@/api/commonApi";
-import { error } from "console";
 import TableCustom from "@/component_common/table/TableCustom";
-import { payments } from "@/component_common/data/data";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Payment, ProductObject } from "@/type/TypeCommon";
+import { ProductObject } from "@/type/TypeCommon";
 import { ColumnDef } from "@tanstack/react-table";
 import { useNavigate } from "react-router-dom";
 import ButtonForm from "@/component_common/commonForm/ButtonForm";
@@ -25,7 +23,7 @@ const ProductPage = () => {
   const queryClient = useQueryClient();
   const [openDialogDelete, setOpentDialogDelete] = useState(false);
   const [objectDelete, setObjectDelete] = useState<ProductObject | null>(null);
-  const { data, isLoading, isFetching, error, isSuccess } = useQuery({
+  const { data, isFetching, isSuccess } = useQuery({
     queryKey: ["products"],
     queryFn: () =>
       fetchDataCondition({
@@ -176,7 +174,6 @@ const ProductPage = () => {
       },
       enableHiding: false,
       cell: ({ row }) => {
-        const payment = row.original;
         return (
           <div className="flex gap-x-2 justify-end">
             <ButtonForm

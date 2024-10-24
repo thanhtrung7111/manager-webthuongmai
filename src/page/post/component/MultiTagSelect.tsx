@@ -14,16 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  Select,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { SelectContent } from "@radix-ui/react-select";
 import { useQuery } from "@tanstack/react-query";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -36,7 +27,7 @@ const MultiTagSelect = ({
   onChange: (list: string) => void;
   value: string;
 }) => {
-  const { data, isLoading, isSuccess, isFetching } = useQuery({
+  const { data, isSuccess } = useQuery({
     queryKey: ["postTags"],
     queryFn: () =>
       fetchDataCondition({
@@ -65,7 +56,7 @@ const MultiTagSelect = ({
         >
           <div className="flex flex-wrap gap-x-3 h-fit text-gray-600">
             {value != ""
-              ? value.split(",").map((tag, index) => (
+              ? value.split(",").map((tag) => (
                   <div className="relative">
                     <Badge className="bg-secondary">{tag}</Badge>
                     <div
@@ -95,7 +86,7 @@ const MultiTagSelect = ({
           <CommandList>
             <CommandEmpty>No framework found.</CommandEmpty>
             <CommandGroup>
-              {options.map((item, index: number) => (
+              {options.map((item) => (
                 <CommandItem
                   key={item}
                   value={item}

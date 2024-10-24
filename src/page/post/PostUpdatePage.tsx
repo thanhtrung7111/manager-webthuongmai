@@ -11,14 +11,13 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-label";
-import { Form, Formik, useFormikContext } from "formik";
-import React, { ReactNode, useEffect, useRef, useState } from "react";
+import { Form, Formik } from "formik";
+import { useEffect, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import "./css/quillCustomStyles.css";
 import { useNavigate, useParams } from "react-router-dom";
 import * as Yup from "yup";
-import Quill from "quill";
 import moment from "moment";
 import { createSlug } from "@/helper/commonHelper";
 import MultiTagSelect from "./component/MultiTagSelect";
@@ -27,11 +26,10 @@ import {
   deleteImage,
   fetchDetailData,
   fetchImage,
-  postData,
   postImage,
   updateData,
 } from "@/api/commonApi";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import SpinnerLoading from "@/component_common/loading/SpinnerLoading";
 import { DcmnFileObject, PostUpdateObject } from "@/type/TypeCommon";
 
@@ -48,9 +46,6 @@ const breadBrumb = [
     itemLink: "/create_product",
   },
 ];
-interface ReactQuillRef {
-  getEditor: () => Quill;
-}
 const PostUpdatePage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -60,11 +55,6 @@ const PostUpdatePage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [infoLoading, setInfoLoading] = useState<string>("");
   const queryClient = useQueryClient();
-  const [valueFile, setValueFile] = useState("");
-  // const { values } = useFormikContext() ?? Ơ;
-  const [valueChang, setValueChange] = useState("");
-  const quillRef = useRef<ReactQuillRef | null>(null);
-  const cursorPositionRef = useRef<number | null>(null);
   const [initialValue, setInitialValue] = useState<
     PostUpdateObject & { newImage?: File | null; image?: string }
   >({
@@ -407,7 +397,7 @@ const PostUpdatePage = () => {
             handleSubmit(values);
           }}
         >
-          {({ setFieldValue, handleChange, values, errors, touched }) => (
+          {({ setFieldValue, values, errors, touched }) => (
             <Form id="formCreateProduct">
               {/* Action  */}
               <div className="flex justify-between items-center mb-2">

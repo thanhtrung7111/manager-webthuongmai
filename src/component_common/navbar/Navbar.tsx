@@ -11,16 +11,7 @@ import {
 import SearchComponent from "./component/SearchComponent";
 import NotificationComponent from "./component/NotificationComponent";
 import MessageComponent from "./component/MessageComponent";
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import Menu from "../sidebar/Menu";
 import { useMediaQuery } from "react-responsive";

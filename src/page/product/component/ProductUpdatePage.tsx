@@ -21,11 +21,11 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useUserStore } from "@/store/userStore";
+// import { useUserStore } from "@/store/userStore";
 import {
   CategoryObject,
   DataExcelPatternObject,
-  DcmnFileObject,
+  //   DcmnFileObject,
   ProductObject,
   ProductUpdateObject,
 } from "@/type/TypeCommon";
@@ -33,9 +33,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Form, Formik } from "formik";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "sonner";
+// import { toast } from "sonner";
 import * as Yup from "yup";
-import Excel from "exceljs";
+// import Excel from "exceljs";
 import { exportExcelPattern } from "@/helper/excelHelper";
 
 const breadBrumb = [
@@ -53,12 +53,11 @@ const breadBrumb = [
 ];
 const ProductUpdatePage = () => {
   const { id } = useParams();
-  const [progress, setProgress] = useState<number>(0);
   const [infoLoading, setInfoLoading] = useState<string>("");
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [image, setImage] = useState<File | null>(null);
-  const { currentUser } = useUserStore();
+  //   const { currentUser } = useUserStore();
   const [openDialog, setOpenDialog] = useState<boolean>(false);
 
   const [initialValue, setInitialValue] = useState<ProductUpdateObject>({
@@ -93,7 +92,7 @@ const ProductUpdatePage = () => {
   const {
     data: lstQUOM,
     isFetching: isFetchingLstQUOM,
-    isSuccess: isSuccessLstQUOM,
+    // isSuccess: isSuccessLstQUOM,
   } = useQuery({
     queryKey: ["lstQUOM"],
     queryFn: () => fetchCategory("lstQUOM"),
@@ -102,7 +101,7 @@ const ProductUpdatePage = () => {
   const {
     data: lstDcmnSbCd,
     isFetching: isFetchinglstDcmnSbCd,
-    isSuccess: isSuccesslstDcmnSbCd,
+    // isSuccess: isSuccesslstDcmnSbCd,
   } = useQuery({
     queryKey: ["lstDcmnSbCd"],
     queryFn: () => fetchCategory("lstDcmnSbCd"),
@@ -110,7 +109,7 @@ const ProductUpdatePage = () => {
   const {
     data: lstProductBrand,
     isFetching: isFetchinglstProductBrand,
-    isSuccess: isSuccesslstProductBrand,
+    // isSuccess: isSuccesslstProductBrand,
   } = useQuery({
     queryKey: ["lstProductBrand"],
     queryFn: () => fetchCategory("lstProductBrand"),
@@ -119,7 +118,7 @@ const ProductUpdatePage = () => {
   const {
     data: lstColor,
     isFetching: isFetchinglstColor,
-    isSuccess: isSuccesslstColor,
+    // isSuccess: isSuccesslstColor,
   } = useQuery({
     queryKey: ["lstColor"],
     queryFn: () => fetchCategory("lstColor"),
@@ -128,7 +127,7 @@ const ProductUpdatePage = () => {
   const {
     data: lstSpndSgDt_Tax_RaNm,
     isFetching: isFetchinglstSpndSgDt_Tax_RaNm,
-    isSuccess: isSuccesslstSpndSgDt_Tax_RaNm,
+    // isSuccess: isSuccesslstSpndSgDt_Tax_RaNm,
   } = useQuery({
     queryKey: ["lstSpndSgDt_Tax_RaNm"],
     queryFn: () => fetchCategory("lstSpndSgDt_Tax_RaNm"),
@@ -137,7 +136,7 @@ const ProductUpdatePage = () => {
   const {
     data: lstEnum_PrdcOptn,
     isFetching: isFetchinglstEnum_PrdcOptn,
-    isSuccess: isSuccesslstEnum_PrdcOptn,
+    // isSuccess: isSuccesslstEnum_PrdcOptn,
   } = useQuery({
     queryKey: ["Enum_PrdcOptn"],
     queryFn: () => fetchCategory("Enum_PrdcOptn"),
@@ -145,7 +144,7 @@ const ProductUpdatePage = () => {
   const {
     data: lstSortCode,
     isFetching: isFetchinglstSortCode,
-    isSuccess: isSuccesslstSortCode,
+    // isSuccess: isSuccesslstSortCode,
   } = useQuery({
     queryKey: ["lstSortCode"],
     queryFn: () => fetchCategory("lstSortCode"),
@@ -154,7 +153,7 @@ const ProductUpdatePage = () => {
   const {
     data: lstProductGroup,
     isFetching: isFetchinglstProductGroup,
-    isSuccess: isSuccesslstProductGroup,
+    // isSuccess: isSuccesslstProductGroup,
   } = useQuery({
     queryKey: ["lstProductGroup"],
     queryFn: () => fetchCategory("lstProductGroup"),
@@ -162,7 +161,7 @@ const ProductUpdatePage = () => {
   const {
     data: lstPrdcSection,
     isFetching: isFetchinglstPrdcSection,
-    isSuccess: isSuccesslstPrdcSection,
+    // isSuccess: isSuccesslstPrdcSection,
   } = useQuery({
     queryKey: ["lstPrdcSection"],
     queryFn: () => fetchCategory("lstPrdcSection"),
@@ -171,7 +170,7 @@ const ProductUpdatePage = () => {
   const {
     data: lstProductGroupMnfr,
     isFetching: isFetchinglstProductGroupMnfr,
-    isSuccess: isSuccesslstProductGroupMnfr,
+    // isSuccess: isSuccesslstProductGroupMnfr,
   } = useQuery({
     queryKey: ["lstProductGroupMnfr"],
     queryFn: () => fetchCategory("lstProductGroupMnfr"),
@@ -179,7 +178,7 @@ const ProductUpdatePage = () => {
   const {
     data: lstMnfrType_inpPrdcOdMt,
     isFetching: isFetchinglstMnfrType_inpPrdcOdMt,
-    isSuccess: isSuccesslstMnfrType_inpPrdcOdMt,
+    // isSuccess: isSuccesslstMnfrType_inpPrdcOdMt,
   } = useQuery({
     queryKey: ["lstMnfrType_inpPrdcOdMt"],
     queryFn: () => fetchCategory("lstMnfrType_inpPrdcOdMt"),
@@ -188,7 +187,7 @@ const ProductUpdatePage = () => {
   const {
     data: lstStdrQUOM,
     isFetching: isFetchinglstStdrQUOM,
-    isSuccess: isSuccesslstStdrQUOM,
+    // isSuccess: isSuccesslstStdrQUOM,
   } = useQuery({
     queryKey: ["lstStdrQUOM"],
     queryFn: () => fetchCategory("lstStdrQUOM"),
@@ -196,7 +195,7 @@ const ProductUpdatePage = () => {
   const {
     data: lstProduct_Set_Mtrl,
     isFetching: isFetchinglstProduct_Set_Mtrl,
-    isSuccess: isSuccesslstProduct_Set_Mtrl,
+    // isSuccess: isSuccesslstProduct_Set_Mtrl,
   } = useQuery({
     queryKey: ["lstProduct_Set_Mtrl"],
     queryFn: () => fetchCategory("lstProduct_Set_Mtrl"),
@@ -204,7 +203,7 @@ const ProductUpdatePage = () => {
   const {
     data: lstAssetType,
     isFetching: isFetchinglstAssetType,
-    isSuccess: isSuccesslstAssetType,
+    // isSuccess: isSuccesslstAssetType,
   } = useQuery({
     queryKey: ["lstAssetType"],
     queryFn: () => fetchCategory("lstAssetType"),
@@ -212,7 +211,7 @@ const ProductUpdatePage = () => {
   const {
     data: lstAssetSubType,
     isFetching: isFetchinglstAssetSubType,
-    isSuccess: isSuccesslstAssetSubType,
+    // isSuccess: isSuccesslstAssetSubType,
   } = useQuery({
     queryKey: ["lstAssetSubType"],
     queryFn: () => fetchCategory("lstAssetSubType"),
@@ -220,7 +219,7 @@ const ProductUpdatePage = () => {
   const {
     data: lstAsstSgAt,
     isFetching: isFetchinglstAsstSgAt,
-    isSuccess: isSuccesslstAsstSgAt,
+    // isSuccess: isSuccesslstAsstSgAt,
   } = useQuery({
     queryKey: ["lstAsstSgAt"],
     queryFn: () => fetchCategory("lstAsstSgAt"),
@@ -229,7 +228,7 @@ const ProductUpdatePage = () => {
   const {
     data: lstAssetAttribute,
     isFetching: isFetchinglstAssetAttribute,
-    isSuccess: isSuccesslstAssetAttribute,
+    // isSuccess: isSuccesslstAssetAttribute,
   } = useQuery({
     queryKey: ["lstAssetAttribute"],
     queryFn: () => fetchCategory("lstAssetAttribute"),
@@ -237,7 +236,7 @@ const ProductUpdatePage = () => {
   const {
     data: lstPrdcMchn,
     isFetching: isFetchinglstPrdcMchn,
-    isSuccess: isSuccesslstPrdcMchn,
+    // isSuccess: isSuccesslstPrdcMchn,
   } = useQuery({
     queryKey: ["lstPrdcMchn"],
     queryFn: () => fetchCategory("lstPrdcMchn"),
@@ -343,7 +342,7 @@ const ProductUpdatePage = () => {
     formData.append("FILE_GRP", "1");
     // formData.append("FILE_GRP", "1");s
     formData.append("Files[0]", image != null ? image : "");
-    const imageResult = await handlePostImage.mutateAsync(formData);
+    await handlePostImage.mutateAsync(formData);
     setInfoLoading("Hoàn thành...");
     // console.log(imageResult);
   };
@@ -742,7 +741,7 @@ const ProductUpdatePage = () => {
           handleSubmitProduct(values);
         }}
       >
-        {({ setFieldValue, handleChange, values, errors, touched }) => (
+        {({ setFieldValue, errors }) => (
           <Form id="formCreateProduct">
             {/* Action  */}
             <div className="flex justify-between items-center mb-2">

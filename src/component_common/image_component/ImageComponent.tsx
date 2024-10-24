@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import React from "react";
 
 const ImageComponent = ({
   url = "",
@@ -12,7 +11,7 @@ const ImageComponent = ({
   type: string;
   className: string;
 }) => {
-  const { data, isFetching, isSuccess, isError } = useQuery({
+  const { data, isSuccess } = useQuery({
     queryKey: ["type", id],
     queryFn: () => url,
   });

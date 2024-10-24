@@ -2,29 +2,20 @@ import { deleteData, fetchCategory, fetchDataCondition } from "@/api/commonApi";
 import BreadcrumbCustom from "@/component_common/breadcrumb/BreadcrumbCustom";
 import ButtonForm from "@/component_common/commonForm/ButtonForm";
 import TableCustom from "@/component_common/table/TableCustom";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  AdvertisementObject,
-  CategoryObject,
-  ProductObject,
-} from "@/type/TypeCommon";
+import { AdvertisementObject, CategoryObject } from "@/type/TypeCommon";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ColumnDef } from "@tanstack/react-table";
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { any } from "zod";
-import DialogCreateAdvertisement from "./component/DialogCreateAdvertisement";
 import SpinnerLoading from "@/component_common/loading/SpinnerLoading";
 
 const AdvertisementPage = () => {
@@ -41,10 +32,7 @@ const AdvertisementPage = () => {
     },
   ];
 
-  const [detailBanner, setDetailBanner] = useState(null);
-  const [openDetailBanner, setOpenDetailBanner] = useState(false);
-  const [bannerID, setBannerID] = useState<string>("");
-  const [bodyDelete, setBodyDelete] = useState<string>("");
+  const [bodyDelete] = useState<string>("");
   const [openDialogDelete, setOpentDialogDelete] = useState(false);
   const [advertisementDelete, setAdvertisementDelete] =
     useState<AdvertisementObject | null>(null);
@@ -56,7 +44,6 @@ const AdvertisementPage = () => {
   const {
     data: dataAdvertisement,
     isFetching: isFetchingAdvertisement,
-    isError: isErrorAdvertisement,
     isSuccess: isSuccessAdvertisement,
   } = useQuery({
     queryKey: ["advertisements"],
@@ -68,22 +55,12 @@ const AdvertisementPage = () => {
       }),
   });
 
-  const {
-    data: dataBannerType,
-    isFetching: isFetchingBannerType,
-    isError: isErrorBannerType,
-    isSuccess: isSuccessBannerType,
-  } = useQuery({
+  const { data: dataBannerType } = useQuery({
     queryKey: ["lstBannerType"],
     queryFn: () => fetchCategory("lstBannerType"),
   });
 
-  const {
-    data: dataBannerDataType,
-    isFetching: isFetchingBannerDataType,
-    isError: isErrorBannerDataType,
-    isSuccess: isSuccessBannerDataType,
-  } = useQuery({
+  const { data: dataBannerDataType } = useQuery({
     queryKey: ["lstBannerDataType"],
     queryFn: () => fetchCategory("lstBannerDataType"),
   });
@@ -303,8 +280,6 @@ const AdvertisementPage = () => {
       },
       enableHiding: false,
       cell: ({ row }) => {
-        const payment = row.original;
-
         return (
           <div className="flex gap-x-2 justify-end">
             <ButtonForm
