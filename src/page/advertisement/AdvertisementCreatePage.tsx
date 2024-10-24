@@ -3,7 +3,6 @@ import {
   fetchDataCondition,
   postData,
   postImage,
-  updateData,
 } from "@/api/commonApi";
 import BreadcrumbCustom from "@/component_common/breadcrumb/BreadcrumbCustom";
 import ButtonForm from "@/component_common/commonForm/ButtonForm";
@@ -19,16 +18,11 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { exportExcelPattern } from "@/helper/excelHelper";
-import { useUserStore } from "@/store/userStore";
-import {
-  AdvertisementObject,
-  CategoryObject,
-  DataExcelPatternObject,
-} from "@/type/TypeCommon";
+import { AdvertisementObject, DataExcelPatternObject } from "@/type/TypeCommon";
 import { Label } from "@radix-ui/react-label";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Form, Formik } from "formik";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 
@@ -45,12 +39,7 @@ const breadBrumb = [
     itemLink: "/create_advertisement",
   },
 ];
-const AdvertisementCreatePage = ({
-  statusPage = "new",
-}: {
-  statusPage?: string;
-}) => {
-  const [progress, setProgress] = useState<number>(0);
+const AdvertisementCreatePage = () => {
   const [infoLoading, setInfoLoading] = useState<string>("");
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -59,8 +48,8 @@ const AdvertisementCreatePage = ({
   const {
     data: dataBannerType,
     isFetching: isFetchingBannerType,
-    isError: isErrorBannerType,
-    isSuccess: isSuccessBannerType,
+    // isError: isErrorBannerType,
+    // isSuccess: isSuccessBannerType,
   } = useQuery({
     queryKey: ["lstBannerType"],
     queryFn: () => fetchCategory("lstBannerType"),
@@ -69,8 +58,8 @@ const AdvertisementCreatePage = ({
   const {
     data: dataBannerDataType,
     isFetching: isFetchingBannerDataType,
-    isError: isErrorBannerDataType,
-    isSuccess: isSuccessBannerDataType,
+    // isError: isErrorBannerDataType,
+    // isSuccess: isSuccessBannerDataType,
   } = useQuery({
     queryKey: ["lstBannerDataType"],
     queryFn: () => fetchCategory("lstBannerDataType"),
@@ -78,10 +67,10 @@ const AdvertisementCreatePage = ({
 
   const {
     data: dataProducts,
-    isLoading: isLoadingProducts,
+    // isLoading: isLoadingProducts,
     isFetching: isFetchingProducts,
-    isError: isErrorProducts,
-    isSuccess: isSuccessProducts,
+    // isError: isErrorProducts,
+    // isSuccess: isSuccessProducts,
   } = useQuery({
     queryKey: ["products"],
     queryFn: () =>
@@ -116,28 +105,28 @@ const AdvertisementCreatePage = ({
     },
   });
 
-  const handleUpdateBanner = useMutation({
-    mutationFn: (body: { [key: string]: any }) => updateData(body),
-    onSuccess: (data: AdvertisementObject[]) => {
-      if (queryClient.getQueryData(["advertisements"])) {
-        queryClient.setQueryData(
-          ["advertisements"],
-          (oldData: AdvertisementObject[]) => {
-            const resultData = data[0];
-            console.log(resultData);
-            return [
-              resultData,
-              ...oldData.filter((item) => item.KKKK0000 != resultData.KKKK0000),
-            ];
-          }
-        );
-      } else {
-        queryClient.invalidateQueries({
-          predicate: (query) => query.queryKey[0] === "advertisements",
-        });
-      }
-    },
-  });
+  // const handleUpdateBanner = useMutation({
+  //   mutationFn: (body: { [key: string]: any }) => updateData(body),
+  //   onSuccess: (data: AdvertisementObject[]) => {
+  //     if (queryClient.getQueryData(["advertisements"])) {
+  //       queryClient.setQueryData(
+  //         ["advertisements"],
+  //         (oldData: AdvertisementObject[]) => {
+  //           const resultData = data[0];
+  //           console.log(resultData);
+  //           return [
+  //             resultData,
+  //             ...oldData.filter((item) => item.KKKK0000 != resultData.KKKK0000),
+  //           ];
+  //         }
+  //       );
+  //     } else {
+  //       queryClient.invalidateQueries({
+  //         predicate: (query) => query.queryKey[0] === "advertisements",
+  //       });
+  //     }
+  //   },
+  // });
 
   const handlePostImage = useMutation({
     mutationFn: (body: FormData) => postImage(body),
@@ -282,7 +271,7 @@ const AdvertisementCreatePage = ({
           handleSubmitBanner(values);
         }}
       >
-        {({ setFieldValue, handleChange, values, errors, touched }) => (
+        {({ setFieldValue, values, errors, touched }) => (
           <Form id="formCreateProduct">
             {/* Action  */}
             <div className="flex justify-between items-center mb-2">
