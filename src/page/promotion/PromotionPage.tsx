@@ -180,10 +180,12 @@ const PromotionPage = () => {
         <TableCustom
           data={[]}
           columns={columns}
-          search={[
-            { key: "PRDCCODE", name: "mã sản phẩm" },
-            { key: "PRDCNAME", name: "tên sản phẩm" },
-          ]}
+          search={
+            [
+              // { key: "PRDCCODE", name: "mã sản phẩm" },
+              // { key: "PRDCNAME", name: "tên sản phẩm" },
+            ]
+          }
           // isLoading={isFetching}
         ></TableCustom>
       </div>
