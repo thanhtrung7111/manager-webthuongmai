@@ -1,6 +1,4 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import React from "react";
 import MessageFrame from "./component/MessageFrame";
 import { MessageObject, useMessageStore } from "@/store/messageStore";
 import {
@@ -8,8 +6,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 
 const data: MessageObject[] = [
   {

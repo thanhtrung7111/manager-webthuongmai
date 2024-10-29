@@ -25,6 +25,7 @@ import PostCreatePage from "./page/post/PostCreatePage";
 import PostTagPage from "./page/post_tag/PostTagPage";
 import PostUpdatePage from "./page/post/PostUpdatePage";
 import ProductUpdatePage from "./page/product/component/ProductUpdatePage";
+import PDFSign from "./page/pdf_sign/PDFSign";
 
 function App() {
   const { currentUser, setTokenInitial } = useUserStore();
@@ -67,6 +68,7 @@ function App() {
               element={<DashboardRevenuePage></DashboardRevenuePage>}
               path="/dashboard_revenue"
             ></Route>
+
             <Route
               element={<ProductPage></ProductPage>}
               path="/product"
@@ -116,6 +118,7 @@ function App() {
               element={<NotifycationComponent></NotifycationComponent>}
               path="/notify"
             ></Route>
+            <Route element={<PDFSign></PDFSign>} path="/sign_pdf"></Route>
           </Route>
           <Route
             element={

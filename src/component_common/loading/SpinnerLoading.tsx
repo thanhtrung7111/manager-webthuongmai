@@ -1,5 +1,3 @@
-import React from "react";
-
 const SpinnerLoading = ({
   className = "w-8 h-8 fill-blue-600",
 }: {

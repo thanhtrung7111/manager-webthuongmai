@@ -96,6 +96,11 @@ const menu: any[] = [
         itemIcon: <i className="ri-advertisement-line"></i>,
         link: "/messages",
       },
+      {
+        itemName: "Kí văn bản",
+        itemIcon: <i className="ri-sketching"></i>,
+        link: "/sign_pdf",
+      },
     ],
   },
 ];

@@ -10,4 +10,14 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    proxy: {
+      // Đường dẫn API mà bạn muốn proxy
+      "/api": {
+        target: "https://remotesigning.viettel.vn", // Địa chỉ máy chủ đích
+        changeOrigin: true, // Thay đổi origin của header
+        rewrite: (path) => path.replace(/^\/api/, ""), // Viết lại đường dẫn nếu cần
+      },
+    },
+  },
 });
