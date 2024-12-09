@@ -4,10 +4,13 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import React, { useState } from "react";
+import { CompatClient, Stomp } from "@stomp/stompjs";
+import React, { useEffect, useState } from "react";
+import SockJS from "sockjs-client";
 
 const MessagesPage = () => {
   const [openFile, setOpenFile] = useState<boolean>(false);
+ 
   const breadBrumb = [
     {
       itemName: "Quản lí chung",
@@ -16,7 +19,31 @@ const MessagesPage = () => {
       itemName: "Tin nhắn",
       itemLink: "/messages",
     },
-  ];
+  ]; 
+  const [messages, setMessages] = useState<any>([]);
+  const [stompClient, setStompClient] = useState<CompatClient | null>(null);
+  useEffect(() => {
+    const socket = new SockJS("http://localhost:8080/ws");
+    const stompClient = Stomp.over(socket);
+    stompClient.connect({ withCredentials: true }, () => {
+      stompClient.subscribe("/topic/notifications/thanhtrung", (message) => {
+        console.log(message.body);
+        if (message.body) {
+          setMessages((prevMessages: any) => [
+            ...prevMessages,
+            JSON.parse(message.body),
+          ]);
+        }
+      });
+    });
+    setStompClient(stompClient);
+
+    return () => {
+      if (stompClient) {
+        stompClient.disconnect();
+      }
+    };
+  }, []);
 
   return (
     <div className="flex flex-col gap-y-3 h-full">

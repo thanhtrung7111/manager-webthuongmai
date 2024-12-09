@@ -1,5 +1,5 @@
 import { FieldHookConfig, useField, useFormikContext } from "formik";
-import React, { memo, useCallback, useEffect, useState } from "react";
+import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 import { areEqual, FixedSizeList as List } from "react-window";
 import { any } from "zod";
 type ObjectSelect = {
@@ -35,6 +35,8 @@ const SelectFormikForm = ({
   onChange?: (value: ObjectSelect) => void;
 }) => {
   const [field, meta, helpers] = useField(name);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [isAbove, setIsAbove] = useState(false);
   const [dataFilter, setDataFilter] = useState(options);
   const [show, setShow] = useState(false);
   const [selected, setSelected] = useState<ObjectSelect>(options[0]);
@@ -84,6 +86,22 @@ const SelectFormikForm = ({
 
     if (findItem) setSelected(findItem);
   }, [field.value]);
+  useEffect(() => {
+    if (show && dropdownRef.current) {
+      const dropdownRect = dropdownRef.current.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+
+      // Kiểm tra xem dropdown có bị tràn đáy không
+      if (dropdownRect.bottom + 250 > windowHeight) {
+        setIsAbove(true);
+      } else {
+        setIsAbove(false);
+      }
+    }
+
+    // Cleanup khi component unmount
+  }, [show]);
+
   // const renderItem = useCallback(
   //   ({ index, style }: { index: number; style: any }) => {
   //     const item = dataFilter[index];
@@ -170,45 +188,48 @@ const SelectFormikForm = ({
           className="ri-arrow-down-s-line cursor-pointer"
         ></i>
 
-        <List
-          height={400}
-          itemCount={dataFilter.length}
-          itemSize={35}
-          width="100%"
-          className={`${
-            show ? "visible opacity-100" : "opacity-0 invisible"
-          } !absolute w-full z-50 top-[90%] right-0 max-h-60 min-h-24 ${
-            dataFilter.length > 5 ? "overflow-y-scroll" : ""
-          } bg-white rounded-md border border-gray-300 custom-scrollbar-wider overflow-hidden transition-all duration-150`}
-        >
-          {/* {renderItem} */}
-          {({ index, style, isScrolling }) => (
-            <div style={style}>
-              <div
-                onMouseDown={(e) => {
-                  handleSelectItem(dataFilter[index]);
-                  console.log(dataFilter[index]);
-                }}
-                className={`px-2 py-2 ${
-                  isScrolling && "animate-pulse"
-                } cursor-pointer w-full h-full hover:bg-slate-100 ${
-                  selected &&
-                  selected[`${itemKey}`] == dataFilter[index][`${itemKey}`]
-                    ? "bg-slate-100"
-                    : "bg-white"
-                }`}
-              >
-                <p
-                  className=" line-clamp-1"
-                  title={dataFilter[index][`${itemValue}`]}
+        <div ref={dropdownRef}>
+          <List
+            height={400}
+            itemCount={dataFilter.length}
+            itemSize={35}
+            width="100%"
+            className={`${
+              show ? "visible opacity-100" : "opacity-0 invisible"
+            } !absolute w-full z-50 ${
+              isAbove ? "-top-[237px]" : "top-[90%]"
+            }  right-0 max-h-60 min-h-24 ${
+              dataFilter.length > 5 ? "overflow-y-scroll" : ""
+            } bg-white rounded-md border border-gray-300 custom-scrollbar-wider overflow-hidden transition-[opacity] duration-150`}
+          >
+            {/* {renderItem} */}
+            {({ index, style, isScrolling }) => (
+              <div style={style}>
+                <div
+                  onMouseDown={(e) => {
+                    handleSelectItem(dataFilter[index]);
+                    console.log(dataFilter[index]);
+                  }}
+                  className={`px-2 py-2 ${
+                    isScrolling && "animate-pulse"
+                  } cursor-pointer w-full h-full hover:bg-slate-100 ${
+                    selected &&
+                    selected[`${itemKey}`] == dataFilter[index][`${itemKey}`]
+                      ? "bg-slate-100"
+                      : "bg-white"
+                  }`}
                 >
-                  {dataFilter[index][`${itemValue}`]}
-                </p>
+                  <p
+                    className=" line-clamp-1"
+                    title={dataFilter[index][`${itemValue}`]}
+                  >
+                    {dataFilter[index][`${itemValue}`]}
+                  </p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* {dataFilter.length <= 0 ? (
+            {/* {dataFilter.length <= 0 ? (
             <div className="text-sm px-2 py-2">
               Không có mục bạn tìm kiếm...
             </div>
@@ -228,7 +249,8 @@ const SelectFormikForm = ({
               );
             })
           )} */}
-        </List>
+          </List>
+        </div>
       </div>
       {meta.error && meta.touched && (
         <span className="text-red-500 text-xs">{meta.error}</span>

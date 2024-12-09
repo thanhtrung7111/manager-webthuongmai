@@ -97,9 +97,14 @@ const menu: any[] = [
         link: "/messages",
       },
       {
+        itemName: "Yêu cầu xác thực",
+        itemIcon: <i className="ri-file-list-3-line"></i>,
+        link: "/sign_pdf",
+      },
+      {
         itemName: "Kí văn bản",
         itemIcon: <i className="ri-sketching"></i>,
-        link: "/sign_pdf",
+        link: "/authen_signature",
       },
     ],
   },

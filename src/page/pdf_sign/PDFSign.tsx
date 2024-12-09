@@ -70,7 +70,7 @@ const PDFSign = () => {
     retryOnMount: false,
     refetchOnWindowFocus: false,
   });
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFile] = useState<File | null>(null);
 
   const fetchCertificates = useMutation({
     mutationFn: () =>
@@ -130,70 +130,143 @@ const PDFSign = () => {
   };
 
   const handleSignPdf = async () => {
-    if (!pdfFile || !selectedSign) {
-      alert("Vui lòng chọn người xác thực kí!");
-      return;
-    }
+    signPdf();
+    // if (!pdfFile || !selectedSign) {
+    //   alert("Vui lòng chọn người xác thực kí!");
+    //   return;
+    // }
 
-    if (!pageSign) {
-      alert("Chọn trang để kí!");
-      return;
-    }
+    // if (!pageSign) {
+    //   alert("Chọn trang để kí!");
+    //   return;
+    // }
 
-    setTimeout(() => {
-      setOpenDialog(true);
-    }, 200);
+    // setTimeout(() => {
+    //   setOpenDialog(true);
+    // }, 200);
 
-    let descriptionContent: string =
-      description && description.current && description.current.value != ""
-        ? CryptoJS.enc.Base64.stringify(
-            CryptoJS.enc.Utf8.parse(description.current.value)
-          )
-        : CryptoJS.enc.Base64.stringify(
-            CryptoJS.enc.Utf8.parse("Xác thực tài liệu")
-          );
+    // let descriptionContent: string =
+    //   description && description.current && description.current.value != ""
+    //     ? CryptoJS.enc.Base64.stringify(
+    //         CryptoJS.enc.Utf8.parse(description.current.value)
+    //       )
+    //     : CryptoJS.enc.Base64.stringify(
+    //         CryptoJS.enc.Utf8.parse("Xác thực tài liệu")
+    //       );
 
-    if (file) {
-      const value = await fileToSHA256Base64(file);
-      await handlePostSignHash.mutateAsync({
-        credentialID: fetchCertificates.data?.data[0]?.credential_id,
-        client_id: "Test_Demo_Mysign",
-        client_secret: "860c5746f30d705ef9b16e0adbd7b5f6d8c4a4ee",
-        numSignatures: 2,
-        description: descriptionContent,
-        documents: [
-          {
-            document_id: 123,
-            document_name: CryptoJS.enc.Base64.stringify(
-              CryptoJS.enc.Utf8.parse(file ? file?.name : "")
-            ),
-          },
-        ],
-        hash: [value],
-        hashAlgo: "2.16.840.1.101.3.4.2.1",
-        signAlgo: fetchCertificates.data?.data[0]?.key.algo[0],
-        async: 0,
-      });
+    if (files) {
+      // console.log(files);
+      // const value = await generateBase64Hash(files);
+      // console.log(value);
+      // console.log({
+      //   credentialID: fetchCertificates.data?.data[0]?.credential_id,
+      //   client_id: "Test_Demo_Mysign",
+      //   client_secret: "860c5746f30d705ef9b16e0adbd7b5f6d8c4a4ee",
+      //   numSignatures: 1,
+      //   description: descriptionContent,
+      //   documents: [
+      //     {
+      //       document_id: 123,
+      //       document_name: CryptoJS.enc.Base64.stringify(
+      //         CryptoJS.enc.Utf8.parse(files ? files?.name : "")
+      //       ),
+      //     },
+      //   ],
+      //   hash: [value],
+      //   hashAlgo: "2.16.840.1.101.3.4.2.1",
+      //   signAlgo: fetchCertificates.data?.data[0]?.key.algo[0],
+      //   async: 0,
+      // });
+      // const data = await handlePostSignHash.mutateAsync({
+      //   credentialID: fetchCertificates.data?.data[0]?.credential_id,
+      //   client_id: "Test_Demo_Mysign",
+      //   client_secret: "860c5746f30d705ef9b16e0adbd7b5f6d8c4a4ee",
+      //   numSignatures: 1,
+      //   description: descriptionContent,
+      //   documents: [
+      //     {
+      //       document_id: 123,
+      //       document_name: CryptoJS.enc.Base64.stringify(
+      //         CryptoJS.enc.Utf8.parse(files ? files?.name : "")
+      //       ),
+      //     },
+      //   ],
+      //   hash: [value],
+      //   hashAlgo: "2.16.840.1.101.3.4.2.1",
+      //   signAlgo: fetchCertificates.data?.data[0]?.key.algo[0],
+      //   async: 0,
+      // });
+      // console.log(data);
     }
   };
 
-  function fileToSHA256Base64(file: File) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (reader.result && typeof reader.result !== "string") {
-          const fileContent = CryptoJS.lib.WordArray.create(reader.result);
-          const hash = CryptoJS.SHA256(fileContent);
-          const hashBase64 = CryptoJS.enc.Base64.stringify(hash);
-          resolve(hashBase64);
-        } else {
-          reject(new Error("File read error: result is null"));
-        }
-      };
-      reader.onerror = (error) => reject(error);
-      return reader.readAsArrayBuffer(file); // Đọc tệp dưới dạng ArrayBuffer
+  const generateBase64Hash = async (file: File) => {
+    const fileArrayBuffer = await file.arrayBuffer(); // Đọc file thành ArrayBuffer
+    const hashBuffer = await crypto.subtle.digest("SHA-256", fileArrayBuffer); // Tạo mã băm SHA256
+
+    // Chuyển ArrayBuffer sang Base64
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const base64Hash = btoa(
+      hashArray.map((byte) => String.fromCharCode(byte)).join("")
+    );
+    return base64Hash;
+  };
+
+  const signPdf = async () => {
+    if (!files) return;
+
+    // Đọc file PDF tải lên
+    const pdfBytes = await files.arrayBuffer();
+    const pdfDoc = await PDFDocument.load(pdfBytes);
+
+    // Gắn chữ ký vào metadata
+    // pdfDoc.setTitle("File PDF đã được ký");
+    // pdfDoc.setKeywords(["PDF", "Signature", "Chữ ký", "Mã hóa"]);
+    // pdfDoc.setSubject("Đây là file PDF có gắn chữ ký mã hóa");
+    // pdfDoc.setAuthor("Người ký");
+
+    // Thêm chữ ký mã hóa vào metadata
+    pdfDoc.setProducer(
+      pdfDoc.getProducer.toString +
+        `D3wsdUZlZXrYtRZF7K3idQQ8fEddcRoDVdFNF37cCPpZIJz1cf5r2adYSUBOencU4e+8BLL+9Ah51AgtKEdGiM59r4cudC7vvlyXcjaoKkAR4ZBaY15nWqweH5VrnwqQ/PfV4jwChaomosMB7csHvjLMQLF4MFm7w8Wb8gyMIzFEdVm8FWGokdlKtb9cemp0wh+na29OEHKJUI8LHqiKjVx/vDFGO2Kg/uCmCglSA0e5in8LWZ2HBvcI3/9SEORmH2urWZFWSmcjFo9TV6TdSXVe4jwFYs++UfRFeNlUrR5MZXW5mU6EqpM9hUbqjcCaDqZqF8pMtFDJCK6bseYgiw==`
+    );
+
+    // console.log(pdfDoc.getProducer()?.valueOf);
+
+    // Tạo file PDF mới đã gắn chữ ký
+    const signedPdfBytes = await pdfDoc.save();
+    const signedPdfBlob = new Blob([signedPdfBytes], {
+      type: "application/pdf",
     });
-  }
+    const url = URL.createObjectURL(signedPdfBlob);
+
+    // Tải file đã ký xuống
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "file_signed.pdf";
+    link.click();
+
+    // Giải phóng URL
+    URL.revokeObjectURL(url);
+  };
+
+  // function fileToSHA256Base64(file: File) {
+  //   return new Promise((resolve, reject) => {
+  //     const reader = new FileReader();
+  //     reader.onload = () => {
+  //       if (reader.result && typeof reader.result !== "string") {
+  //         const fileContent = CryptoJS.lib.WordArray.create(reader.result);
+  //         const hash = CryptoJS.SHA256(fileContent);
+  //         const hashBase64 = CryptoJS.enc.Base64.stringify(hash);
+  //         resolve(hashBase64);
+  //       } else {
+  //         reject(new Error("File read error: result is null"));
+  //       }
+  //     };
+  //     reader.onerror = (error) => reject(error);
+  //     return reader.readAsArrayBuffer(file); // Đọc tệp dưới dạng ArrayBuffer
+  //   });
+  // }
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     const droppedFiles = e.dataTransfer.files;

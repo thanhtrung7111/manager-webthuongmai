@@ -246,9 +246,11 @@ const TableCustom = <TData, TValue>({
               <span className="text-gray-500">Đang tải dữ liệu...</span>
             </div>
           ) : table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
+            table.getRowModel().rows.map((row, index: number) => (
               <TableRow
-                className="border-r-0 border-l-0"
+                className={`border-r-0 border-l-0 ${
+                  index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                }`}
                 key={row.id}
 
                 // data-state={row.getIsSelected() && "selected"}

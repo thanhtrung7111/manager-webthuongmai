@@ -26,6 +26,8 @@ import PostTagPage from "./page/post_tag/PostTagPage";
 import PostUpdatePage from "./page/post/PostUpdatePage";
 import ProductUpdatePage from "./page/product/component/ProductUpdatePage";
 import PDFSign from "./page/pdf_sign/PDFSign";
+import AuthenSignaturePage from "./page/authen_signature/AuthenSignaturePage";
+import PDFFileSign from "./page/pdf_sign/PDFFileSign";
 
 function App() {
   const { currentUser, setTokenInitial } = useUserStore();
@@ -119,6 +121,14 @@ function App() {
               path="/notify"
             ></Route>
             <Route element={<PDFSign></PDFSign>} path="/sign_pdf"></Route>
+            <Route
+              element={<PDFFileSign></PDFFileSign>}
+              path="/sign_file_pdf"
+            ></Route>
+            <Route
+              element={<AuthenSignaturePage></AuthenSignaturePage>}
+              path="/authen_signature"
+            ></Route>
           </Route>
           <Route
             element={
