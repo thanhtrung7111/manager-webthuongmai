@@ -178,6 +178,7 @@ const PromotionPage = () => {
       {/* table */}
       <div className="rounded-md p-5 bg-white border-gray-200 border shadow-md">
         <TableCustom
+          unit="Khuyến mãi"
           data={[]}
           columns={columns}
           search={
