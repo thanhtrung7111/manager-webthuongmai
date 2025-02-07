@@ -1,15 +1,24 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  darkMode: ["class"],
+  darkMode: "class",
   content: ["./index.html", "./src/**/*.{html,js,tsx}"],
   theme: {
     extend: {
       colors: {
         primary: {
+          light: "hsl(var(--primary-light))",
           DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          dark: "hsl(var(--primary-dark))",
         },
-        background: "hsl(var(--background))",
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        background: {
+          light: "hsl(var(--background-light))",
+          DEFAULT: "hsl(var(--background))",
+          dark: "hsl(var(--background-dark))",
+        },
         foreground: "hsl(var(--foreground))",
         card: {
           DEFAULT: "hsl(var(--card))",
@@ -18,10 +27,6 @@ export default {
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
-        },
-        secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
         },
         muted: {
           DEFAULT: "hsl(var(--muted))",
@@ -53,6 +58,9 @@ export default {
       },
       boxShadow: {
         "custom-sm": "0 0 10px 1px rgba(0,0,0,0.5)",
+      },
+      fontFamily: {
+        roboto: ["Roboto", "sans-serif"],
       },
     },
   },

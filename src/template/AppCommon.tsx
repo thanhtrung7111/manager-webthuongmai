@@ -11,12 +11,16 @@ const AppCommon = () => {
       {location.pathname.indexOf("/messages") < 0 && (
         <ComponentFrameMessage></ComponentFrameMessage>
       )}
-      <div className="flex h-full">
-        <Sidebar></Sidebar>
-        <div className="flex-auto h-screen overflow-y-scroll flex flex-col bg-slate-50">
+      <div className="h-full">
+        <div className="h-full flex flex-col bg-slate-50">
           <Navbar></Navbar>
-          <div className="flex-auto p-5">
-            <Outlet />
+          <div className="flex flex-auto min-h-0">
+            {/* <div className="block"> */}
+            <Sidebar></Sidebar>
+            {/* </div> */}
+            <div className="flex-auto p-5 max-h-full overflow-auto custom-scrollbar-wider relative">
+              <Outlet />
+            </div>
           </div>
         </div>
       </div>

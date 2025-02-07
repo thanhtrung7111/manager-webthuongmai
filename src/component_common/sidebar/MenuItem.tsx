@@ -68,25 +68,12 @@ const MenuItem = ({
   };
   return level == 1 ? (
     <div className="mb-5">
-      {!compact ? (
+      {!compact && (
         <p
-          className={`text-orange-300 font-bold delay-1000 text-xs uppercase ${
-            !compact ? "opacity-100 visible" : "opacity-0 invisible"
-          } transition-opacity mb-2`}
+          className={`text-gray-700 font-semibold tracking-widest text-xs uppercase  mb-2`}
         >
           {item[name] as string}
         </p>
-      ) : (
-        <div className="flex justify-center">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>...</TooltipTrigger>
-              <TooltipContent side="right">
-                <p>{item[name] as string}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
       )}
       <div className="flex flex-col gap-y-1">
         {Array.isArray(item[listName]) &&
@@ -108,7 +95,11 @@ const MenuItem = ({
     </div>
   ) : compact ? (
     // Thu gọn menu
-    <div className={`relative flex justify-center ${"menuItem" + level}`}>
+    <div
+      className={`relative flex justify-center ${"menuItem" + level}  ${
+        compact ? "visible" : "invisible"
+      } delay-300`}
+    >
       {Array.isArray(item[listName]) ? (
         <div
           className={`group/a mb-1 hover:bg-primary-foreground flex justify-between py-2 px-3 cursor-pointer text-gray-500 hover:text-primary  rounded-sm ${
@@ -203,7 +194,9 @@ const MenuItem = ({
   ) : (
     // Mở rộng menu
     <div
-      className={`relative ${"menuItem" + level} ${compact ? "w-0" : "w-full"}`}
+      className={`relative ${
+        "menuItem" + level
+      } ${compact ? "w-0" : "w-full"}`}
     >
       {Array.isArray(item[listName]) ? (
         <div
@@ -212,15 +205,11 @@ const MenuItem = ({
           }}
           className={`group/a hover:bg-primary-foreground flex items-center ${
             compact ? "justify-center" : "justify-between"
-          } py-2 px-3 cursor-pointer text-gray-500 hover:text-primary  rounded-sm`}
+          } py-2 px-3 cursor-pointer text-gray-700 hover:text-primary  rounded-sm`}
         >
           <div className="flex gap-x-2 items-center">
             {item[iconName] as React.ReactNode}
-            <p
-              className={`group-hover/a:text-primary text-sm transition-opacity${
-                !compact ? "opacity-100 visible" : "opacity-0 invisible"
-              }`}
-            >
+            <p className={`group-hover/a:text-primary text-sm`}>
               {!compact && (item[name] as string)}
             </p>
           </div>
@@ -238,21 +227,17 @@ const MenuItem = ({
           className={({ isActive }) => {
             console.log(isActive);
             return isActive
-              ? `group/a bg-primary-foreground flex ${
+              ? `group/a bg-primary flex ${
                   compact ? "justify-center" : "justify-between"
-                } py-2 px-3 cursor-pointer text-gray-500 text-primary  rounded-sm`
+                } py-2 px-3 cursor-pointer text-white  rounded-sm`
               : `group/a hover:bg-primary-foreground flex ${
                   compact ? "justify-center" : "justify-between"
-                } py-2 px-3 cursor-pointer text-gray-500 hover:text-primary  rounded-sm`;
+                } py-2 px-3 cursor-pointer text-gray-700 hover:text-primary  rounded-sm`;
           }}
         >
           <span className="flex gap-x-2 ">
             {item[iconName] as React.ReactNode}
-            <div
-              className={`${
-                !compact ? "opacity-100 visible" : "opacity-0 w-0 invisible"
-              } transition-all`}
-            >
+            <div className={`transition-all`}>
               <span className="text-sm">
                 {!compact && (item[name] as string)}
               </span>

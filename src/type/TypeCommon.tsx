@@ -6,6 +6,12 @@ export type BreadcrumbItemObject = {
   [key: string]: any;
 };
 
+export type LanguageObject = {
+  FUNCCODE: string;
+  ITEMCODE: number;
+  ITEMNAME: string;
+};
+
 export type LoginObject = {
   APP_CODE: string;
   USERLGIN: string;

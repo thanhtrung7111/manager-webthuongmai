@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import MenuItem from "./MenuItem";
 import { MenuItemObject } from "@/type/TypeCommon";
 
@@ -18,21 +19,24 @@ const Menu = ({
   linkName?: keyof MenuItemObject;
   compact: boolean;
 }) => {
+  
   return (
     <>
-      {(list as MenuItemObject[]).map((i) => {
-        return (
-          <MenuItem
-            compact={compact}
-            linkName={linkName}
-            level={levelBegin}
-            item={i}
-            name={name}
-            iconName={iconName}
-            listName={listName}
-          ></MenuItem>
-        );
-      })}
+    
+        {(list as MenuItemObject[]).map((i) => {
+          return (
+            <MenuItem
+              compact={compact}
+              linkName={linkName}
+              level={levelBegin}
+              item={i}
+              name={name}
+              iconName={iconName}
+              listName={listName}
+            ></MenuItem>
+          );
+        })}
+     
     </>
   );
 };

@@ -7,15 +7,17 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { useState } from "react";
 import { useMediaQuery } from "react-responsive";
 
 const SearchComponent = () => {
+  const [focusInput, setFocusInput] = useState<boolean>(false);
   const isMobileScreen: boolean = useMediaQuery({ query: "(max-width:767px)" });
   return isMobileScreen ? (
     <Dialog>
       <DialogTrigger className="w-fit">
-        <div className="rounded-full border border-gray-200 w-16 h-9 flex items-center justify-center">
-          <i className="ri-search-line text-sm"></i>
+        <div className="flex items-center justify-center">
+          <i className="ri-search-line text-2xl"></i>
         </div>
       </DialogTrigger>
       <DialogContent>
@@ -32,14 +34,16 @@ const SearchComponent = () => {
       </DialogContent>
     </Dialog>
   ) : (
-    <div className="relative w-96 bg-white h-fit">
-      <div className="w-full flex  border border-slate-300 items-center pl-2 gap-x-2 rounded-sm overflow-hidden">
-        <i className="ri-search-line text-xs flex-shrink-0"></i>
+    <div className={`relative ${focusInput ? "w-96" : "w-80"} transition-[width] duration-300 bg-white h-fit`}>
+      <div className="w-full flex  rounded-full border border-slate-300 items-center px-4 gap-x-2 overflow-hidden">
         <input
           type="text"
+          onFocus={() => setFocusInput(true)}
+          onBlur={()=>setFocusInput(false)}
           className="flex-auto outline-none bg-transparent text-xs py-2 text-slate-700"
           placeholder="Tìm kiếm..."
         />
+        <i className="ri-search-line text-xs flex-shrink-0"></i>
       </div>
     </div>
   );

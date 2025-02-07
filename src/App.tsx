@@ -1,48 +1,94 @@
 import { useEffect } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import HomePage from "@/page/home/HomePage";
-import AppCommon from "./template/AppCommon";
-import ProductPage from "./page/product/ProductPage";
-import AdvertisementPage from "./page/advertisement/AdvertisementPage";
-import DashboardProductPage from "./page/dashboard_product/DashboardProductPage";
-import DashboardRevenuePage from "./page/dashboard_revenue/DashboardRevenuePage";
 import AppLogin from "./template/AppLogin";
-import LoginPage from "./page/login/LoginPage";
-import { useQuery } from "@tanstack/react-query";
-import { fetchInitialToken } from "./api/authApi";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useUserStore } from "./store/userStore";
 import SpinnerLoading from "./component_common/loading/SpinnerLoading";
 // import ProductCreatePage from "./page/create_product/ProductCreatePage";
 import { Toaster } from "sonner";
-import ProductCreatePageFormik from "./page/create_product/ProductCreatePageFormik";
-import MessagesPage from "./page/message/MessagesPage";
-import PromotionPage from "./page/promotion/PromotionPage";
-import NotifycationComponent from "./page/NotifycationComponent";
-import AdvertisementCreatePage from "./page/advertisement/AdvertisementCreatePage";
-import AdvertisementUpdatePage from "./page/advertisement/AdvertisementUpdatePage";
-import PostPage from "./page/post/PostPage";
-import PostCreatePage from "./page/post/PostCreatePage";
-import PostTagPage from "./page/post_tag/PostTagPage";
-import PostUpdatePage from "./page/post/PostUpdatePage";
-import ProductUpdatePage from "./page/product/component/ProductUpdatePage";
-import PDFSign from "./page/pdf_sign/PDFSign";
-import AuthenSignaturePage from "./page/authen_signature/AuthenSignaturePage";
-import PDFFileSign from "./page/pdf_sign/PDFFileSign";
+import { useGetTokenInitial } from "./api/react_query/query_auth";
+import { useGetLanguage } from "./api/react_query/query_common";
+import AppCommon from "./template/AppCommon";
+import HomePage from "./figure/home/page/HomePage";
+import DashboardProductPage from "./figure/dashboard/page/DashboardProductPage";
+import DashboardRevenuePage from "./figure/dashboard/page/DashboardRevenuePage";
+import ProductPage from "./figure/product/page/ProductPage";
+import ProductCreatePageFormik from "./figure/product/page/ProductCreatePageFormik";
+import ProductUpdatePage from "./figure/product/page/ProductUpdatePage";
+import AdvertisementPage from "./figure/advertisement/page/AdvertisementPage";
+import AdvertisementCreatePage from "./figure/advertisement/page/AdvertisementCreatePage";
+import AdvertisementUpdatePage from "./figure/advertisement/page/AdvertisementUpdatePage";
+import PostPage from "./figure/post/page/PostPage";
+import PostCreatePage from "./figure/post/page/PostCreatePage";
+import PostUpdatePage from "./figure/post/page/PostUpdatePage";
+import PostTagPage from "./figure/post_tag/page/PostTagPage";
+import MessagesPage from "./figure/message/page/MessagesPage";
+import PromotionPage from "./figure/promotion/page/PromotionPage";
+import NotifycationComponent from "./figure/NotifycationComponent";
+import PDFSign from "./figure/pdf_sign/PDFSign";
+import AuthenSignaturePage from "./figure/authen_signature/AuthenSignaturePage";
+import TipTapDemo from "./figure/TipTapDemo";
+import LoginPage from "./figure/login/page/LoginPage";
+import { useConfigurationStore } from "./store/configurationStore";
+import PDFFileSign from "./figure/pdf_sign/PDFFileSign";
+import { LanguageObject } from "./type/TypeCommon";
+import themes from "./helper/themes";
+import { hexToHSL } from "./helper/commonHelper";
 
 function App() {
   const { currentUser, setTokenInitial } = useUserStore();
-  const { data, isFetching, isSuccess } = useQuery({
-    queryKey: ["tokenInitial"],
-    queryFn: async () => await fetchInitialToken(),
-  });
+  const { setKeyLanguages, setLanguages, keyLanguage } = useConfigurationStore(
+    (state) => state.languageConfig
+  );
+  const { setTheme, keyTheme } = useConfigurationStore(
+    (state) => state.themeConfig
+  );
+  const getTokenInitial = useGetTokenInitial();
+  const getLanguage = useGetLanguage();
+  // console.log(languageConfig);
+  useEffect(() => {
+    async function getConfiguation() {
+      setTokenInitial(getTokenInitial.data?.TOKEN);
+      if (!keyLanguage) {
+        setKeyLanguages({ key: "V" });
+      }
+    }
+    if (getTokenInitial.isSuccess && getTokenInitial.data != undefined) {
+      getConfiguation();
+    }
+  }, [getTokenInitial.isSuccess]);
 
   useEffect(() => {
-    if (isSuccess && data != undefined) {
-      setTokenInitial(data?.TOKEN);
+    async function getConfigLanguage() {
+      const result: LanguageObject[] = await getLanguage.mutateAsync({
+        body: {
+          APP_CODE: "WER",
+          LGGECODE: keyLanguage,
+        },
+      });
+      console.log(result);
+      setLanguages({ languages: result });
     }
-  }, [isSuccess]);
+    if (keyLanguage != null) {
+      getConfigLanguage();
+    }
+  }, [keyLanguage]);
 
-  return isFetching ? (
+  useEffect(() => {
+    const root = document.documentElement;
+    const currentTheme: Record<string, string> =
+      themes[keyTheme.toLowerCase() as keyof typeof themes];
+
+    Object.entries(currentTheme).forEach(([key, value]: [string, string]) => {
+      if (key.startsWith("--")) {
+        // Chỉ cập nhật các biến CSS
+        const formattedValue = value.startsWith("#") ? hexToHSL(value) : value;
+        root.style.setProperty(key, formattedValue);
+      }
+    });
+  }, [keyTheme]);
+
+  return getTokenInitial.isFetching ? (
     <div className="h-screen w-full flex items-center justify-center gap-x-3">
       <SpinnerLoading className="w-10 h-10 fill-primary" />
       <span className="text-2xl text-gray-500 italic">Đang tải dữ liệu..</span>
@@ -61,7 +107,10 @@ function App() {
               )
             }
           >
-            <Route element={<HomePage></HomePage>} path="/"></Route>
+            <Route
+              element={<DashboardProductPage></DashboardProductPage>}
+              path="/"
+            ></Route>
             <Route
               element={<DashboardProductPage></DashboardProductPage>}
               path="/dashboard_product"
@@ -128,6 +177,10 @@ function App() {
             <Route
               element={<AuthenSignaturePage></AuthenSignaturePage>}
               path="/authen_signature"
+            ></Route>
+            <Route
+              element={<TipTapDemo></TipTapDemo>}
+              path="/tiptap_demo"
             ></Route>
           </Route>
           <Route

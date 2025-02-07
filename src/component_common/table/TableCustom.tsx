@@ -49,6 +49,7 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   search: SearchObjectProduct[];
+  unit: string;
   isLoading?: boolean;
 }
 const pageSize = 20;
@@ -56,6 +57,7 @@ const TableCustom = <TData, TValue>({
   columns,
   data,
   search,
+  unit,
   isLoading = false,
 }: DataTableProps<TData, TValue>) => {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -87,7 +89,7 @@ const TableCustom = <TData, TValue>({
   });
   return (
     <div className="w-full">
-      <div className="flex justify-between mb-3">
+      <div className="flex justify-between mb-3 border p-3 rounded-sm">
         <div className="flex gap-x-2 items-center">
           <Popover>
             <PopoverTrigger>
@@ -104,7 +106,7 @@ const TableCustom = <TData, TValue>({
               </Button>
             </PopoverTrigger>
             <PopoverContent
-              className="grid grid-cols-2 gap-2 w-[600px]"
+              className="grid relative grid-cols-2 gap-2 w-[600px]"
               align="start"
             >
               {search.map((item: SearchObjectProduct) => {
@@ -112,13 +114,6 @@ const TableCustom = <TData, TValue>({
                   <input
                     placeholder={`Nhập ${item.name} tìm kiếm...`}
                     className="outline-none rounded-md border border-gray-300 text-sm py-2 px-3"
-                    // onChange={(e) => {
-                    //   table
-                    //     .getColumn(`${item.key}`)
-                    //     ?.setFilterValue(e.target.value);
-
-                    //   setPageIndex(0);
-                    // }}
                     onBlur={(e) => {
                       table
                         .getColumn(`${item.key}`)
@@ -145,7 +140,8 @@ const TableCustom = <TData, TValue>({
                 );
               })}
               <ButtonForm
-                className="Tìm kiếm"
+                className="absolute !w-28 -bottom-5 right-0 border border-gray-300 shadow-sm !bg-gray-100 hover:!bg-opacity-100 !text-gray-500"
+                icon={<i className="ri-search-line"></i>}
                 label="Tìm kiếm"
                 type="submit"
               ></ButtonForm>
@@ -181,15 +177,22 @@ const TableCustom = <TData, TValue>({
         </div>
         <div className="flex gap-x-2 items-center">
           <div className="flex-1 text-sm text-muted-foreground">
-            ({pageIndex * pageSize} -{" "}
-            {pageIndex * pageSize + pageSize >=
-            table.getCoreRowModel().rows.length
-              ? table.getCoreRowModel().rows.length
-              : pageIndex * pageSize + pageSize}
-            ) trên {table.getCoreRowModel().rows.length} sản phẩm
+            <span className="font-semibold">
+              ({pageIndex * pageSize} -{" "}
+              {pageIndex * pageSize + pageSize >=
+              table.getCoreRowModel().rows.length
+                ? table.getCoreRowModel().rows.length.toLocaleString("en-US")
+                : (pageIndex * pageSize + pageSize).toLocaleString("en-US")}
+              )
+            </span>{" "}
+            trên{" "}
+            <span className="font-semibold">
+              {table.getCoreRowModel().rows.length.toLocaleString("en-US")}{" "}
+              {unit.toLowerCase()}
+            </span>
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+          <Popover>
+            <PopoverTrigger asChild>
               <Button
                 variant="outline"
                 className="ml-auto text-gray-600 focus:!ring-0 focus:!ring-transparent text-xs"
@@ -197,27 +200,33 @@ const TableCustom = <TData, TValue>({
               >
                 Hiển thị cột <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            </PopoverTrigger>
+            <PopoverContent className="w-56 p-0 py-1" align="end">
               {table
                 .getAllColumns()
                 .filter((column) => column.getCanHide())
                 .map((column) => {
                   return (
-                    <DropdownMenuCheckboxItem
+                    <div
                       key={column.id}
-                      className="capitalize"
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) =>
-                        column.toggleVisibility(!!value)
+                      className="capitalize cursor-pointer flex text-gray-800 gap-x-2 text-sm px-3 py-1 hover:bg-slate-100"
+                      onClick={(value) =>
+                        column.toggleVisibility(!column.getIsVisible())
                       }
                     >
+                      {/* { && ( */}
+                      <i
+                        className={`${
+                          column.getIsVisible() ? "visible" : "invisible"
+                        } ri-check-line`}
+                      ></i>
+                      {/* )} */}
                       {column.columnDef.meta as string}
-                    </DropdownMenuCheckboxItem>
+                    </div>
                   );
                 })}
-            </DropdownMenuContent>
-          </DropdownMenu>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
       <Table id="table" className="bg-white relative z-0">
@@ -239,40 +248,49 @@ const TableCustom = <TData, TValue>({
             </TableRow>
           ))}
         </TableHeader>
-        <TableBody>
-          {isLoading ? (
-            <div className="py-5 flex items-center gap-x-3">
-              <SpinnerLoading className="w-6 h-6 fill-primary"></SpinnerLoading>{" "}
-              <span className="text-gray-500">Đang tải dữ liệu...</span>
-            </div>
-          ) : table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row, index: number) => (
-              <TableRow
-                className={`border-r-0 border-l-0 ${
-                  index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                }`}
-                key={row.id}
 
-                // data-state={row.getIsSelected() && "selected"}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell
-                    key={cell.id}
-                    className="!text-gray-600 !p-2 !w-fit"
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
+        {isLoading ? (
+          <div className="py-5 flex items-center gap-x-3">
+            <SpinnerLoading className="w-6 h-6 fill-primary"></SpinnerLoading>{" "}
+            <span className="text-gray-500">Đang tải dữ liệu...</span>
+          </div>
+        ) : (
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row, index: number) => (
+                <TableRow
+                  className={`border-r-0 border-l-0 ${
+                    index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                  }`}
+                  key={row.id}
+
+                  // data-state={row.getIsSelected() && "selected"}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell
+                      key={cell.id}
+                      className="!text-gray-600 !p-2 !w-fit"
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-20 text-center"
+                >
+                  No results.
+                </TableCell>
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-20 text-center">
-                No results.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
+            )}{" "}
+          </TableBody>
+        )}
       </Table>
       {table.getFilteredRowModel().rows.length > pageSize && (
         <div className="flex items-center justify-center space-x-2 py-4 mt-5">

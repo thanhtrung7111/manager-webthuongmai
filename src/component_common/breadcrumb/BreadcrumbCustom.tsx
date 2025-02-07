@@ -23,15 +23,21 @@ const BreadcrumbCustom = ({
           return item[itemLink] && item[itemLink] != "" ? (
             <>
               <BreadcrumbItem>
-                <NavLink to={item[itemLink]} className={"hover:text-gray-600"}>
+                <NavLink
+                  to={item[itemLink]}
+                  className={"hover:text-gray-600 transition-colors"}
+                >
                   {item[itemName] as string}
                 </NavLink>
               </BreadcrumbItem>
               {index + 1 != linkList.length && <BreadcrumbSeparator />}
             </>
           ) : (
-            <BreadcrumbItem>
-              <BreadcrumbPage> {item[itemName] as string}</BreadcrumbPage>
+            <BreadcrumbItem className="text-gray-500">
+              <BreadcrumbPage className="text-gray-500">
+                {" "}
+                {item[itemName] as string}
+              </BreadcrumbPage>
               {index + 1 != linkList.length && <BreadcrumbSeparator />}
             </BreadcrumbItem>
           );

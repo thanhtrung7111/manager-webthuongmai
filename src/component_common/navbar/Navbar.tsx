@@ -17,6 +17,17 @@ import Menu from "../sidebar/Menu";
 import { useMediaQuery } from "react-responsive";
 import IconCompany from "@/assets/img/iconcompany.png";
 import { useUserStore } from "@/store/userStore";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { getLabelByKey } from "@/helper/commonHelper";
+import { useConfigurationStore } from "@/store/configurationStore";
+import { useState } from "react";
+import { NavLink } from "react-router-dom";
 const menu = [
   {
     itemName: "Dashboard",
@@ -80,16 +91,27 @@ const menu2 = [
   },
 ];
 const Navbar = () => {
+  const [openLanguage, setOpenLanguage] = useState(false);
   const { currentUser, logoutUser } = useUserStore();
+  const { setKeyLanguages, setLanguages, keyLanguage } = useConfigurationStore(
+    (state) => state.languageConfig
+  );
+
+  const { setTheme, keyTheme } = useConfigurationStore(
+    (state) => state.themeConfig
+  );
   const isMobileScreen = useMediaQuery({ query: "(max-width:1024px)" });
   console.log(currentUser);
   return (
-    <div className="sticky shrink-0 top-0 z-10 bg-white shadow-lg border-b h-20 border-gray-200 px-5 py-4 flex justify-between items-center">
+    <div className="sticky shrink-0 top-0 z-50 bg-background bg-w shadow-md h-16 border-gray-200 px-7 flex justify-between items-center">
       <div className="flex items-center gap-x-2">
         {isMobileScreen && (
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="outline" className="outline-none">
+              <Button
+                variant="outline"
+                className="outline-none py-1 px-3 h-fit"
+              >
                 <i className="ri-menu-line"></i>
               </Button>
             </SheetTrigger>
@@ -97,11 +119,6 @@ const Navbar = () => {
               side={"left"}
               className="flex flex-col justify-between px-0"
             >
-              <div
-                className={`flex items-center justify-center px-5 bg-white w-fit rounded-full`}
-              >
-                <img src={IconCompany} alt="" className="w-full max-w-24" />
-              </div>
               <div
                 className={`flex-auto border-b w-full px-5 border-slate-100 ${"custom-scrollbar overflow-y-scroll overflow-x-hidden"}`}
               >
@@ -133,52 +150,155 @@ const Navbar = () => {
           </Sheet>
         )}
 
-        <SearchComponent></SearchComponent>
+        <NavLink to={"/"} className="flex items-center">
+          <div
+            className={`flex items-center justify-center w-fit  rounded-full  shadow-gray-500`}
+          >
+            <img src={IconCompany} alt="" className="w-full max-w-24" />
+          </div>
+        </NavLink>
+
+        {/* <p className="text-white italic">Xin chào, {currentUser?.USERNAME}...</p> */}
       </div>
       <div className="flex gap-x-5 items-center">
         <div className="flex gap-x-5">
+          <SearchComponent></SearchComponent>
           <MessageComponent></MessageComponent>
           <NotificationComponent></NotificationComponent>
         </div>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild className="cursor-pointer">
+        <Popover>
+          <PopoverTrigger asChild className="cursor-pointer">
             <div className="flex gap-x-3 items-center">
-              <Avatar className="size-9">
+              <Avatar className="size-8">
                 <AvatarImage src="https://github.com/shadcn.png" />
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
               <div className="flex flex-col text-gray-600">
-                <span className="font-medium">{currentUser?.USERNAME}</span>
-                <span className="text-sm line-clamp-1">
+                <span className="font-medium text-gray-700 text-sm">
+                  {currentUser?.USERNAME}
+                </span>
+                <span className="text-xs line-clamp-1 text-gray-700 italic">
                   {currentUser?.PSTNNAME}
                 </span>
               </div>
             </div>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56" side="bottom">
-            <DropdownMenuLabel>Tài khoản của tôi</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem className="cursor-pointer">
-                Thông tin tài khoản
-              </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer">
-                Đổi mật khẩu
-              </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer">
-                Cài đặt
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-
-            <DropdownMenuItem
-              className="cursor-pointer"
-              onClick={() => logoutUser()}
+          </PopoverTrigger>
+          <PopoverContent className="w-64 p-0 text-sm" align="end">
+            <div
+              // onClick={() => logoutUser()}
+              className="flex gap-x-2 text-gray-500 cursor-pointer hover:bg-gray-100 px-2 py-2 border-b border-gray-200"
             >
-              Đăng xuất
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              <i className="ri-user-line"></i>
+              Thông tin cá nhân
+            </div>
+            <Popover open={openLanguage}>
+              <PopoverTrigger asChild>
+                <div
+                  onClick={() => setOpenLanguage(!openLanguage)}
+                  className="flex gap-x-2 justify-between items-center text-gray-500 cursor-pointer hover:bg-gray-100 px-2 py-2 border-b border-gray-200"
+                >
+                  <div className="flex gap-x-2">
+                    <i className="ri-global-line"></i>
+                    {getLabelByKey({ key: 10000, defaultLabel: "Ngôn ngữ" })}
+                  </div>
+                  <div className="font-semibold flex gap-x-2 items-center text-xs">
+                    {keyLanguage == "V" ? "Việt Nam" : "England"}
+                  </div>
+                </div>
+              </PopoverTrigger>
+              <PopoverContent className="w-40 p-0" align="end">
+                <div className="grid">
+                  <div
+                    onClick={() => {
+                      setKeyLanguages({ key: "V" });
+                      setOpenLanguage(false);
+                    }}
+                    className={`flex items-center gap-x-2 px-2 py-2 cursor-pointer hover:bg-gray-100`}
+                  >
+                    <img
+                      src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Flag_of_Vietnam.svg/255px-Flag_of_Vietnam.svg.png"
+                      alt=""
+                      className="h-5 w-8"
+                    />
+                    <span className="text-xs text-gray-500">
+                      {" "}
+                      {keyLanguage == "V" ? "Việt Nam" : "Vietnamese"}
+                    </span>
+                  </div>
+                  <div
+                    onClick={() => {
+                      setKeyLanguages({ key: "E" });
+                      setOpenLanguage(false);
+                    }}
+                    className="flex items-center gap-x-2 px-2 py-2 cursor-pointer hover:bg-gray-100"
+                  >
+                    <img
+                      src="https://cdn.britannica.com/73/4473-050-0D875725/Grand-Union-Flag-January-1-1776.jpg"
+                      alt=""
+                      className="h-5 w-8"
+                    />
+                    <span className="text-xs text-gray-500">Tiếng Anh</span>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
+            <div
+              className="flex gap-x-2 justify-between text-gray-500 cursor-pointer hover:bg-gray-100 px-2 py-2 border-b border-gray-200"
+              onClick={() =>
+                keyTheme.toLocaleLowerCase() == "dark"
+                  ? setTheme({ theme: "Light" })
+                  : setTheme({ theme: "Dark" })
+              }
+            >
+              <div>
+                {keyTheme == "Light" && <i className="ri-moon-fill"></i>}
+                {keyTheme == "Dark" && (
+                  <i className="ri-sun-fill text-white"></i>
+                )}{" "}
+                Theme
+              </div>
+              <div className="font-medium">{keyTheme}</div>
+            </div>
+            <div
+              onClick={() => logoutUser()}
+              className="flex gap-x-2 text-gray-500 cursor-pointer hover:bg-gray-100 px-2 py-2 border-b border-gray-200"
+            >
+              <i className="ri-logout-box-line"></i>
+              {getLabelByKey({ key: 10000, defaultLabel: "Đăng xuất" })}
+            </div>
+          </PopoverContent>
+        </Popover>
+        {/* <Popover>
+          <PopoverTrigger asChild className="cursor-pointer">
+            <i className="ri-global-line"></i>
+            Tiếng Việt
+          </PopoverTrigger>
+          <PopoverContent className="w-52 p-0 text-sm" align="end">
+            <div
+              // onClick={() => logoutUser()}
+              className="flex gap-x-2 text-gray-500 cursor-pointer hover:bg-gray-100 px-2 py-2"
+            >
+              <img
+                src="https://media.istockphoto.com/id/1849848209/vi/vec-to/qu%E1%BB%91c-k%E1%BB%B3-vi%E1%BB%87t-nam-t%E1%BB%B7-l%E1%BB%87-khung-h%C3%ACnh-ch%C3%ADnh-x%C3%A1c-c%E1%BB%A7a-qu%E1%BB%91c-k%E1%BB%B3-m%C3%A0u-s%E1%BA%AFc-ch%C3%ADnh-th%E1%BB%A9c-vector-minh-h%E1%BB%8Da.jpg?s=612x612&w=0&k=20&c=h76ccQXC75_T_queCCQeWIgutnocGEKfgZ3mw-S1-co="
+                className="h-6 w-10 object-center object-cover"
+                alt=""
+              />
+              Tiếng việt
+            </div>
+            <div
+              onClick={() => logoutUser()}
+              className="flex gap-x-2 text-gray-500 cursor-pointer hover:bg-gray-100 px-2 py-2"
+            >
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Flag_of_the_United_Kingdom_%281-2%29.svg/1200px-Flag_of_the_United_Kingdom_%281-2%29.svg.png"
+                alt=""
+                className="h-6 w-10 object-center object-cover"
+              />
+              Tiếng anh
+            </div>
+          </PopoverContent>
+        </Popover> */}
       </div>
     </div>
   );

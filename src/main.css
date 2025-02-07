@@ -78,26 +78,30 @@
   }
 
   .custom-scrollbar-wider::-webkit-scrollbar {
-    width: 4px !important;
+    width: 6px !important;
     background-color: rgb(241, 241, 241);
   }
 
   .custom-scrollbar-wider::-webkit-scrollbar-thumb {
     background: #d8d8d8;
 
-    width: 4px !important;
+    width: 6px !important;
   }
 
   .custom-scrollbar-wider-x::-webkit-scrollbar {
-    height: 4px !important;
+    height: 6px !important;
     background-color: rgb(241, 241, 241);
   }
 
   .custom-scrollbar-wider-x::-webkit-scrollbar-thumb {
     background: #d8d8d8;
 
-    height: 4px !important;
+    height: 6px !important;
   }
+}
+
+body {
+  @apply font-roboto;
 }
 
 .menuItem1:hover .menuItemChild1 {
@@ -117,4 +121,83 @@
 
 .transition-opacityVisible {
   transition: opacity visible ease-in 0.5;
+}
+
+/* Text  Editor  */
+
+.ProseMirror {
+  min-height: 500px;
+  border: 1px solid rgb(187, 187, 187);
+  padding-inline: 20px;
+  padding-block: 20px;
+  background-color: white;
+  color: gray;
+  /* overflow-y: scroll; */
+}
+
+.ProseMirror:focus {
+  outline: none;
+}
+
+.ProseMirror h1 {
+  font-size: 30px;
+}
+
+.ProseMirror h2 {
+  font-size: 24px;
+}
+
+.ProseMirror h3 {
+  font-size: 18px;
+}
+
+.ProseMirror > code {
+  background-color: beige;
+}
+
+.ProseMirror blockquote {
+  padding-left: 3px;
+  border-left: 5px solid rgb(211, 211, 211);
+}
+
+.ProseMirror ul {
+  list-style: disc;
+  padding-left: 30px;
+}
+
+.ProseMirror ol {
+  list-style: decimal;
+  padding-left: 30px;
+}
+
+.ProseMirror > pre > code {
+  background-color: rgb(114, 114, 114);
+  color: white;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.ProseMirror img {
+  height: 300px;
+  width: auto;
+}
+
+.ProseMirror table {
+  border: 1px solid rgb(207, 207, 207);
+  border-collapse: collapse;
+  width: 100%;
+}
+.ProseMirror th,
+.ProseMirror td {
+  border: 1px solid rgb(207, 207, 207); /* Đặt đường viền cho th và td */
+  padding: 8px; /* Khoảng cách giữa nội dung và đường viền */
+  text-align: left; /* Căn chỉnh văn bản bên trái */
+}
+
+.ProseMirror .selectedCell {
+  background-color: #f2f2f2;
+}
+
+.ProseMirror th {
+  background-color: #f2f2f2; /* Màu nền cho tiêu đề */
 }

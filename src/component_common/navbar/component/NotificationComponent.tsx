@@ -6,23 +6,33 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 const NotificationComponent = () => {
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild className="cursor-pointer">
-        <div className="relative">
-          <i className="ri-notification-line text-xl"></i>
-          <div className="absolute -top-2 -right-2 size-5 bg-orange-500 rounded-full flex items-center justify-center">
-            <span className="text-white font-thin text-xs">1</span>
+    <Popover>
+      <PopoverTrigger asChild>
+        <div className="relative cursor-pointer">
+          <i className="ri-notification-line text-xl text-gray-700"></i>
+          <div className="absolute -top-2 -right-2 size-5 bg-orange-500 border-2 border-white rounded-full flex items-center justify-center">
+            <span className="text-white font-medium text-[10px]">1</span>
           </div>
         </div>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-72">
-        <DropdownMenuLabel>Thông báo</DropdownMenuLabel>
-        <DropdownMenuGroup>
-          <DropdownMenuItem className="cursor-pointer py-2">
-            <div className="flex justify-between gap-x-1">
+      </PopoverTrigger>
+      <PopoverContent className="w-80 p-0">
+        <div className="px-3 py-2 border-b text-sm flex justify-between items-center">
+          <p className="text-gray-700 font-medium">Thông báo</p>
+          <p className="text-gray-700 text-xs cursor-pointer hover:text-primary transition-colors">
+            Đánh dấu đã đọc
+          </p>
+        </div>
+        <div className="grid text-xs">
+          <div className="cursor-pointer py-2">
+            <div className="flex justify-between gap-x-1 px-3">
               <div className="size-9 flex-shrink-0">
                 <img
                   className="w-full h-full"
@@ -35,9 +45,9 @@ const NotificationComponent = () => {
                 vừa đặt hàng thành công!
               </p>
             </div>
-          </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer py-2">
-            <div className="flex justify-between gap-x-1">
+          </div>
+          <div className="cursor-pointer py-2">
+            <div className="flex justify-between gap-x-1 px-3">
               <div className="size-9 flex-shrink-0">
                 <img
                   className="w-full h-full"
@@ -51,9 +61,9 @@ const NotificationComponent = () => {
                 hàng thành công!
               </p>
             </div>
-          </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer bg-slate-100 py-2">
-            <div className="flex justify-between gap-x-1">
+          </div>
+          <div className="cursor-pointer bg-slate-100 py-2">
+            <div className="flex justify-between gap-x-1 px-3">
               <div className="size-9 flex-shrink-0">
                 <img
                   className="w-full h-full"
@@ -67,10 +77,10 @@ const NotificationComponent = () => {
                 hàng thành công!
               </p>
             </div>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 };
 
