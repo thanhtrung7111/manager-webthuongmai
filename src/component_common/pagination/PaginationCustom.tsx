@@ -42,17 +42,17 @@ const PaginationCustom = ({
       <PaginationContent>
         <PaginationItem onClick={() => onPageChange(1)}>
           <div
-            className={`w-8 h-8 flex items-center justify-center rounded-md border bg-slate-50 text-gray-400 cursor-pointer`}
+            className={`w-8 h-8 flex items-center justify-center rounded-md border  bg-clr-surface text-clr-content ${
+              pageIndex == 1 ? "opacity-50" : "opacity-100"
+            } cursor-pointer`}
           >
             <i className="ri-skip-left-line"></i>
           </div>
         </PaginationItem>
         <PaginationItem onClick={onPrevious}>
           <div
-            className={`w-8 h-8 flex items-center justify-center rounded-md border text-gray-400 ${
-              pageIndex == 1
-                ? "bg-slate-200 cursor-auto"
-                : "bg-slate-50 cursor-pointer"
+            className={`w-8 h-8 flex items-center justify-center rounded-md border  bg-clr-surface text-clr-content ${
+              pageIndex == 1 ? "opacity-50" : "opacity-100"
             }`}
           >
             <i className="ri-arrow-left-s-line"></i>
@@ -77,7 +77,7 @@ const PaginationCustom = ({
                 className={`h-8 px-3 text-sm flex items-center justify-center rounded-md border ${
                   pageIndex == pageNumber
                     ? "bg-clr-surface-accent text-clr-accent"
-                    : "bg-slate-50 text-gray-500"
+                    : "bg-clr-surface text-clr-content"
                 }`}
               >
                 {pageNumber}
@@ -113,10 +113,8 @@ const PaginationCustom = ({
 
         <PaginationItem onClick={onNext}>
           <div
-            className={`w-8 h-8 flex items-center justify-center rounded-md border  text-gray-400 ${
-              pageIndex == lastPage
-                ? "bg-slate-200 cursor-auto"
-                : "bg-slate-50 cursor-pointer"
+            className={`w-8 h-8 flex items-center justify-center rounded-md border  bg-clr-surface text-clr-content ${
+              pageIndex == lastPage ? "opacity-50" : "opacity-100"
             }`}
           >
             <i className="ri-arrow-right-s-line"></i>
@@ -124,7 +122,9 @@ const PaginationCustom = ({
         </PaginationItem>
         <PaginationItem onClick={() => onPageChange(lastPage)}>
           <div
-            className={`w-8 h-8 flex items-center justify-center rounded-md border bg-slate-50 text-gray-400 cursor-pointer`}
+            className={`w-8 h-8 flex items-center justify-center rounded-md border  bg-clr-surface text-clr-content ${
+              pageIndex == lastPage ? "opacity-50" : "opacity-100"
+            }`}
           >
             <i className="ri-skip-right-line"></i>
           </div>

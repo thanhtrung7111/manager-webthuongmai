@@ -90,8 +90,28 @@ const menu2 = [
     link: "/logout",
   },
 ];
+
+const lstTheme: {
+  theme: string;
+  themeIcon?: React.ReactNode;
+  color?: string;
+}[] = [
+  {
+    theme: "Dark",
+    themeIcon: <i className="ri-moon-fill"></i>,
+  },
+  {
+    theme: "Light",
+    themeIcon: <i className="ri-sun-fill text-yellow-400"></i>,
+  },
+  {
+    theme: "Default",
+    color: "#009578",
+  },
+];
 const Navbar = () => {
-  const [openLanguage, setOpenLanguage] = useState(false);
+  const [openLanguage, setOpenLanguage] = useState<boolean>(false);
+  const [openTheme, setOpenTheme] = useState<boolean>(false);
   const { currentUser, logoutUser } = useUserStore();
   const { setKeyLanguages, setLanguages, keyLanguage } = useConfigurationStore(
     (state) => state.languageConfig
@@ -243,23 +263,73 @@ const Navbar = () => {
                 </div>
               </PopoverContent>
             </Popover>
-            <div
-              className="flex gap-x-2 justify-between text-gray-500 cursor-pointer hover:bg-gray-100 px-2 py-2 border-b border-gray-200"
-              onClick={() =>
-                keyTheme.toLocaleLowerCase() == "dark"
-                  ? setTheme({ theme: "Light" })
-                  : setTheme({ theme: "Dark" })
-              }
-            >
-              <div>
-                {keyTheme == "Light" && <i className="ri-moon-fill"></i>}
-                {keyTheme == "Dark" && (
-                  <i className="ri-sun-fill text-white"></i>
-                )}{" "}
-                Theme
-              </div>
-              <div className="font-medium">{keyTheme}</div>
-            </div>
+            <Popover open={openTheme}>
+              <PopoverTrigger asChild onClick={() => setOpenTheme(!openTheme)}>
+                <div
+                  className="flex gap-x-2 justify-between text-gray-500 cursor-pointer hover:bg-gray-100 px-2 py-2 border-b border-gray-200"
+                  // onClick={() =>
+                  //   keyTheme.toLocaleLowerCase() == "dark"
+                  //     ? setTheme({ theme: "Light" })
+                  //     : setTheme({ theme: "Dark" })
+                  // }
+                >
+                  <div className="flex items-center gap-x-2">
+                    {
+                      lstTheme.find(
+                        (item) =>
+                          item.theme.toLowerCase() === keyTheme.toLowerCase()
+                      )?.themeIcon
+                    }
+                    {lstTheme.find(
+                      (item) =>
+                        item.theme.toLowerCase() === keyTheme.toLowerCase()
+                    )?.color && (
+                      <div
+                        className="rounded-full size-3"
+                        style={{
+                          backgroundColor: lstTheme.find(
+                            (item) =>
+                              item.theme.toLowerCase() ===
+                              keyTheme.toLowerCase()
+                          )?.color,
+                        }}
+                      ></div>
+                    )}
+                    Theme
+                  </div>
+                  <div className="font-medium">{keyTheme}</div>
+                </div>
+              </PopoverTrigger>
+              <PopoverContent className="w-40 p-0" align="end">
+                <div className="grid">
+                  {lstTheme.map((item) => {
+                    return (
+                      <div
+                        onClick={() => {
+                          setTheme({ theme: item.theme });
+                          setOpenTheme(false);
+                        }}
+                        className={`flex items-center gap-x-3 px-2 py-2 cursor-pointer  hover:bg-gray-100`}
+                      >
+                        {item?.themeIcon}
+                        {item.color && (
+                          <div
+                            className="rounded-full size-4"
+                            style={{
+                              backgroundColor: item.color,
+                            }}
+                          ></div>
+                        )}
+                        <span className="text-xs text-clr-content font-medium">
+                          {item.theme}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </PopoverContent>
+            </Popover>
+
             <div
               onClick={() => logoutUser()}
               className="flex gap-x-2 text-gray-500 cursor-pointer hover:bg-gray-100 px-2 py-2 border-b border-gray-200"

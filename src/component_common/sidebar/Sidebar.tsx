@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Menu from "./Menu";
 import IconCompany from "@/assets/img/iconcompany.png";
+import { useConfigurationStore } from "@/store/configurationStore";
 const menu: any[] = [
   {
     itemName: "Dashboard",
@@ -125,6 +126,7 @@ const menu2 = [
 const Sidebar = () => {
   const [open, setOpen] = useState<boolean>(true);
   const [delayOpen, setDelayOpen] = useState<boolean>(false);
+  const { keyTheme } = useConfigurationStore((state) => state.themeConfig);
   useEffect(() => {
     setDelayOpen(true);
     setTimeout(() => {
@@ -133,12 +135,12 @@ const Sidebar = () => {
   }, [open]);
   return (
     <div
-      className={`hidden shrink-0 border-r  lg:flex ${
+      className={`hidden shrink-0 shadow-lg  lg:flex ${
         !open ? "w-20" : "w-64"
       } bg-clr-sidebar delay-500  flex-col justify-between sticky top-0 transition-[width] duration-300 z-[20]`}
     >
       <div
-        className={`absolute w-8 h-8 top-5 -translate-y-1/2 bg-clr-navbar -translate-x-1/2 -right-6   border border-gray-300 rounded-sm flex items-center justify-center z-10 cursor-pointer`}
+        className={`absolute w-8 h-8 top-7 -translate-y-1/2 bg-clr-navbar -translate-x-1/2 -right-6 border border-clr-content-light  rounded-sm flex items-center justify-center z-10 cursor-pointer`}
         onClick={() => setOpen(!open)}
       >
         <i
@@ -171,12 +173,15 @@ const Sidebar = () => {
           </div>
         </div> */}
         <div
-          className={`flex-auto h-96 border-b border-slate-100 ${
+          className={`flex-auto h-96 ${
             open && "custom-scrollbar overflow-y-scroll"
           }`}
         >
-   
-          <div className={`${open ? "px-5" : "px-2"} ${delayOpen ? "invisible" : "visible"} pt-5`}>
+          <div
+            className={`${open ? "px-5" : "px-2"} ${
+              delayOpen ? "invisible" : "visible"
+            } pt-5`}
+          >
             <Menu
               linkName={"link"}
               compact={!open}
@@ -189,7 +194,11 @@ const Sidebar = () => {
           </div>
         </div>
       </div>
-      <div className={`${open ? "px-5" : "px-2"} ${delayOpen ? "invisible" : "visible"} pt-10 pb-6`}>
+      {/* <div
+        className={`${open ? "px-5" : "px-2"} ${
+          delayOpen ? "invisible" : "visible"
+        } pt-10 pb-6`}
+      >
         <Menu
           linkName={"link"}
           compact={!open}
@@ -199,7 +208,7 @@ const Sidebar = () => {
           listName={"itemList"}
           name={"itemName"}
         ></Menu>
-      </div>
+      </div> */}
     </div>
   );
 };

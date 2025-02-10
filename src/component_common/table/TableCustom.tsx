@@ -105,6 +105,8 @@ const TableCustom = <TData, TValue>({
   };
 
   const handleDrop = (index: number) => {
+    console.log(index);
+    console.log(draggedIndex);
     if (draggedIndex === null || draggedIndex === index) {
       setDraggedIndex(null);
       setHoverIndex(null);
@@ -112,9 +114,12 @@ const TableCustom = <TData, TValue>({
     }
     // Hoán đổi vị trí hai phần tử
     const newData = [...initialData];
-    [newData[draggedIndex], newData[index]] = [
-      newData[index],
-      newData[draggedIndex],
+    [
+      newData[draggedIndex + pageIndex * pageSize],
+      newData[index + pageIndex * pageSize],
+    ] = [
+      newData[index + pageIndex * pageSize],
+      newData[draggedIndex + pageIndex * pageSize],
     ];
 
     setInitialData([...newData]);
@@ -131,14 +136,14 @@ const TableCustom = <TData, TValue>({
           <Popover>
             <PopoverTrigger>
               <Button
-                className="flex items-center gap-x-2"
+                className="flex items-center gap-x-2 bg-clr-warning"
                 variant={"outline"}
                 type="submit"
                 size={"sm"}
               >
-                <span className="text-gray-600">Lọc</span>
+                <span className="text-white">Lọc</span>
                 <div className="rotate-0 transition-transform duration-500 cursor-pointer">
-                  <i className="ri-filter-line text-gray-600"></i>
+                  <i className="ri-filter-line text-white"></i>
                 </div>
               </Button>
             </PopoverTrigger>
@@ -188,7 +193,7 @@ const TableCustom = <TData, TValue>({
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  className="group flex items-center gap-x-2"
+                  className="group flex items-center gap-x-2 bg-clr-success hover:opacity-90 hover:bg-clr-success"
                   size={"sm"}
                   onClick={() => {
                     table.resetColumnFilters();
@@ -200,9 +205,9 @@ const TableCustom = <TData, TValue>({
                   }}
                   variant={"outline"}
                 >
-                  <span className="text-gray-600">Làm mới</span>
+                  <span className="text-white">Làm mới</span>
                   <div className="rotate-0 group-hover:rotate-90 transition-transform duration-500 cursor-pointer">
-                    <i className="ri-refresh-line text-xl text-gray-600"></i>
+                    <i className="ri-refresh-line text-xl text-white"></i>
                   </div>
                 </Button>
               </TooltipTrigger>
@@ -213,7 +218,7 @@ const TableCustom = <TData, TValue>({
           </TooltipProvider>
         </div>
         <div className="flex gap-x-2 items-center">
-          <div className="flex-1 text-sm text-muted-foreground">
+          <div className="flex-1 text-sm text-clr-content">
             <span className="font-semibold">
               ({pageIndex * pageSize} -{" "}
               {pageIndex * pageSize + pageSize >=
@@ -266,13 +271,13 @@ const TableCustom = <TData, TValue>({
           </Popover>
         </div>
       </div>
-      <Table id="table" className="bg-white relative z-0">
+      <Table id="table" className="bg-transparent relative z-0">
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow className="hover:bg-white" key={headerGroup.id}>
+            <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
                 return (
-                  <TableHead key={header.id} className="p-2">
+                  <TableHead key={header.id} className="p-2 text-clr-content">
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -297,7 +302,7 @@ const TableCustom = <TData, TValue>({
               table.getRowModel().rows.map((row, index: number) => (
                 <TableRow
                   className={`cursor-pointer ${
-                    index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                    index % 2 === 0 ? "bg-transparent" : "bg-"
                   } ${
                     hoverIndex == index &&
                     "border-2 border-dashed border-clr-warning"
@@ -316,7 +321,7 @@ const TableCustom = <TData, TValue>({
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
-                      className="!text-gray-600 !p-2 !w-fit"
+                      className="text-clr-content !p-2 !w-fit"
                     >
                       {flexRender(
                         cell.column.columnDef.cell,

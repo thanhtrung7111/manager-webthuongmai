@@ -61,7 +61,7 @@ const ProductPage = () => {
             table.getIsAllPageRowsSelected() &&
             "bg-clr-surface-accent text-clr-accent"
           }`}
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          onCheckedChange={(value) => table.toggleAllRowsSelected(!!value)}
           aria-label="Select all"
         />
       ),
@@ -306,9 +306,9 @@ const ProductPage = () => {
         {/* Action  */}
 
         {/* table */}
-        <div className="rounded-md p-5 pt-3 bg-white border-gray-200 border shadow-md">
+        <div className="rounded-md p-5 pt-3 bg-clr-sidebar border border-clr-sidebar shadow-md">
           <div className="flex justify-between items-center mb-5">
-            <h4 className="text-xl font-medium text-gray-600 border-l-4 pl-2 border-gray-500">
+            <h4 className="text-xl font-medium text-clr-content border-l-4 pl-2 border-clr-content">
               Danh mục
             </h4>
             <div className="flex gap-x-2">
