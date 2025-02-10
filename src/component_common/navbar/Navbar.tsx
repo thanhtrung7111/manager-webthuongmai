@@ -103,7 +103,7 @@ const Navbar = () => {
   const isMobileScreen = useMediaQuery({ query: "(max-width:1024px)" });
   console.log(currentUser);
   return (
-    <div className="sticky shrink-0 top-0 z-50 bg-background bg-w shadow-md h-16 border-gray-200 px-7 flex justify-between items-center">
+    <div className="sticky shrink-0 top-0 z-50 bg-clr-navbar bg-w shadow-md h-16 border-gray-200 px-7 flex justify-between items-center">
       <div className="flex items-center gap-x-2">
         {isMobileScreen && (
           <Sheet>
@@ -112,12 +112,12 @@ const Navbar = () => {
                 variant="outline"
                 className="outline-none py-1 px-3 h-fit"
               >
-                <i className="ri-menu-line"></i>
+                <i className="ri-menu-line text-clr-menu"></i>
               </Button>
             </SheetTrigger>
             <SheetContent
               side={"left"}
-              className="flex flex-col justify-between px-0"
+              className="flex flex-col justify-between px-0 bg-clr-sidebar  text-clr-menu"
             >
               <div
                 className={`flex-auto border-b w-full px-5 border-slate-100 ${"custom-scrollbar overflow-y-scroll overflow-x-hidden"}`}
@@ -152,7 +152,7 @@ const Navbar = () => {
 
         <NavLink to={"/"} className="flex items-center">
           <div
-            className={`flex items-center justify-center w-fit  rounded-full  shadow-gray-500`}
+            className={`py-2 px-2 rounded-lg bg-white flex items-center justify-center w-fit shadow-gray-500`}
           >
             <img src={IconCompany} alt="" className="w-full max-w-24" />
           </div>
@@ -175,10 +175,10 @@ const Navbar = () => {
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
               <div className="flex flex-col text-gray-600">
-                <span className="font-medium text-gray-700 text-sm">
+                <span className="font-medium text-clr-menu text-sm">
                   {currentUser?.USERNAME}
                 </span>
-                <span className="text-xs line-clamp-1 text-gray-700 italic">
+                <span className="text-xs line-clamp-1 text-clr-menu italic">
                   {currentUser?.PSTNNAME}
                 </span>
               </div>

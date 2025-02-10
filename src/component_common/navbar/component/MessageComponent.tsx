@@ -12,14 +12,16 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import React from "react";
 
 const MessageComponent = () => {
+  console.log("Message Hello")
   return (
     <Popover>
       <PopoverTrigger asChild>
         <div className="relative cursor-pointer">
-          <i className="ri-message-3-line text-xl text-gray-700"></i>
-          <div className="absolute -top-2 -right-2 size-5 border-2 border-white bg-orange-500 rounded-full flex items-center justify-center">
+          <i className="ri-message-3-line text-xl text-clr-menu"></i>
+          <div className="absolute -top-2 -right-2 size-5 border-2 border-white bg-clr-primary rounded-full flex items-center justify-center">
             <span className="text-white font-medium text-[10px]">1</span>
           </div>
         </div>
@@ -68,4 +70,4 @@ const MessageComponent = () => {
   );
 };
 
-export default MessageComponent;
+export default React.memo(MessageComponent);

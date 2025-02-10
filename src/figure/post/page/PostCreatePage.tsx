@@ -30,7 +30,7 @@ const breadBrumb = [
     itemName: "Quản lí chung",
   },
   {
-    itemName: "Danh sách bài viết",
+    itemName: "Bài viết",
     itemLink: "/product",
   },
   {
@@ -241,20 +241,24 @@ const PostCreatePage = () => {
           {({ setFieldValue, handleChange, values, errors, touched }) => (
             <Form id="formCreateProduct">
               {/* Action  */}
-              <div className="flex justify-between items-center mb-2">
-                <div className="flex items-end gap-x-2">
-                  <div
-                    className="text-gray-500 cursor-pointer"
-                    onClick={() => navigate(-1)}
-                  >
-                    <i className="ri-logout-box-line text-xl"></i>
-                  </div>
-                  <h4 className="text-xl font-medium text-gray-600">
-                    Thêm bài viết mới
-                  </h4>
-                </div>
-                <div className="flex gap-x-2 shrink-0">
-                  {/* <ButtonForm
+
+              {/* table */}
+              <div className="gap-x-2">
+                <div className="rounded-md p-5 pt-3 h-fit bg-white border-gray-200 border shadow-md flex flex-col gap-y-3">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-end gap-x-2">
+                      {/* <div
+                        className="text-gray-500 cursor-pointer"
+                        onClick={() => navigate(-1)}
+                      >
+                        <i className="ri-logout-box-line text-xl"></i>
+                      </div> */}
+                      <h4 className="text-xl font-medium text-gray-600 border-l-4 pl-2 border-gray-500">
+                        Thông tin bài viết
+                      </h4>
+                    </div>
+                    <div className="flex gap-x-2 shrink-0">
+                      {/* <ButtonForm
                     label="Import Excel"
                     type="submit"
                     className="bg-primary !w-36"
@@ -270,64 +274,68 @@ const PostCreatePage = () => {
                     // onClick={() => extractExcel()}
                     icon={<i className="ri-download-2-line"></i>}
                   ></ButtonForm> */}
-                  <ButtonForm
-                    label="Lưu"
-                    type="submit"
-                    className="bg-secondary !w-16"
-                    disabled={isLoading}
-                    // loading={
-                    //   handlePostProduct.isPending || setImage.isPending
-                    // }
-                    // onClick={() => {
-                    //
-                    // }}
-                  ></ButtonForm>
-                </div>
-              </div>
-
-              {/* table */}
-              <div className="gap-x-2">
-                <div className="rounded-md p-5 h-fit bg-white border-gray-200 border shadow-md flex flex-col gap-y-3">
-                  <div className="flex items-center justify-between pb-2 border-gray-400 border-b">
-                    <div className="text-gray-600 text-xl">
-                      Chỉnh sửa bài viết
-                    </div>
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <div className="p-3 cursor-pointer border w-8 h-8 flex items-center justify-center bg-white rounded-lg -left-2">
-                          <i className="ri-eye-line text-gray-600"></i>
-                        </div>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-[1200px]">
-                        <div className="relative rounded-md p-5 bg-white border-gray-200 border shadow-md flex flex-col gap-y-3 h-[850px] overflow-y-scroll custom-scrollbar-wider">
-                          {/* <div className="text-gray-600 text-xl pb-2 border-gray-400 border-b">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <div className="p-3 cursor-pointer border w-8 h-8 flex items-center justify-center bg-white rounded-lg -left-2">
+                            <i className="ri-eye-line text-gray-600"></i>
+                          </div>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[1200px]">
+                          <div className="relative rounded-md p-5 bg-white border-gray-200 border shadow-md flex flex-col gap-y-3 h-[850px] overflow-y-scroll custom-scrollbar-wider">
+                            {/* <div className="text-gray-600 text-xl pb-2 border-gray-400 border-b">
                     Review bài viết
                   </div> */}
-                          <div
-                            id="content"
-                            dangerouslySetInnerHTML={{
-                              __html: addTailwindClasses(
-                                `<h1>${
-                                  values.POSTTITL
-                                    ? values.POSTTITL
-                                    : "Chưa có tiêu đề..."
-                                }</h1>` +
-                                  `<h5 style='font-size:14px'><span style='color:#484848;font-weight:500'>Ngày đăng:</span> ${moment(
-                                    Date.now()
-                                  ).format("DD/MM/yyyy HH:mm:ss")}</h5>`
-                              ),
-                            }}
-                            className="w-full ql-review"
-                          ></div>
-                          {/* <div
+                            <div
+                              id="content"
+                              dangerouslySetInnerHTML={{
+                                __html: addTailwindClasses(
+                                  `<h1>${
+                                    values.POSTTITL
+                                      ? values.POSTTITL
+                                      : "Chưa có tiêu đề..."
+                                  }</h1>` +
+                                    `<h5 style='font-size:14px'><span style='color:#484848;font-weight:500'>Ngày đăng:</span> ${moment(
+                                      Date.now()
+                                    ).format("DD/MM/yyyy HH:mm:ss")}</h5>`
+                                ),
+                              }}
+                              className="w-full ql-review"
+                            ></div>
+                            {/* <div
                             className="preview"
                             dangerouslySetInnerHTML={createMarkup(
                               convertedContent
                             )}
                           ></div> */}
-                        </div>
-                      </DialogContent>
-                    </Dialog>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                      <ButtonForm
+                        label="Lưu"
+                        type="submit"
+                        className="bg-secondary !w-16"
+                        disabled={isLoading}
+                        // loading={
+                        //   handlePostProduct.isPending || setImage.isPending
+                        // }
+                        // onClick={() => {
+                        //
+                        // }}
+                      ></ButtonForm>
+                      <ButtonForm
+                        label="Hủy"
+                        type="button"
+                        className="bg-red-500 !w-14"
+                        disabled={isLoading}
+                        // loading={
+                        //   handlePostProduct.isPending || setImage.isPending
+                        // }
+                        // onClick={() => {
+                        //
+                        // }}
+                        onClick={() => navigate(-1)}
+                      ></ButtonForm>
+                    </div>
                   </div>
 
                   <InputFormikForm

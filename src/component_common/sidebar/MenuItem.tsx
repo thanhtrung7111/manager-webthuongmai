@@ -70,7 +70,7 @@ const MenuItem = ({
     <div className="mb-5">
       {!compact && (
         <p
-          className={`text-gray-700 font-semibold tracking-widest text-xs uppercase  mb-2`}
+          className={`text-clr-menu font-semibold tracking-widest text-xs uppercase  mb-2`}
         >
           {item[name] as string}
         </p>
@@ -102,7 +102,7 @@ const MenuItem = ({
     >
       {Array.isArray(item[listName]) ? (
         <div
-          className={`group/a mb-1 hover:bg-primary-foreground flex justify-between py-2 px-3 cursor-pointer text-gray-500 hover:text-primary  rounded-sm ${
+          className={`group/a mb-1 hover:bg-primary-foreground flex justify-between py-2 px-3 cursor-pointer text-clr-menu hover:text-primary  rounded-sm ${
             level >= 3 ? "w-64" : "w-fit"
           }`}
         >
@@ -123,7 +123,7 @@ const MenuItem = ({
           </span>
           {level >= 3 && Array.isArray(item[listName]) && (
             <i
-              className={`group-hover/a:text-primary ri-arrow-right-s-line text-gray-800 hover:text-transparent transition-transform`}
+              className={`group-hover/a:text-primary ri-arrow-right-s-line text-clr-menu hover:text-transparent transition-transform`}
             ></i>
           )}
         </div>
@@ -132,10 +132,10 @@ const MenuItem = ({
           to={linkName ? item[linkName] : "/home"}
           className={({ isActive }) =>
             isActive
-              ? `bg-primary-foreground text-primary flex justify-between py-2 px-3 cursor-pointer text-gray-500  rounded-sm ${
+              ? `bg-primary-foreground text-primary flex justify-between py-2 px-3 cursor-pointer text-clr-menu  rounded-sm ${
                   level >= 3 ? "w-64" : "w-fit"
                 }`
-              : `group/a hover:bg-primary-foreground flex justify-between py-2 px-3 cursor-pointer text-gray-500 hover:text-primary  rounded-sm ${
+              : `group/a hover:bg-primary-foreground flex justify-between py-2 px-3 cursor-pointer text-clr-menu hover:text-primary  rounded-sm ${
                   level >= 3 ? "w-64" : "w-fit"
                 }`
           }
@@ -157,7 +157,7 @@ const MenuItem = ({
           </span>
           {level >= 3 && Array.isArray(item[listName]) && (
             <i
-              className={`group-hover/a:text-primary ri-arrow-right-s-line text-gray-800 hover:text-transparent transition-transform`}
+              className={`group-hover/a:text-primary ri-arrow-right-s-line text-clr-menu hover:text-transparent transition-transform`}
             ></i>
           )}
         </NavLink>
@@ -165,7 +165,7 @@ const MenuItem = ({
 
       {item[listName] && (
         <div
-          className={`opacity-0 invisible rounded-md border absolute top-0 left-full bg-white h-fit ${
+          className={`opacity-0 invisible rounded-md border absolute top-0 left-full bg-clr-navbar h-fit ${
             "menuItemChild" + level
           }`}
         >
@@ -205,7 +205,7 @@ const MenuItem = ({
           }}
           className={`group/a hover:bg-primary-foreground flex items-center ${
             compact ? "justify-center" : "justify-between"
-          } py-2 px-3 cursor-pointer text-gray-700 hover:text-primary  rounded-sm`}
+          } py-2 px-3 cursor-pointer text-clr-menu hover:text-primary  rounded-sm`}
         >
           <div className="flex gap-x-2 items-center">
             {item[iconName] as React.ReactNode}
@@ -215,7 +215,7 @@ const MenuItem = ({
           </div>
           {Array.isArray(item[listName]) && (
             <i
-              className={`group-hover/a:text-primary ri-arrow-up-s-line text-gray-800 hover:text-transparent transition-transform ${
+              className={`group-hover/a:text-primary ri-arrow-up-s-line text-clr-menu hover:text-transparent transition-transform ${
                 open == true ? "rotate-180" : "rotate-90"
               }`}
             ></i>
@@ -224,15 +224,14 @@ const MenuItem = ({
       ) : (
         <NavLink
           to={linkName && item[linkName]}
-          className={({ isActive }) => {
-            console.log(isActive);
+          className={({ isActive })  => {
             return isActive
-              ? `group/a bg-primary flex ${
+              ? `group/a bg-clr-surface-accent-light flex ${
                   compact ? "justify-center" : "justify-between"
                 } py-2 px-3 cursor-pointer text-white  rounded-sm`
               : `group/a hover:bg-primary-foreground flex ${
                   compact ? "justify-center" : "justify-between"
-                } py-2 px-3 cursor-pointer text-gray-700 hover:text-primary  rounded-sm`;
+                } py-2 px-3 cursor-pointer text-clr-menu hover:text-primary  rounded-sm`;
           }}
         >
           <span className="flex gap-x-2 ">
@@ -245,7 +244,7 @@ const MenuItem = ({
           </span>
           {!compact && Array.isArray(item[listName]) && (
             <i
-              className={`group-hover/a:text-primary ri-arrow-up-s-line text-gray-800 hover:text-transparent transition-transform ${
+              className={`group-hover/a:text-primary ri-arrow-up-s-line text-clr-menu hover:text-transparent transition-transform ${
                 open == true ? "rotate-180" : "rotate-90"
               }`}
             ></i>
@@ -258,7 +257,7 @@ const MenuItem = ({
           <div className={`border-l border-slate-200 ml-5 pl-2 w-full pr-5`}>
             <div
               ref={menuRef}
-              className={`h-0 flex gap-y-1 flex-col overflow-hidden max-h-full transition-[height] duration-500`}
+              className={`h-0 flex gap-y-1 flex-col overflow-hidden max-h-full transition-[height] duration-300`}
             >
               {Array.isArray(item[listName]) &&
                 (item[listName] as MenuItemObject[]).length >= 1 &&

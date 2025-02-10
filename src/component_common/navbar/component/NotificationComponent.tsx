@@ -17,8 +17,8 @@ const NotificationComponent = () => {
     <Popover>
       <PopoverTrigger asChild>
         <div className="relative cursor-pointer">
-          <i className="ri-notification-line text-xl text-gray-700"></i>
-          <div className="absolute -top-2 -right-2 size-5 bg-orange-500 border-2 border-white rounded-full flex items-center justify-center">
+          <i className="ri-notification-line text-xl text-clr-menu"></i>
+          <div className="absolute -top-2 -right-2 size-5 bg-clr-primary border-2 border-white rounded-full flex items-center justify-center">
             <span className="text-white font-medium text-[10px]">1</span>
           </div>
         </div>

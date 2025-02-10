@@ -55,7 +55,7 @@ const breadBrumb = [
     itemName: "Quản lí chung",
   },
   {
-    itemName: "Danh sách sản phẩm",
+    itemName: "Sản phẩm",
     itemLink: "/product",
   },
   {
@@ -595,7 +595,7 @@ const ProductCreatePageFormik = () => {
           setProgress(50);
         }}
       ></Button> */}
-      <div className="mb-3">
+      <div className="mb-2">
         <BreadcrumbCustom
           linkList={breadBrumb}
           itemName={"itemName"}
@@ -614,46 +614,52 @@ const ProductCreatePageFormik = () => {
       >
         {({ setFieldValue, handleChange, values, errors, touched }) => (
           <Form id="formCreateProduct">
-            {/* Action  */}
-            <div className="flex justify-between items-center mb-2">
-              <div className="flex items-end gap-x-2">
-                <div
-                  className="text-gray-500 cursor-pointer"
-                  onClick={() => navigate(-1)}
-                >
-                  <i className="ri-logout-box-line text-xl"></i>
-                </div>
-                <h4 className="text-xl font-medium text-gray-600">
-                  Thêm sản phẩm mới
-                </h4>
-              </div>
-              <div className="flex gap-x-2 shrink-0">
-                <ButtonForm
-                  label="Import Excel"
-                  type="submit"
-                  className="bg-primary !w-36"
-                  disabled={setProduct.isPending || setCreateImage.isPending}
-                  icon={<i className="ri-download-2-line"></i>}
-                ></ButtonForm>
-                <ButtonForm
-                  label="File excel mẫu"
-                  type="button"
-                  className="!bg-yellow-500 !w-36"
-                  onClick={() => extractExcel()}
-                  icon={<i className="ri-download-2-line"></i>}
-                ></ButtonForm>
-                <ButtonForm
-                  label="Lưu"
-                  type="submit"
-                  className="bg-secondary !w-16"
-                  loading={setProduct.isPending || setCreateImage.isPending}
-                ></ButtonForm>
-              </div>
-            </div>
-
             {/* table */}
 
-            <div className="rounded-md p-5 bg-white border-gray-200 border shadow-md">
+            <div className="rounded-md p-5 pt-3 bg-white border-gray-200 border shadow-md">
+              {/* Action  */}
+              <div className="flex justify-between items-center mb-3">
+                <div className="flex items-end gap-x-2">
+                  {/* <div
+                    className="text-gray-500 cursor-pointer"
+                    onClick={() => navigate(-1)}
+                  >
+                    <i className="ri-logout-box-line text-xl"></i>
+                  </div> */}
+                  <h4 className="text-xl font-medium text-gray-600 border-l-4 pl-2 border-gray-500">
+                    Thông tin sản phẩm
+                  </h4>
+                </div>
+                <div className="flex gap-x-2 shrink-0">
+                  <ButtonForm
+                    label="Import Excel"
+                    type="submit"
+                    className="bg-primary !w-36"
+                    disabled={setProduct.isPending || setCreateImage.isPending}
+                    icon={<i className="ri-download-2-line"></i>}
+                  ></ButtonForm>
+                  <ButtonForm
+                    label="File excel mẫu"
+                    type="button"
+                    className="!bg-yellow-500 !w-36"
+                    onClick={() => extractExcel()}
+                    icon={<i className="ri-download-2-line"></i>}
+                  ></ButtonForm>
+                  <ButtonForm
+                    label="Lưu"
+                    type="submit"
+                    className="bg-secondary !w-16"
+                    loading={setProduct.isPending || setCreateImage.isPending}
+                  ></ButtonForm>
+                  <ButtonForm
+                    label="Hủy"
+                    type="button"
+                    className="bg-red-500 !w-16"
+                    onClick={() => navigate(-1)}
+                  ></ButtonForm>
+                </div>
+              </div>
+
               <div className="grid grid-cols-[1fr_3fr] gap-3 mb-5">
                 <div className="relative min-h-[500px] w-full overflow-hidden">
                   <div className="grid w-full items-center gap-1.5 h-full">

@@ -29,7 +29,7 @@ const breadBrumb = [
     itemName: "Quản lí chung",
   },
   {
-    itemName: "Danh sách bài viết",
+    itemName: "Bài viết",
     itemLink: "/post",
   },
 ];
@@ -291,10 +291,9 @@ const PostPage = () => {
         </div>
 
         {/* Action  */}
-        
 
         {/* table */}
-        <div className="rounded-md p-5 bg-white border-gray-200 border shadow-md">
+        <div className="rounded-md p-5 pt-3 bg-white border-gray-200 border shadow-md">
           <div className="flex justify-between items-center mb-5">
             <h4 className="text-xl font-medium text-gray-600 border-l-4 pl-2 border-gray-500">
               Danh mục

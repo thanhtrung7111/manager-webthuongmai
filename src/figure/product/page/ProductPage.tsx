@@ -44,7 +44,7 @@ const ProductPage = () => {
       itemName: "Quản lí chung",
     },
     {
-      itemName: "Danh sách sản phẩm",
+      itemName: "Sản phẩm",
       itemLink: "/product",
     },
   ];
@@ -57,6 +57,10 @@ const ProductPage = () => {
             table.getIsAllPageRowsSelected() ||
             (table.getIsSomePageRowsSelected() && "indeterminate")
           }
+          className={`${
+            table.getIsAllPageRowsSelected() &&
+            "bg-clr-surface-accent text-clr-accent"
+          }`}
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
         />
@@ -64,6 +68,9 @@ const ProductPage = () => {
       cell: ({ row }) => (
         <Checkbox
           checked={row.getIsSelected()}
+          className={`${
+            row.getIsSelected() && "bg-clr-surface-accent text-clr-accent"
+          }`}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
           aria-label="Select row"
         />
@@ -306,13 +313,13 @@ const ProductPage = () => {
             </h4>
             <div className="flex gap-x-2">
               <ButtonForm
-                className="!bg-primary !w-28"
+                className="bg-clr-warning !w-28"
                 type="button"
                 icon={<i className="ri-download-2-line"></i>}
                 label="Xuất excel"
               ></ButtonForm>
               <ButtonForm
-                className="!bg-secondary !w-28"
+                className="bg-clr-success !w-28"
                 type="button"
                 icon={<i className="ri-file-add-line"></i>}
                 onClick={() => navigate("/create_product")}

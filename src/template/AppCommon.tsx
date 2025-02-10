@@ -12,7 +12,7 @@ const AppCommon = () => {
         <ComponentFrameMessage></ComponentFrameMessage>
       )}
       <div className="h-full">
-        <div className="h-full flex flex-col bg-slate-50">
+        <div className="h-full flex flex-col bg-clr-surface">
           <Navbar></Navbar>
           <div className="flex flex-auto min-h-0">
             {/* <div className="block"> */}

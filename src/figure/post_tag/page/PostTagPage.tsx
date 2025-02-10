@@ -299,7 +299,7 @@ const PostTagPage = () => {
         </div> */}
 
         {/* table */}
-        <div className="rounded-md p-5 bg-white border-gray-200 border shadow-md">
+        <div className="rounded-md p-5 pt-3 bg-white border-gray-200 border shadow-md">
           <div className="flex justify-between items-center mb-5">
             <h4 className="text-xl font-medium text-gray-600 border-l-4 pl-2 border-gray-500">
               Danh mục

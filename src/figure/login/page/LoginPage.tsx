@@ -122,6 +122,7 @@ const LoginPage = () => {
                   <ButtonForm
                     type="submit"
                     label="Đăng nhập"
+                    className="bg-clr-primary"
                     loading={getTokenUser.isPending}
                   ></ButtonForm>
                 </Form>
@@ -184,7 +185,7 @@ const LoginPage = () => {
                     <ButtonForm
                       type="submit"
                       label="Tiếp tục"
-                      className=" disabled:bg-slate-60"
+                      className=" disabled:bg-slate-60 bg-clr-primary"
                       loading={getTokenLocation.isPending}
                     ></ButtonForm>
                   </div>

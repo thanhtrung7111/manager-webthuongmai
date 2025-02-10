@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -60,13 +60,17 @@ const TableCustom = <TData, TValue>({
   unit,
   isLoading = false,
 }: DataTableProps<TData, TValue>) => {
+  const [initialData, setInitialData] = useState<TData[]>(data);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
   const [pageIndex, setPageIndex] = useState<number>(0);
   const table = useReactTable({
-    data,
+    data: initialData,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -87,6 +91,39 @@ const TableCustom = <TData, TValue>({
       rowSelection,
     },
   });
+
+  const handleDragStart = (index: number) => {
+    setDraggedIndex(index);
+  };
+
+  const handleDragOver = (
+    event: React.DragEvent<HTMLTableRowElement>,
+    index: number
+  ) => {
+    event.preventDefault();
+    setHoverIndex(index);
+  };
+
+  const handleDrop = (index: number) => {
+    if (draggedIndex === null || draggedIndex === index) {
+      setDraggedIndex(null);
+      setHoverIndex(null);
+      return;
+    }
+    // Hoán đổi vị trí hai phần tử
+    const newData = [...initialData];
+    [newData[draggedIndex], newData[index]] = [
+      newData[index],
+      newData[draggedIndex],
+    ];
+
+    setInitialData([...newData]);
+    setDraggedIndex(null);
+    setHoverIndex(null);
+  };
+  useEffect(() => {
+    setInitialData(data);
+  }, [data]);
   return (
     <div className="w-full">
       <div className="flex justify-between mb-3 border p-3 rounded-sm">
@@ -251,19 +288,29 @@ const TableCustom = <TData, TValue>({
 
         {isLoading ? (
           <div className="py-5 flex items-center gap-x-3">
-            <SpinnerLoading className="w-6 h-6 fill-primary"></SpinnerLoading>{" "}
+            <SpinnerLoading className="w-6 h-6 fill-primary"></SpinnerLoading>
             <span className="text-gray-500">Đang tải dữ liệu...</span>
           </div>
         ) : (
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {table.getRowModel().rows?.length || data.length != 0 ? (
               table.getRowModel().rows.map((row, index: number) => (
                 <TableRow
-                  className={`border-r-0 border-l-0 ${
+                  className={`cursor-pointer ${
                     index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                  } ${
+                    hoverIndex == index &&
+                    "border-2 border-dashed border-clr-warning"
+                    // : "border-r-0 border-l-0 border-solid"
+                  } ${
+                    draggedIndex == index &&
+                    "!border-cyan-600 !border-2 border-dashed"
                   }`}
                   key={row.id}
-
+                  draggable
+                  onDragStart={() => handleDragStart(index)}
+                  onDragOver={(e) => handleDragOver(e, index)}
+                  onDrop={() => handleDrop(index)}
                   // data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (

@@ -17,10 +17,10 @@ const SearchComponent = () => {
     <Dialog>
       <DialogTrigger className="w-fit">
         <div className="flex items-center justify-center">
-          <i className="ri-search-line text-2xl"></i>
+          <i className="ri-search-line text-xl text-clr-menu"></i>
         </div>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="bg-clr-popup">
         <DialogHeader>
           <DialogTitle className="text-primary">Tìm kiếm</DialogTitle>
           <DialogDescription>
@@ -34,16 +34,20 @@ const SearchComponent = () => {
       </DialogContent>
     </Dialog>
   ) : (
-    <div className={`relative ${focusInput ? "w-96" : "w-80"} transition-[width] duration-300 bg-white h-fit`}>
-      <div className="w-full flex  rounded-full border border-slate-300 items-center px-4 gap-x-2 overflow-hidden">
+    <div
+      className={`relative ${
+        focusInput ? "w-96" : "w-80"
+      } transition-[width] duration-300 bg-transparent h-fit`}
+    >
+      <div className="w-full flex  rounded-full border border-clr-menu items-center px-4 gap-x-2 overflow-hidden">
         <input
           type="text"
           onFocus={() => setFocusInput(true)}
-          onBlur={()=>setFocusInput(false)}
-          className="flex-auto outline-none bg-transparent text-xs py-2 text-slate-700"
+          onBlur={() => setFocusInput(false)}
+          className="flex-auto outline-none bg-transparent text-xs py-2 text-clr-menu placeholder:text-clr-menu"
           placeholder="Tìm kiếm..."
         />
-        <i className="ri-search-line text-xs flex-shrink-0"></i>
+        <i className="ri-search-line text-xs flex-shrink-0 text-clr-menu"></i>
       </div>
     </div>
   );

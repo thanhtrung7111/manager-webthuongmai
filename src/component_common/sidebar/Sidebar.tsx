@@ -133,18 +133,18 @@ const Sidebar = () => {
   }, [open]);
   return (
     <div
-      className={`hidden shrink-0 rounded-md border-r  lg:flex ${
+      className={`hidden shrink-0 border-r  lg:flex ${
         !open ? "w-20" : "w-64"
-      } bg-white delay-500  flex-col justify-between sticky top-0 transition-[width] duration-300 z-[20]`}
+      } bg-clr-sidebar delay-500  flex-col justify-between sticky top-0 transition-[width] duration-300 z-[20]`}
     >
       <div
-        className={`absolute w-8 h-8 top-5 -translate-y-1/2 -translate-x-1/2 -right-6   border border-gray-300 rounded-sm flex items-center justify-center z-10 bg-white cursor-pointer`}
+        className={`absolute w-8 h-8 top-5 -translate-y-1/2 bg-clr-navbar -translate-x-1/2 -right-6   border border-gray-300 rounded-sm flex items-center justify-center z-10 cursor-pointer`}
         onClick={() => setOpen(!open)}
       >
         <i
           className={`ri-arrow-right-s-line ${
             open ? "-rotate-180" : "rotate-0"
-          } transition-transform duration-300`}
+          } transition-transform duration-300 text-clr-menu`}
         ></i>
       </div>
 
