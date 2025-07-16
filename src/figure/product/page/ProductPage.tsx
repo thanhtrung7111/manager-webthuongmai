@@ -27,8 +27,13 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { getLabelByKey } from "@/helper/commonHelper";
+import { useConfigurationStore } from "@/store/configurationStore";
 
 const ProductPage = () => {
+  const { setLocationPage } = useConfigurationStore(
+    (state) => state.pageConfig
+  );
+
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [openDialogDelete, setOpentDialogDelete] = useState(false);
@@ -171,9 +176,9 @@ const ProductPage = () => {
               <div
                 // onClick={() => logoutUser()}
                 className="flex gap-x-2 items-center text-gray-500 cursor-pointer hover:bg-gray-100 px-2 py-2"
-                onClick={() =>
-                  navigate("/update_product/" + row.original.KKKK0000)
-                }
+                onClick={() => {
+                  navigate("/update_product/" + row.original.KKKK0000);
+                }}
               >
                 <i className="ri-error-warning-line"></i>
                 Xem chi tiết
@@ -306,45 +311,56 @@ const ProductPage = () => {
         {/* Action  */}
 
         {/* table */}
-        <div className="rounded-md p-5 pt-3 bg-clr-sidebar border border-clr-sidebar shadow-md">
-          <div className="flex justify-between items-center mb-5">
-            <h4 className="text-xl font-medium text-clr-content border-l-4 pl-2 border-clr-content">
-              Danh mục
-            </h4>
-            <div className="flex gap-x-2">
-              <ButtonForm
-                className="bg-clr-warning !w-28"
-                type="button"
-                icon={<i className="ri-download-2-line"></i>}
-                label="Xuất excel"
-              ></ButtonForm>
-              <ButtonForm
-                className="bg-clr-success !w-28"
-                type="button"
-                icon={<i className="ri-file-add-line"></i>}
-                onClick={() => navigate("/create_product")}
-                label={getLabelByKey({ key: 14, defaultLabel: "Thêm mới" })}
-              ></ButtonForm>
+        <div className="grid grid-cols-[3fr_1fr] gap-x-3">
+          <div className="rounded-sm p-5 pt-3 bg-clr-sidebar border border-clr-sidebar shadow-md">
+            <div className="flex justify-between items-center mb-5">
+              <h4 className="text-xl font-medium text-clr-content border-l-4 pl-2 border-clr-content">
+                Danh mục
+              </h4>
+              <div className="flex gap-x-2">
+                <ButtonForm
+                  className="bg-clr-warning !w-28"
+                  type="button"
+                  icon={<i className="ri-download-2-line"></i>}
+                  label="Xuất excel"
+                ></ButtonForm>
+                <ButtonForm
+                  className="bg-clr-success !w-28"
+                  type="button"
+                  icon={<i className="ri-file-add-line"></i>}
+                  onClick={() => navigate("/create_product")}
+                  label={getLabelByKey({ key: 14, defaultLabel: "Thêm mới" })}
+                ></ButtonForm>
+              </div>
+            </div>
+            <TableCustom
+              data={getLstProduct.data ? getLstProduct.data : []}
+              columns={columns}
+              unit="sản phẩm"
+              search={[
+                { key: "PRDCCODE", name: "mã sản phẩm", type: "text" },
+                { key: "PRDCNAME", name: "tên sản phẩm", type: "text" },
+                {
+                  key: "QUOMNAME",
+                  name: "đơn vị tính",
+                  type: "combobox",
+                  dataList: getLstQUOM.data,
+                  dataKey: "ITEMNAME",
+                  dataName: "ITEMNAME",
+                },
+              ]}
+              isLoading={getLstProduct.isFetching}
+              name="product"
+            ></TableCustom>
+          </div>
+
+          <div className="rounded-sm p-5 pt-3 bg-clr-sidebar border border-clr-sidebar shadow-md h-96">
+            <div className="flex justify-between items-center mb-5">
+              <h4 className="text-xl font-medium text-clr-content border-l-4 pl-2 border-clr-content">
+                Sản phẩm vừa xem
+              </h4>
             </div>
           </div>
-          <TableCustom
-            data={getLstProduct.data ? getLstProduct.data : []}
-            columns={columns}
-            unit="sản phẩm"
-            search={[
-              { key: "PRDCCODE", name: "mã sản phẩm", type: "text" },
-              { key: "PRDCNAME", name: "tên sản phẩm", type: "text" },
-              {
-                key: "QUOMNAME",
-                name: "đơn vị tính",
-                type: "combobox",
-                dataList: getLstQUOM.data,
-                dataKey: "ITEMNAME",
-                dataName: "ITEMNAME",
-              },
-            ]}
-            isLoading={getLstProduct.isFetching}
-          ></TableCustom>
         </div>
       </div>{" "}
     </>

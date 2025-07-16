@@ -147,7 +147,7 @@ const DashboardProductPage = () => {
     },
   ];
   return (
-    <div className="flex flex-col gap-y-3">
+    <div className="flex flex-col gap-y-2">
       <div className="mb-1">
         <BreadcrumbCustom
           linkList={breadBrumb}
@@ -260,6 +260,7 @@ const DashboardProductPage = () => {
         <TableCustom
           data={[]}
           columns={columns}
+          name="Dashboard"
           unit="Sản phẩm"
           search={
             [

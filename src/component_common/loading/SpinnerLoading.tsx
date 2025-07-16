@@ -1,13 +1,9 @@
-const SpinnerLoading = ({
-  className = "w-8 h-8 fill-blue-600",
-}: {
-  className?: string;
-}) => {
+const SpinnerLoading = ({ className = "w-8 h-8" }: { className?: string }) => {
   return (
-    <div role="status">
+    <div role="status" className="flex items-center gap-x-2">
       <svg
         aria-hidden="true"
-        className={`${className} text-gray-200 animate-spin dark:text-gray-600 fill-blue-600`}
+        className={`${className} text-gray-200 animate-spin !fill-clr-surface-accent`}
         viewBox="0 0 100 101"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -22,6 +18,7 @@ const SpinnerLoading = ({
         />
       </svg>
       <span className="sr-only">Loading...</span>
+      <div className="text-clr-content">Đang tải dữ liệu...</div>
     </div>
   );
 };

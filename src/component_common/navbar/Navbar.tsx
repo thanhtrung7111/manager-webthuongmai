@@ -26,8 +26,9 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { getLabelByKey } from "@/helper/commonHelper";
 import { useConfigurationStore } from "@/store/configurationStore";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
+import { useGetDocument } from "@/api/react_query/query_document";
 const menu = [
   {
     itemName: "Dashboard",
@@ -113,6 +114,7 @@ const Navbar = () => {
   const [openLanguage, setOpenLanguage] = useState<boolean>(false);
   const [openTheme, setOpenTheme] = useState<boolean>(false);
   const { currentUser, logoutUser } = useUserStore();
+  const getImage = useGetDocument();
   const { setKeyLanguages, setLanguages, keyLanguage } = useConfigurationStore(
     (state) => state.languageConfig
   );
@@ -121,7 +123,11 @@ const Navbar = () => {
     (state) => state.themeConfig
   );
   const isMobileScreen = useMediaQuery({ query: "(max-width:1024px)" });
-  console.log(currentUser);
+  useEffect(() => {
+    if (currentUser && currentUser.USERIMGE) {
+      getImage.mutateAsync({ URL: currentUser.USERIMGE });
+    }
+  }, [currentUser]);
   return (
     <div className="sticky shrink-0 top-0 z-50 bg-clr-navbar bg-w shadow-md h-16 border-gray-200 px-7 flex justify-between items-center">
       <div className="flex items-center gap-x-2">
@@ -181,7 +187,7 @@ const Navbar = () => {
         {/* <p className="text-white italic">Xin chào, {currentUser?.USERNAME}...</p> */}
       </div>
       <div className="flex gap-x-5 items-center">
-        <div className="flex gap-x-5">
+        <div className="flex gap-x-5 items-center">
           <SearchComponent></SearchComponent>
           <MessageComponent></MessageComponent>
           <NotificationComponent></NotificationComponent>
@@ -191,17 +197,20 @@ const Navbar = () => {
           <PopoverTrigger asChild className="cursor-pointer">
             <div className="flex gap-x-3 items-center">
               <Avatar className="size-8">
-                <AvatarImage src="https://github.com/shadcn.png" />
+                <AvatarImage
+                  src={getImage.data ? URL.createObjectURL(getImage.data) : ""}
+                  className="object-cover object-center"
+                />
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
-              <div className="flex flex-col text-gray-600">
+              {/* <div className="flex flex-col text-gray-600">
                 <span className="font-medium text-clr-menu text-sm">
                   {currentUser?.USERNAME}
                 </span>
                 <span className="text-xs line-clamp-1 text-clr-menu italic">
                   {currentUser?.PSTNNAME}
                 </span>
-              </div>
+              </div> */}
             </div>
           </PopoverTrigger>
           <PopoverContent className="w-64 p-0 text-sm" align="end">

@@ -18,7 +18,7 @@ const AppCommon = () => {
             {/* <div className="block"> */}
             <Sidebar></Sidebar>
             {/* </div> */}
-            <div className="flex-auto p-5 max-h-full overflow-auto custom-scrollbar-wider relative">
+            <div className="flex-auto p-5 max-h-full overflow-auto custom-scrollbar-wider relative transition-[width]">
               <Outlet />
             </div>
           </div>

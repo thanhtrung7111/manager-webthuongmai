@@ -336,6 +336,7 @@ const PostTagPage = () => {
               //     dataName: "ITEMNAME",
               //   },
             ]}
+            name="post_tag"
             isLoading={getLstPostTag.isFetching}
           ></TableCustom>
         </div>

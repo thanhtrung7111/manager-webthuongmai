@@ -4,8 +4,15 @@ import {
   PaginationEllipsis,
   PaginationItem,
 } from "@/components/ui/pagination";
-import React from "react";
+import React, { useState } from "react";
 import { usePanigation, DOTS } from "./usePagination";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const PaginationCustom = ({
   onPageChange,
@@ -18,6 +25,7 @@ const PaginationCustom = ({
   pageIndex: number;
   size: number;
 }) => {
+  const [pageValue, setPageValue] = useState<number>(pageIndex);
   const paginationRange: any = usePanigation({
     currentPage: pageIndex,
     totalCount: size,
@@ -36,7 +44,7 @@ const PaginationCustom = ({
     if (pageIndex == lastPage) return;
     onPageChange(pageIndex + 1);
   };
-  console.log(pageIndex);
+
   return (
     <Pagination>
       <PaginationContent>
@@ -62,9 +70,43 @@ const PaginationCustom = ({
         {paginationRange.map((pageNumber: number, index: number) => {
           if (pageNumber == DOTS) {
             return (
-              <PaginationItem>
-                <PaginationEllipsis className="text-gray-400" />
-              </PaginationItem>
+              <Popover>
+                <PopoverTrigger asChild className="cursor-pointer" title="Tìm trang">
+                  <PaginationItem>
+                    <PaginationEllipsis className="text-gray-400" />
+                  </PaginationItem>
+                </PopoverTrigger>
+                <PopoverContent className="w-80">
+                  <div className="flex w-full max-w-sm items-center space-x-2">
+                    <Input
+                      type="email"
+                      className="focus:!ring-0 focus:!ring-transparent text-xs h-8"
+                      placeholder="Nhập số trang..."
+                      onChange={(e) =>
+                        setPageValue(
+                          Number(e.target.value == "" ? -1 : e.target.value)
+                        )
+                      }
+                      onKeyDown={(e) => {
+                        if (pageValue == -1) return;
+                        if (e.key == "Enter") {
+                          onPageChange(pageValue);
+                        }
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      className="bg-clr-primary text-clr-content h-8 text-xs"
+                      onClick={(e) => {
+                        if (pageValue == -1) return;
+                        onPageChange(pageValue);
+                      }}
+                    >
+                      Đến trang
+                    </Button>
+                  </div>
+                </PopoverContent>
+              </Popover>
             );
           }
 

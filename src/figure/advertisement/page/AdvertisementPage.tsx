@@ -30,6 +30,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { getLabelByKey } from "@/helper/commonHelper";
+import StatusBagde from "@/component_common/status/StatusBagde";
 
 const AdvertisementPage = () => {
   const queryClient = useQueryClient();
@@ -236,7 +237,14 @@ const AdvertisementPage = () => {
       },
       cell: ({ row }) => (
         <div className="capitalize">
-          {row.getValue("BANR_RUN") == 1 ? (
+          <StatusBagde
+            item={row.getValue("BANR_RUN")}
+            statusConfig={[
+              { className: "bg-green-500", name: "Đang hoạt động", value: 1 },
+              { className: "bg-red-500", name: "Ngừng hoạt động", value: 0 },
+            ]}
+          ></StatusBagde>
+          {/* {row.getValue("BANR_RUN") == 1 ? (
             <div className="text-sm text-green-500 px-3 w-fit py-2 rounded-md flex items-center justify-center">
               Đang chạy
             </div>
@@ -244,7 +252,7 @@ const AdvertisementPage = () => {
             <div className="text-sm text-red-500 px-3 w-fit py-2 rounded-md flex items-center justify-center">
               Không hoạt động
             </div>
-          )}
+          )} */}
         </div>
       ),
       enableHiding: true,
@@ -472,6 +480,7 @@ const AdvertisementPage = () => {
                 dataList: dataListStatus,
               },
             ]}
+            name="advertisement"
             isLoading={getLstAdvertisement.isFetching}
           ></TableCustom>
         </div>

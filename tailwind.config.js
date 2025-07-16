@@ -99,6 +99,12 @@ export default {
           dark: "hsl(var(--clr-success-dark))",
         },
 
+        "clr-border": {
+          light: "hsl(var(--clr-border-light))",
+          DEFAULT: "hsl(var(--clr-border))",
+          dark: "hsl(var(--clr-border-dark))",
+        },
+
         foreground: "hsl(var(--foreground))",
         card: {
           DEFAULT: "hsl(var(--card))",

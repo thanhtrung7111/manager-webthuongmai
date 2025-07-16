@@ -70,7 +70,7 @@ const MenuItem = ({
     <div className="mb-5">
       {!compact && (
         <p
-          className={`text-clr-menu font-semibold tracking-widest text-xs uppercase  mb-2`}
+          className={`text-clr-menu font-semibold tracking-widest text-xs italic uppercase  mb-2 whitespace-nowrap`}
         >
           {item[name] as string}
         </p>
@@ -98,7 +98,7 @@ const MenuItem = ({
     <div
       className={`relative flex justify-center ${"menuItem" + level}  ${
         compact ? "visible" : "invisible"
-      } delay-300`}
+      }`}
     >
       {Array.isArray(item[listName]) ? (
         <div
@@ -106,18 +106,22 @@ const MenuItem = ({
             level >= 3 ? "w-64" : "w-fit"
           }`}
         >
-          <span className={`flex ${level >= 3 ? "gap-x-2" : "gap-x-0"}`}>
-            <TooltipProvider>
+          <span
+            className={`flex ${
+              level >= 3 ? "gap-x-2" : "gap-x-0"
+            } whitespace-nowrap`}
+          >
+            <TooltipProvider delayDuration={10}>
               <Tooltip>
                 <TooltipTrigger>
                   {item[iconName] as React.ReactNode}
                 </TooltipTrigger>
                 <TooltipContent side="right">
-                  <p>{item[name] as string}</p>
+                  <p className="whitespace-nowrap text-clr-content">{item[name] as string}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-            <span className="text-sm">
+            <span className="text-xs whitespace-nowrap">
               {level >= 3 && (item[name] as string)}
             </span>
           </span>
@@ -140,18 +144,22 @@ const MenuItem = ({
                 }`
           }
         >
-          <span className={`flex ${level >= 3 ? "gap-x-2" : "gap-x-0"}`}>
-            <TooltipProvider>
+          <span
+            className={`flex ${
+              level >= 3 ? "gap-x-2" : "gap-x-0"
+            } whitespace-nowrap`}
+          >
+            <TooltipProvider delayDuration={10}>
               <Tooltip>
                 <TooltipTrigger>
                   {item[iconName] as React.ReactNode}
                 </TooltipTrigger>
                 <TooltipContent side="right">
-                  <p>{item[name] as string}</p>
+                  <p className="whitespace-nowrap text-clr-content">{item[name] as string}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-            <span className="text-sm">
+            <span className="text-xs whitespace-nowrap">
               {level >= 3 && (item[name] as string)}
             </span>
           </span>
@@ -194,9 +202,7 @@ const MenuItem = ({
   ) : (
     // Mở rộng menu
     <div
-      className={`relative ${
-        "menuItem" + level
-      } ${compact ? "w-0" : "w-full"}`}
+      className={`relative ${"menuItem" + level} ${compact ? "w-0" : "w-full"}`}
     >
       {Array.isArray(item[listName]) ? (
         <div
@@ -209,7 +215,7 @@ const MenuItem = ({
         >
           <div className="flex gap-x-2 items-center">
             {item[iconName] as React.ReactNode}
-            <p className={`group-hover/a:text-primary text-sm`}>
+            <p className={`group-hover/a:text-primary text-xs whitespace-nowrap`}>
               {!compact && (item[name] as string)}
             </p>
           </div>
@@ -224,20 +230,20 @@ const MenuItem = ({
       ) : (
         <NavLink
           to={linkName && item[linkName]}
-          className={({ isActive })  => {
+          className={({ isActive }) => {
             return isActive
               ? `group/a bg-clr-surface-accent-light flex ${
                   compact ? "justify-center" : "justify-between"
-                } py-2 px-3 cursor-pointer text-white  rounded-sm`
+                } py-2 px-3 cursor-pointer text-white  rounded-sm transition-transform`
               : `group/a hover:bg-primary-foreground flex ${
                   compact ? "justify-center" : "justify-between"
-                } py-2 px-3 cursor-pointer text-clr-menu hover:text-primary  rounded-sm`;
+                } py-2 px-3 cursor-pointer text-clr-menu hover:text-primary rounded-sm transition-transform`;
           }}
         >
-          <span className="flex gap-x-2 ">
+          <span className="flex gap-x-2 whitespace-nowrap">
             {item[iconName] as React.ReactNode}
             <div className={`transition-all`}>
-              <span className="text-sm">
+              <span className="text-xs whitespace-nowrap">
                 {!compact && (item[name] as string)}
               </span>
             </div>

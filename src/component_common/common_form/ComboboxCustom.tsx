@@ -54,7 +54,7 @@ const ComboboxCustom = ({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between font-normal text-gray-600"
+          className="w-full justify-between text-xs h-8 font-normal text-gray-600"
         >
           {!!value && valueDisplay ? valueDisplay : placeholder}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -62,7 +62,7 @@ const ComboboxCustom = ({
       </PopoverTrigger>
       <PopoverContent className="w-[250px] p-0 w">
         <Command>
-          <CommandInput placeholder="Nhập tìm kiếm..." />
+          <CommandInput className="text-xs" placeholder="Nhập tìm kiếm..." />
           <CommandList>
             <CommandEmpty>Không có danh sách.</CommandEmpty>
             <CommandGroup>
@@ -70,6 +70,7 @@ const ComboboxCustom = ({
                 <CommandItem
                   key={item[dataKey]}
                   value={item[dataKey]}
+                  className="text-xs"
                   onSelect={(currentValue) => {
                     setValue(currentValue == value ? "" : currentValue);
                     console.log(currentValue);

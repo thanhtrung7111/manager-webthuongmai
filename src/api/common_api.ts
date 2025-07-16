@@ -340,6 +340,7 @@ export const getApiDocument = async (url: string) => {
     });
     return response.data;
   } catch (error) {
+    console.log(error);
     throw new Error("Lỗi hệ thống!");
   }
 };

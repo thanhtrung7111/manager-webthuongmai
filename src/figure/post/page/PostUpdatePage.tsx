@@ -557,9 +557,9 @@ const PostUpdatePage = () => {
                       value={value}
                       onChange={handleChangeContent}
                       className="h-[830px]"
-                    /> */}
+                    /> 
 
-                    {/* {value == "" && <span className="text-xs text-red-500">Không để trống nội dung</span>} */}
+                     {value == "" && <span className="text-xs text-red-500">Không để trống nội dung</span>} */}
                   </div>
                 </div>
               </div>

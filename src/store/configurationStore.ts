@@ -1,4 +1,4 @@
-import { LanguageObject } from "@/type/TypeCommon";
+import { LanguageObject, SearchObject } from "@/type/TypeCommon";
 import { merge } from "lodash";
 import { set } from "react-hook-form";
 import { create } from "zustand";
@@ -16,9 +16,29 @@ type ThemeConfig = {
   setTheme: (value: { theme: string }) => void;
 };
 
+type PageConfig = {
+  lstPage: {
+    namePage: string;
+    numberPage: number;
+    lstSearch: SearchObject[];
+  }[];
+  setLocationPage: (value: {
+    namePage: string;
+    numberPage: number;
+    lstSearch: SearchObject[];
+  }) => void;
+  // setLstSearchSave: (value: { lstSearch: SearchObject[] }) => void;
+};
+
 type ConfigurationStore = {
   languageConfig: StoreLanguage;
   themeConfig: ThemeConfig;
+  pageConfig: PageConfig;
+};
+
+type RecentlyViewed = {
+  lstRecently: { namePage: string; lstViewed: string };
+  setItemViewed: (value: { namePage: string; itemCode: string }) => void;
 };
 
 export const useConfigurationStore = create<ConfigurationStore>()(
@@ -53,6 +73,22 @@ export const useConfigurationStore = create<ConfigurationStore>()(
           }));
         },
       },
+      pageConfig: {
+        lstPage: [],
+        setLocationPage(value) {
+          set((state) => ({
+            pageConfig: {
+              ...state.pageConfig,
+              lstPage: [
+                ...state.pageConfig.lstPage.filter(
+                  (item) => item.namePage != value.namePage
+                ),
+                value,
+              ],
+            },
+          }));
+        },
+      },
     }),
     {
       name: "config", // Tên lưu trữ trong localStorage
@@ -78,6 +114,11 @@ export const useConfigurationStore = create<ConfigurationStore>()(
             {},
             currentState.themeConfig,
             typedPersistedState.themeConfig
+          ),
+          pageConfig: merge(
+            {},
+            currentState.pageConfig,
+            typedPersistedState.pageConfig
           ),
         };
       },

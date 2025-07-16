@@ -203,3 +203,14 @@ export type DcmnFileObject = {
   FILEDATA: string | undefined | null;
   KKKK0001: string | undefined | null;
 };
+
+export type SearchObject = {
+  keySearch: string;
+  value: string | number;
+};
+
+export type StatusObject = {
+  value: number | string;
+  className: string;
+  name: string;
+};

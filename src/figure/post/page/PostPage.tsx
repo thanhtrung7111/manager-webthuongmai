@@ -184,6 +184,7 @@ const PostPage = () => {
       },
     },
   ];
+  // console.log(in)
   return (
     <>
       <Dialog
@@ -300,13 +301,13 @@ const PostPage = () => {
             </h4>
             <div className="flex gap-x-2">
               <ButtonForm
-                className="!bg-primary !w-28"
+                className="!bg-yellow-500 !w-28"
                 type="button"
                 icon={<i className="ri-download-2-line"></i>}
                 label="Xuất excel"
               ></ButtonForm>
               <ButtonForm
-                className="!bg-secondary !w-28"
+                className="!bg-green-500 !w-28"
                 type="button"
                 icon={<i className="ri-file-add-line"></i>}
                 onClick={() => navigate("/create_post")}
@@ -330,6 +331,7 @@ const PostPage = () => {
               //   dataName: "ITEMNAME",
               // },
             ]}
+            name="post"
             isLoading={getLstPost.isFetching}
           ></TableCustom>
         </div>

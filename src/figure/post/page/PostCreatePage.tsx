@@ -24,6 +24,7 @@ import SpinnerLoading from "@/component_common/loading/SpinnerLoading";
 import { useSetPost } from "@/api/react_query/query_post";
 import { useSetDocument } from "@/api/react_query/query_document";
 import MultiTagSelect from "../component/MultiTagSelect";
+import TipTapCustom from "@/component_common/tiptap/TipTapCustom";
 // import { Editor, EditorState } from "react-draft-wysiwyg";
 const breadBrumb = [
   {
@@ -296,7 +297,7 @@ const PostCreatePage = () => {
                                   }</h1>` +
                                     `<h5 style='font-size:14px'><span style='color:#484848;font-weight:500'>Ngày đăng:</span> ${moment(
                                       Date.now()
-                                    ).format("DD/MM/yyyy HH:mm:ss")}</h5>`
+                                    ).format("DD/MM/yyyy HH:mm:ss")}</h5>${value}`
                                 ),
                               }}
                               className="w-full ql-review"
@@ -333,7 +334,7 @@ const PostCreatePage = () => {
                         // onClick={() => {
                         //
                         // }}
-                        onClick={() => navigate(-1)}
+                        onClick={() => console.log(value)}
                       ></ButtonForm>
                     </div>
                   </div>
@@ -438,13 +439,10 @@ const PostCreatePage = () => {
                     >
                       Nội dung <span className="text-red-400 ">*</span>
                     </Label>
-                    {/* <ReactQuill
-                      modules={modules}
-                      theme="snow"
-                      value={value}
-                      onChange={handleChangeContent}
-                      className="h-[830px]"
-                    /> */}
+                    <TipTapCustom
+                      content={value}
+                      onContentChange={(value) => setValue(value)}
+                    ></TipTapCustom>
 
                     {/* {value == "" && <span className="text-xs text-red-500">Không để trống nội dung</span>} */}
                   </div>

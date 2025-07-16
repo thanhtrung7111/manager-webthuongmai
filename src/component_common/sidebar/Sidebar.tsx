@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Menu from "./Menu";
 import IconCompany from "@/assets/img/iconcompany.png";
 import { useConfigurationStore } from "@/store/configurationStore";
+import { useUserStore } from "@/store/userStore";
 const menu: any[] = [
   {
     itemName: "Dashboard",
@@ -125,6 +126,7 @@ const menu2 = [
 ];
 const Sidebar = () => {
   const [open, setOpen] = useState<boolean>(true);
+  const { currentUser, logoutUser } = useUserStore();
   const [delayOpen, setDelayOpen] = useState<boolean>(false);
   const { keyTheme } = useConfigurationStore((state) => state.themeConfig);
   useEffect(() => {
@@ -137,8 +139,27 @@ const Sidebar = () => {
     <div
       className={`hidden shrink-0 shadow-lg  lg:flex ${
         !open ? "w-20" : "w-64"
-      } bg-clr-sidebar delay-500  flex-col justify-between sticky top-0 transition-[width] duration-300 z-[20]`}
+      } bg-clr-sidebar  flex-col justify-between sticky top-0 transition-[width] duration-500 z-[20]`}
     >
+      <div className="border-b py-5 px-6 flex gap-x-3 items-center">
+        <div
+          className={`rounded-md flex-shrink-0 size-9 overflow-hidden`}
+        >
+          <img
+            className="object-center object-cover h-full w-full"
+            src="https://plus.unsplash.com/premium_photo-1689708721750-8a0e6dc14cee?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8bWFuJTIwYXZhdGFyfGVufDB8fDB8fHww"
+            alt=""
+          />
+        </div>
+
+        <div className={`flex flex-auto flex-col ${open ? "h-full" : "h-0"} overflow-hidden`}>
+          <h5 className="text-clr-content whitespace-nowrap text-sm">{currentUser?.USERNAME}</h5>
+          <span className="text-xs text-clr-content whitespace-nowrap">
+            {currentUser?.JOB_NAME}
+          </span>
+        </div>
+      </div>
+
       <div
         className={`absolute w-8 h-8 top-7 -translate-y-1/2 bg-clr-navbar -translate-x-1/2 -right-6 border border-clr-content-light  rounded-sm flex items-center justify-center z-10 cursor-pointer`}
         onClick={() => setOpen(!open)}
@@ -178,9 +199,7 @@ const Sidebar = () => {
           }`}
         >
           <div
-            className={`${open ? "px-5" : "px-2"} ${
-              delayOpen ? "invisible" : "visible"
-            } pt-5`}
+            className={`px-5 pt-5`}
           >
             <Menu
               linkName={"link"}
