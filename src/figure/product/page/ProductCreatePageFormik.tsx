@@ -28,27 +28,9 @@ import { toast } from "sonner";
 import * as Yup from "yup";
 import Excel from "exceljs";
 import { exportExcelPattern } from "@/helper/excelHelper";
-import { useSetProduct } from "@/api/react_query/query_product";
-import {
-  useGetEnumPrdcOptn,
-  useGetLstAssetAttribute,
-  useGetLstAssetType,
-  useGetLstAsstSgAt,
-  useGetLstColor,
-  useGetLstDcmnSbCd,
-  useGetLstMnfrTypeInpPrdcOdMt,
-  useGetLstPrdcMchn,
-  useGetLstPrdcSection,
-  useGetLstProductBrand,
-  useGetLstProductGroup,
-  useGetLstProductGroupMnfr,
-  useGetLstProductSetMtrl,
-  useGetLstQUOM,
-  useGetLstSortCode,
-  useGetLstSpndSgDtTaxRaNm,
-  useGetLstStdrQUOM,
-} from "@/api/react_query/query_common";
 import { useSetDocument } from "@/api/react_query/query_document";
+import { useGetLstCode, usePostNew } from "@/api/react_query/query_common";
+import { VARIABLE_LST_CODE } from "@/api/constant";
 
 const breadBrumb = [
   {
@@ -71,26 +53,124 @@ const ProductCreatePageFormik = () => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
 
   //KHAI BÁO REACT QUERY
-  const getLstQUOM = useGetLstQUOM();
-  const getLstDcmnSbCd = useGetLstDcmnSbCd();
-  const getLstProductBrand = useGetLstProductBrand();
-  const getLstColor = useGetLstColor();
-  const getLstSpndSgDtTaxRaNm = useGetLstSpndSgDtTaxRaNm();
-  const getEnumPrdcOptn = useGetEnumPrdcOptn();
-  const getLstSortCode = useGetLstSortCode();
-  const getLstProductGroup = useGetLstProductGroup();
-  const getLstPrdcSection = useGetLstPrdcSection();
-  const getLstProductGroupMnfr = useGetLstProductGroupMnfr();
-  const getLstMnfrTypeInpPrdcOdMt = useGetLstMnfrTypeInpPrdcOdMt();
-  const getLstStdrQUOM = useGetLstStdrQUOM();
-  const getLstProductSetMtrl = useGetLstProductSetMtrl();
-  const getLstAssetType = useGetLstAssetType();
-  const getLstAssetSubType = useGetLstAssetType();
-  const getLstAsstSgAt = useGetLstAsstSgAt();
-  const getLstAssetAttribute = useGetLstAssetAttribute();
-  const getLstPrdcMchn = useGetLstPrdcMchn();
+  const varLstQUOM = VARIABLE_LST_CODE.get("lstQUOM");
+  const getLstQUOM = useGetLstCode({
+    key: varLstQUOM?.key ? varLstQUOM.key : "",
+    body: varLstQUOM?.body,
+    enabled: true,
+  });
+  const varLstDcmnSbCd = VARIABLE_LST_CODE.get("lstDcmnSbCd");
+  const getLstDcmnSbCd = useGetLstCode({
+    key: varLstDcmnSbCd?.key ? varLstDcmnSbCd.key : "",
+    body: varLstDcmnSbCd?.body,
+    enabled: true,
+  });
+  const varLstProductBrand = VARIABLE_LST_CODE.get("lstProductBrand");
+  const getLstProductBrand = useGetLstCode({
+    key: varLstProductBrand?.key ? varLstProductBrand.key : "",
+    body: varLstProductBrand?.body,
+    enabled: true,
+  });
+  const varLstColor = VARIABLE_LST_CODE.get("lstColor");
+  const getLstColor = useGetLstCode({
+    key: varLstColor?.key ? varLstColor.key : "",
+    body: varLstColor?.body,
+    enabled: true,
+  });
+  const varLstSpndSgDtTaxRaNm = VARIABLE_LST_CODE.get("lstSpndSgDt_Tax_RaNm");
+  const getLstSpndSgDtTaxRaNm = useGetLstCode({
+    key: varLstSpndSgDtTaxRaNm?.key ? varLstSpndSgDtTaxRaNm.key : "",
+    body: varLstSpndSgDtTaxRaNm?.body,
+    enabled: true,
+  });
+  const varGetEnumPrdcOptn = VARIABLE_LST_CODE.get("Enum_PrdcOptn");
+  const getEnumPrdcOptn = useGetLstCode({
+    key: varGetEnumPrdcOptn?.key ? varGetEnumPrdcOptn.key : "",
+    body: varGetEnumPrdcOptn?.body,
+    enabled: true,
+  });
+
+  const varGetLstSortCode = VARIABLE_LST_CODE.get("lstSortCode");
+  const getLstSortCode = useGetLstCode({
+    key: varGetLstSortCode?.key ? varGetLstSortCode.key : "",
+    body: varGetLstSortCode?.body,
+    enabled: true,
+  });
+  const varGetLstProductGroup = VARIABLE_LST_CODE.get("lstSortCode");
+  const getLstProductGroup = useGetLstCode({
+    key: varGetLstProductGroup?.key ? varGetLstProductGroup.key : "",
+    body: varGetLstProductGroup?.body,
+    enabled: true,
+  });
+  const varGetLstPrdcSection = VARIABLE_LST_CODE.get("lstPrdcSection");
+  const getLstPrdcSection = useGetLstCode({
+    key: varGetLstPrdcSection?.key ? varGetLstPrdcSection.key : "",
+    body: varGetLstPrdcSection?.body,
+    enabled: true,
+  });
+  const varGetLstProductGroupMnfr = VARIABLE_LST_CODE.get(
+    "lstProductGroupMnfr"
+  );
+  const getLstProductGroupMnfr = useGetLstCode({
+    key: varGetLstProductGroupMnfr?.key ? varGetLstProductGroupMnfr.key : "",
+    body: varGetLstProductGroupMnfr?.body,
+    enabled: true,
+  });
+
+  const varGetLstMnfrTypeInpPrdcOdMt = VARIABLE_LST_CODE.get(
+    "lstMnfrType_inpPrdcOdMt"
+  );
+  const getLstMnfrTypeInpPrdcOdMt = useGetLstCode({
+    key: varGetLstMnfrTypeInpPrdcOdMt?.key
+      ? varGetLstMnfrTypeInpPrdcOdMt.key
+      : "",
+    body: varGetLstMnfrTypeInpPrdcOdMt?.body,
+    enabled: true,
+  });
+  const varGetLstStdrQUOM = VARIABLE_LST_CODE.get("lstStdrQUOM");
+  const getLstStdrQUOM = useGetLstCode({
+    key: varGetLstStdrQUOM?.key ? varGetLstStdrQUOM.key : "",
+    body: varGetLstStdrQUOM?.body,
+    enabled: true,
+  });
+  const varGetLstProductSetMtrl = VARIABLE_LST_CODE.get("lstProduct_Set_Mtrl");
+  const getLstProductSetMtrl = useGetLstCode({
+    key: varGetLstProductSetMtrl?.key ? varGetLstProductSetMtrl.key : "",
+    body: varGetLstProductSetMtrl?.body,
+    enabled: true,
+  });
+  const varGetLstAssetType = VARIABLE_LST_CODE.get("lstAssetType");
+  const getLstAssetType = useGetLstCode({
+    key: varGetLstAssetType?.key ? varGetLstAssetType.key : "",
+    body: varGetLstAssetType?.body,
+    enabled: true,
+  });
+  const varGetLstAssetSubType = VARIABLE_LST_CODE.get("lstAssetSubType");
+  const getLstAssetSubType = useGetLstCode({
+    key: varGetLstAssetType?.key ? varGetLstAssetType.key : "",
+    body: varGetLstAssetType?.body,
+    enabled: true,
+  });
+  const varGetLstAsstSgAt = VARIABLE_LST_CODE.get("lstAsstSgAt");
+  const getLstAsstSgAt = useGetLstCode({
+    key: varGetLstAsstSgAt?.key ? varGetLstAsstSgAt.key : "",
+    body: varGetLstAsstSgAt?.body,
+    enabled: true,
+  });
+  const varGetLstAssetAttribute = VARIABLE_LST_CODE.get("lstAssetAttribute");
+  const getLstAssetAttribute = useGetLstCode({
+    key: varGetLstAssetAttribute?.key ? varGetLstAssetAttribute.key : "",
+    body: varGetLstAssetAttribute?.body,
+    enabled: true,
+  });
+  const varGetlstPrdcMchn = VARIABLE_LST_CODE.get("lstPrdcMchn");
+  const getLstPrdcMchn = useGetLstCode({
+    key: varGetlstPrdcMchn?.key ? varGetlstPrdcMchn.key : "",
+    body: varGetlstPrdcMchn?.body,
+    enabled: true,
+  });
   const setCreateImage = useSetDocument();
-  const setProduct = useSetProduct({ key: "product", update: true });
+  const setProduct = usePostNew();
 
   const validationSchema = Yup.object().shape({
     PRDCCODE: Yup.string(),

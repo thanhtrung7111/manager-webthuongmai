@@ -1,4 +1,4 @@
-import { useSetPostTag } from "@/api/react_query/query_tag";
+import { usePostUpdate } from "@/api/react_query/query_common";
 import ButtonForm from "@/component_common/commonForm/ButtonForm";
 import InputFormikForm from "@/component_common/commonForm/InputFormikForm";
 import {
@@ -25,7 +25,7 @@ const PostTagCreateDialog = ({
     TAG_NAME: Yup.string().required("Không để trống tên tag bài viết!"),
   });
 
-  const setPostTag = useSetPostTag({ key: "post_tag", update: true });
+  const setPostTag = usePostUpdate();
 
   return (
     <Dialog

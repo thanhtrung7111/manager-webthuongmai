@@ -1,10 +1,10 @@
-import { useSetAdvertisement } from "@/api/react_query/query_advertisement";
+import { VARIABLE_DCMNCODE, VARIABLE_LST_CODE } from "@/api/constant";
 import {
-  useGetLstBannerDataType,
-  useGetLstBannerType,
+  useGetLst,
+  useGetLstCode,
+  usePostNew,
 } from "@/api/react_query/query_common";
 import { useSetDocument } from "@/api/react_query/query_document";
-import { useGetLstProduct } from "@/api/react_query/query_product";
 import BreadcrumbCustom from "@/component_common/breadcrumb/BreadcrumbCustom";
 import ButtonForm from "@/component_common/commonForm/ButtonForm";
 import InputFormikForm from "@/component_common/commonForm/InputFormikForm";
@@ -48,13 +48,27 @@ const AdvertisementCreatePage = () => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
 
   //Khai bao query va mutation
-  const getLstProduct = useGetLstProduct({ key: "products" });
-  const getLstBannerDataType = useGetLstBannerDataType();
-  const getLstBannerType = useGetLstBannerType();
-  const setAdvertisement = useSetAdvertisement({
-    key: "advertisements",
-    update: true,
+  const varProduct = VARIABLE_DCMNCODE.get("appPrdcList");
+  const getLstProduct = useGetLst({
+    key: varProduct?.key ?? "",
+    body: varProduct?.body,
+    enabled: true,
   });
+
+  const varBannerDataType = VARIABLE_LST_CODE.get("lstBannerDataType");
+  const getLstBannerDataType = useGetLstCode({
+    key: varBannerDataType?.key ? varBannerDataType?.key : "",
+    body: varBannerDataType?.body,
+    enabled: true,
+  });
+
+  const varBannerType = VARIABLE_LST_CODE.get("lstBannerType");
+  const getLstBannerType = useGetLstCode({
+    key: varBannerType?.key ? varBannerType?.key : "",
+    body: varBannerType?.body,
+    enabled: true,
+  });
+  const setAdvertisement = usePostNew();
   const setCreateImage = useSetDocument();
 
   const validationSchema = Yup.object().shape({

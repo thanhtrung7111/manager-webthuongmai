@@ -16,11 +16,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import SpinnerLoading from "@/component_common/loading/SpinnerLoading";
-import { useGetLstQUOM } from "@/api/react_query/query_common";
-import {
-  useDeleteProduct,
-  useGetLstProduct,
-} from "@/api/react_query/query_product";
+
 import {
   Popover,
   PopoverContent,
@@ -28,6 +24,12 @@ import {
 } from "@/components/ui/popover";
 import { getLabelByKey } from "@/helper/commonHelper";
 import { useConfigurationStore } from "@/store/configurationStore";
+import {
+  useGetLst,
+  useGetLstCode,
+  usePostDelete,
+} from "@/api/react_query/query_common";
+import { VARIABLE_DCMNCODE, VARIABLE_LST_CODE } from "@/api/constant";
 
 const ProductPage = () => {
   const { setLocationPage } = useConfigurationStore(
@@ -40,9 +42,20 @@ const ProductPage = () => {
   const [objectDelete, setObjectDelete] = useState<ProductObject | null>(null);
 
   //Khai báo query và mutation
-  const getLstProduct = useGetLstProduct({ key: "products" });
-  const getLstQUOM = useGetLstQUOM();
-  const deleteProduct = useDeleteProduct({ key: "products", update: true });
+  const varLstProduct = VARIABLE_DCMNCODE.get("appPrdcList");
+  const getLstProduct = useGetLst({
+    key: varLstProduct?.key ? varLstProduct?.key : "",
+    body: varLstProduct?.body,
+    enabled: true,
+  });
+
+  const varLstQUOM = VARIABLE_LST_CODE.get("lstQUOM");
+  const getLstQUOM = useGetLstCode({
+    body: varLstQUOM?.body,
+    enabled: true,
+    key: varLstQUOM?.key ? varLstQUOM?.key : "",
+  });
+  const postDelete = usePostDelete();
 
   const breadBrumb = [
     {
@@ -209,7 +222,7 @@ const ProductPage = () => {
       <Dialog
         open={openDialogDelete}
         onOpenChange={() => {
-          if (!deleteProduct.isPending) {
+          if (!postDelete.isPending) {
             setOpentDialogDelete(false);
           }
         }}
@@ -220,12 +233,12 @@ const ProductPage = () => {
             <div className="w-full overflow-hidden">
               <div
                 className={`${
-                  deleteProduct.isSuccess ? "-translate-x-1/2" : "translate-x-0"
+                  postDelete.isSuccess ? "-translate-x-1/2" : "translate-x-0"
                 } w-[200%] grid grid-cols-2 transition-transform`}
               >
                 <div className="flex flex-col">
                   <DialogDescription className="flex items-center mb-5 justify-center gap-x-2 py-6">
-                    {deleteProduct.isPending ? (
+                    {postDelete.isPending ? (
                       <>
                         <SpinnerLoading className="w-6 h-6 fill-primary"></SpinnerLoading>
                         <span className="text-gray-700 text-base">
@@ -253,8 +266,9 @@ const ProductPage = () => {
                       label="Xác nhận"
                       onClick={async () => {
                         if (objectDelete != null)
-                          deleteProduct.mutateAsync({
+                          postDelete.mutateAsync({
                             KEY_CODE: objectDelete?.KKKK0000,
+                            DCMN_CODE: "inpProduct",
                           });
                       }}
                     ></ButtonForm>

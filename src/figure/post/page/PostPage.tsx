@@ -1,4 +1,5 @@
-import { useDeletePost, useGetLstPost } from "@/api/react_query/query_post";
+import { VARIABLE_DCMNCODE } from "@/api/constant";
+import { useGetLst, usePostDelete } from "@/api/react_query/query_common";
 import BreadcrumbCustom from "@/component_common/breadcrumb/BreadcrumbCustom";
 import ButtonForm from "@/component_common/commonForm/ButtonForm";
 import SpinnerLoading from "@/component_common/loading/SpinnerLoading";
@@ -41,8 +42,13 @@ const PostPage = () => {
     null
   );
 
-  const getLstPost = useGetLstPost({ key: "posts" });
-  const deletePost = useDeletePost({ key: "posts", update: true });
+  const varPost = VARIABLE_DCMNCODE.get("inpSalePost");
+  const getLstPost = useGetLst({
+    key: varPost?.key ? varPost?.key : "",
+    body: varPost?.body,
+    enabled: true,
+  });
+  const postDelete = usePostDelete();
 
   const columns: ColumnDef<PostUpdateObject>[] = [
     {
@@ -190,7 +196,7 @@ const PostPage = () => {
       <Dialog
         open={openDialogDelete}
         onOpenChange={() => {
-          if (!deletePost.isPending) {
+          if (!postDelete.isPending) {
             setOpentDialogDelete(false);
           }
         }}
@@ -201,12 +207,12 @@ const PostPage = () => {
             <div className="w-full overflow-hidden">
               <div
                 className={`${
-                  deletePost.isSuccess ? "-translate-x-1/2" : "translate-x-0"
+                  postDelete.isSuccess ? "-translate-x-1/2" : "translate-x-0"
                 } w-[200%] grid grid-cols-2 transition-transform`}
               >
                 <div className="flex flex-col">
                   <DialogDescription className="flex items-center mb-5 justify-center gap-x-2 py-6">
-                    {deletePost.isPending ? (
+                    {postDelete.isPending ? (
                       <>
                         <SpinnerLoading className="w-6 h-6 fill-primary"></SpinnerLoading>
                         <span className="text-gray-700 text-base">
@@ -234,10 +240,11 @@ const PostPage = () => {
                       label="Xác nhận"
                       onClick={async () => {
                         if (objectDelete != null)
-                          deletePost.mutateAsync({
+                          postDelete.mutateAsync({
                             KEY_CODE: objectDelete?.KKKK0000
                               ? objectDelete?.KKKK0000
                               : "",
+                            DCMN_CODE: "inpSalePost",
                           });
                       }}
                     ></ButtonForm>

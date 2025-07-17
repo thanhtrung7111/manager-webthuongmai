@@ -1,18 +1,16 @@
+import { VARIABLE_DCMNCODE, VARIABLE_LST_CODE } from "@/api/constant";
 import {
-  useDeleteAdvertisement,
-  useGetAdvertisement,
-  useUpdateAdvertisement,
-} from "@/api/react_query/query_advertisement";
-import {
-  useGetLstBannerDataType,
-  useGetLstBannerType,
+  useGetDetail,
+  useGetLst,
+  useGetLstCode,
+  usePostDelete,
+  usePostUpdate,
 } from "@/api/react_query/query_common";
 import {
   useDeleteDocument,
   useGetDocument,
   useSetDocument,
 } from "@/api/react_query/query_document";
-import { useGetLstProduct } from "@/api/react_query/query_product";
 import BreadcrumbCustom from "@/component_common/breadcrumb/BreadcrumbCustom";
 import ButtonForm from "@/component_common/commonForm/ButtonForm";
 import InputFormikForm from "@/component_common/commonForm/InputFormikForm";
@@ -68,22 +66,42 @@ const AdvertisementUpdatePage = () => {
   const [openDialogDelete, setOpenDialogDelete] = useState<boolean>(false);
 
   //Khai bao query va mutation
-  const getAdvertisement = useGetAdvertisement();
-  const getLstProduct = useGetLstProduct({ key: "products" });
-  const getLstBannerDataType = useGetLstBannerDataType();
-  const getLstBannerType = useGetLstBannerType();
-  const updateAdvertisement = useUpdateAdvertisement({
-    key: "advertisements",
-    update: true,
+  const varAdvertisement = VARIABLE_DCMNCODE.get("inpBanner");
+  const getDetail = useGetDetail({
+    key: varAdvertisement?.key ? varAdvertisement.key + id : "",
+    body: {
+      KEY_CODE: id,
+      DCMNCODE: varAdvertisement?.key ? varAdvertisement?.key : "",
+    },
+    enabled: true,
   });
-  const deleteBanner = useDeleteAdvertisement({
-    key: "advertisements",
-    update: true,
+
+  const varProduct = VARIABLE_DCMNCODE.get("appPrdcList");
+  const getLstProduct = useGetLst({
+    key: varProduct?.key ? varProduct.key : "",
+    body: varProduct?.body,
+    enabled: true,
   });
-  const getImage = useGetDocument();
+
+  const varBannerDataType = VARIABLE_LST_CODE.get("lstBannerDataType");
+  const getLstBannerDataType = useGetLstCode({
+    key: varBannerDataType?.key ? varBannerDataType.key : "",
+    body: varBannerDataType?.body,
+    enabled: true,
+  });
+
+  const varBannerType = VARIABLE_LST_CODE.get("lstBannerType");
+  const getLstBannerType = useGetLstCode({
+    key: varBannerType?.key ? varBannerType.key : "",
+    body: varBannerType?.body,
+    enabled: true,
+  });
+
+  const postUpdate = usePostUpdate();
+  const postDelete = usePostDelete();
+  const getImage = useGetDocument({ url: "", enabled: false });
   const setCreateImage = useSetDocument();
   const deleteImage = useDeleteDocument();
-  const getBanner = useGetAdvertisement();
 
   const validationSchema = Yup.object().shape({
     COMPCODE: Yup.string(),
@@ -124,7 +142,7 @@ const AdvertisementUpdatePage = () => {
     console.log(values);
     setOpenDialog(true);
     setInfoLoading("Đang cập nhật dữ liệu...");
-    const data = await updateAdvertisement.mutateAsync({
+    const data = await postUpdate.mutateAsync({
       body: {
         DCMNCODE: "inpBanner",
         HEADER: [{ ...values }],
@@ -132,16 +150,13 @@ const AdvertisementUpdatePage = () => {
     });
     if (image != null) {
       setInfoLoading("Đang thêm hình ảnh...");
-      if (
-        getAdvertisement.data &&
-        getAdvertisement.data[0].DCMNFILE[0].FILECODE
-      ) {
+      if (getDetail.data && getDetail.data[0].DCMNFILE[0].FILECODE) {
         const formDataDelete: FormData = new FormData();
         formDataDelete.append("DCMNCODE", "inpBanner");
         formDataDelete.append("KEY_CODE", values.KKKK0000);
         formDataDelete.append(
           "FILECODE",
-          getAdvertisement.data[0].DCMNFILE[0].FILECODE
+          getDetail.data[0].DCMNFILE[0].FILECODE
         );
         await deleteImage.mutateAsync({ body: formDataDelete });
       }
@@ -158,42 +173,42 @@ const AdvertisementUpdatePage = () => {
     setInfoLoading("Hoàn thành...");
   };
 
-  useEffect(() => {
-    const handleFetchDetailBanner = async () => {
-      console.log(id, "205 detail");
-      const resultData = await getAdvertisement.mutateAsync({
-        KEY_CODE: id ? id : "",
-      });
-      console.log(resultData);
-      await getImage.mutateAsync({
-        URL:
-          resultData[0].DCMNFILE?.length > 0 &&
-          resultData[0].DCMNFILE[0].FILE_URL
-            ? resultData[0].DCMNFILE[0].FILE_URL
-            : "",
-      });
-      setInitialValue({
-        COMPCODE: resultData[0].COMPCODE,
-        KKKK0000: resultData[0].KKKK0000,
-        LCTNCODE: resultData[0].LCTNCODE,
-        BANRCODE: resultData[0].BANRCODE,
-        BANRNAME: resultData[0].BANRNAME,
-        BANRTYPE: resultData[0].BANRTYPE,
-        OBJCTYPE: resultData[0].OBJCTYPE,
-        OBJCCODE: resultData[0].OBJCCODE,
-        BANR_RUN: resultData[0].BANR_RUN,
-        IMAGE_BANR:
-          resultData[0].DCMNFILE?.length > 0 &&
-          resultData[0].DCMNFILE[0].FILENAME
-            ? resultData[0].DCMNFILE[0].FILENAME
-            : "",
-      });
-    };
-    if (id != null && id != "") {
-      handleFetchDetailBanner();
-    }
-    console.log("advertisement page");
-  }, [id]);
+  // useEffect(() => {
+  //   const handleFetchDetailBanner = async () => {
+  //     console.log(id, "205 detail");
+  //     const resultData = await getDetail.mutateAsync({
+  //       KEY_CODE: id ? id : "",
+  //     });
+  //     console.log(resultData);
+  //     await getImage.mutateAsync({
+  //       URL:
+  //         resultData[0].DCMNFILE?.length > 0 &&
+  //         resultData[0].DCMNFILE[0].FILE_URL
+  //           ? resultData[0].DCMNFILE[0].FILE_URL
+  //           : "",
+  //     });
+  //     setInitialValue({
+  //       COMPCODE: resultData[0].COMPCODE,
+  //       KKKK0000: resultData[0].KKKK0000,
+  //       LCTNCODE: resultData[0].LCTNCODE,
+  //       BANRCODE: resultData[0].BANRCODE,
+  //       BANRNAME: resultData[0].BANRNAME,
+  //       BANRTYPE: resultData[0].BANRTYPE,
+  //       OBJCTYPE: resultData[0].OBJCTYPE,
+  //       OBJCCODE: resultData[0].OBJCCODE,
+  //       BANR_RUN: resultData[0].BANR_RUN,
+  //       IMAGE_BANR:
+  //         resultData[0].DCMNFILE?.length > 0 &&
+  //         resultData[0].DCMNFILE[0].FILENAME
+  //           ? resultData[0].DCMNFILE[0].FILENAME
+  //           : "",
+  //     });
+  //   };
+  //   if (id != null && id != "") {
+  //     handleFetchDetailBanner();
+  //   }
+  //   console.log("advertisement page");
+  // }, [id]);
 
   // useEffect(() => {
   //   getAdvertisement.reset();
@@ -253,9 +268,10 @@ const AdvertisementUpdatePage = () => {
                       className="!w-28 !bg-primary"
                       label="Xác nhận"
                       onClick={async () => {
-                        if (getAdvertisement.data)
-                          deleteBanner.mutateAsync({
-                            KEY_CODE: getAdvertisement.data[0].KKKK0000,
+                        if (getDetail.data)
+                          postDelete.mutateAsync({
+                            KEY_CODE: getDetail.data[0].KKKK0000,
+                            DCMN_CODE: "inpBanner",
                           });
                       }}
                     ></ButtonForm>
@@ -306,7 +322,7 @@ const AdvertisementUpdatePage = () => {
       <Dialog
         open={openDialog}
         onOpenChange={() => {
-          if (!setCreateImage.isPending && !updateAdvertisement.isPending) {
+          if (!setCreateImage.isPending && !postUpdate.isPending) {
             setOpenDialog(false);
           }
         }}
@@ -317,9 +333,7 @@ const AdvertisementUpdatePage = () => {
             <div className="w-full overflow-hidden">
               <div
                 className={`${
-                  updateAdvertisement.isSuccess
-                    ? "-translate-x-1/2"
-                    : "translate-x-0"
+                  postUpdate.isSuccess ? "-translate-x-1/2" : "translate-x-0"
                 } w-[200%] grid grid-cols-2 transition-transform`}
               >
                 <div className="flex flex-col">
@@ -344,7 +358,7 @@ const AdvertisementUpdatePage = () => {
                       label="Đóng"
                       onClick={() => {
                         setOpenDialog(false);
-                        updateAdvertisement.reset();
+                        postUpdate.reset();
                         setCreateImage.reset();
                       }}
                     ></ButtonForm>
@@ -400,14 +414,14 @@ const AdvertisementUpdatePage = () => {
                   type="submit"
                   className="bg-secondary !w-fit px-3"
                   icon={<i className="ri-save-3-line"></i>}
-                  loading={updateAdvertisement.isPending}
+                  loading={postUpdate.isPending}
                 ></ButtonForm>
                 <ButtonForm
                   label="Xóa"
                   type="button"
                   className="bg-red-500 !w-20"
                   onClick={() => setOpenDialogDelete(true)}
-                  disabled={updateAdvertisement.isPending}
+                  disabled={postUpdate.isPending}
                   icon={<i className="ri-delete-bin-line"></i>}
                 ></ButtonForm>
               </div>
@@ -422,7 +436,7 @@ const AdvertisementUpdatePage = () => {
                       {(values.BANRTYPE == "001" && image != null) ||
                       (values.BANRTYPE == "001" &&
                         getImage.data != null &&
-                        getAdvertisement.isSuccess) ? (
+                        getDetail.isSuccess) ? (
                         <img
                           className="h-72 w-full border shadow-md object-top object-cover"
                           src={
@@ -434,7 +448,7 @@ const AdvertisementUpdatePage = () => {
                         />
                       ) : (
                         <div className="h-72 flex-auto bg-slate-200 flex items-center justify-center">
-                          {getAdvertisement.isPending && (
+                          {getDetail.isPending && (
                             <SpinnerLoading className="w-6 h-6 fill-slate-500"></SpinnerLoading>
                           )}
                         </div>
@@ -443,7 +457,7 @@ const AdvertisementUpdatePage = () => {
                         {(values.BANRTYPE == "004" && image != null) ||
                         (values.BANRTYPE == "004" &&
                           getImage.data != null &&
-                          getAdvertisement.isSuccess) ? (
+                          getDetail.isSuccess) ? (
                           <div>
                             <img
                               className="w-52 h-full border shadow-md object-top object-cover"
@@ -457,7 +471,7 @@ const AdvertisementUpdatePage = () => {
                           </div>
                         ) : (
                           <div className="w-52 bg-slate-200 flex items-center justify-center">
-                            {getAdvertisement.isPending && (
+                            {getDetail.isPending && (
                               <SpinnerLoading className="w-6 h-6 fill-slate-500"></SpinnerLoading>
                             )}
                           </div>
@@ -469,7 +483,7 @@ const AdvertisementUpdatePage = () => {
                     {(values.BANRTYPE == "002" && image != null) ||
                     (values.BANRTYPE == "002" &&
                       getImage.data != null &&
-                      getAdvertisement.isSuccess) ? (
+                      getDetail.isSuccess) ? (
                       <img
                         className="h-44 w-full border shadow-md object-top object-cover"
                         src={
@@ -482,7 +496,7 @@ const AdvertisementUpdatePage = () => {
                     ) : (
                       <div className="h-44 flex-auto bg-slate-200 flex items-center justify-center">
                         {" "}
-                        {getAdvertisement.isPending && (
+                        {getDetail.isPending && (
                           <SpinnerLoading className="w-6 h-6 fill-slate-500"></SpinnerLoading>
                         )}
                       </div>
@@ -490,7 +504,7 @@ const AdvertisementUpdatePage = () => {
                     {(values.BANRTYPE == "003" && image != null) ||
                     (values.BANRTYPE == "003" &&
                       getImage.data != null &&
-                      getAdvertisement.isSuccess) ? (
+                      getDetail.isSuccess) ? (
                       <img
                         className="h-72 w-full border shadow-md object-top object-cover"
                         src={
@@ -502,7 +516,7 @@ const AdvertisementUpdatePage = () => {
                       />
                     ) : (
                       <div className="h-72 flex-auto bg-slate-200 flex items-center justify-center">
-                        {getAdvertisement.isPending && (
+                        {getDetail.isPending && (
                           <SpinnerLoading className="w-6 h-6 fill-slate-500"></SpinnerLoading>
                         )}
                       </div>
@@ -604,9 +618,7 @@ const AdvertisementUpdatePage = () => {
                   {/* Loại quảng cáo  */}
                   <SelectFormikForm
                     options={getLstProduct.data ? getLstProduct.data : []}
-                    loading={
-                      getLstProduct.isFetching || getAdvertisement.isPending
-                    }
+                    loading={getLstProduct.isFetching || getDetail.isPending}
                     itemKey={"PRDCCODE"}
                     itemValue={"PRDCNAME"}
                     important={true}

@@ -114,7 +114,10 @@ const Navbar = () => {
   const [openLanguage, setOpenLanguage] = useState<boolean>(false);
   const [openTheme, setOpenTheme] = useState<boolean>(false);
   const { currentUser, logoutUser } = useUserStore();
-  const getImage = useGetDocument();
+  const getImage = useGetDocument({
+    url: currentUser?.USERIMGE ?? "",
+    enabled: currentUser != null && currentUser?.USERIMGE != null,
+  });
   const { setKeyLanguages, setLanguages, keyLanguage } = useConfigurationStore(
     (state) => state.languageConfig
   );
@@ -123,11 +126,7 @@ const Navbar = () => {
     (state) => state.themeConfig
   );
   const isMobileScreen = useMediaQuery({ query: "(max-width:1024px)" });
-  useEffect(() => {
-    if (currentUser && currentUser.USERIMGE) {
-      getImage.mutateAsync({ URL: currentUser.USERIMGE });
-    }
-  }, [currentUser]);
+
   return (
     <div className="sticky shrink-0 top-0 z-50 bg-clr-navbar bg-w shadow-md h-16 border-gray-200 px-7 flex justify-between items-center">
       <div className="flex items-center gap-x-2">

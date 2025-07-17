@@ -70,7 +70,7 @@ const MenuItem = ({
     <div className="mb-5">
       {!compact && (
         <p
-          className={`text-clr-menu font-semibold tracking-widest text-xs italic uppercase  mb-2 whitespace-nowrap`}
+          className={`text-clr-menu font-semibold tracking-widest text-sm italic uppercase  mb-2 whitespace-nowrap`}
         >
           {item[name] as string}
         </p>
@@ -121,7 +121,7 @@ const MenuItem = ({
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-            <span className="text-xs whitespace-nowrap">
+            <span className="text-sm whitespace-nowrap">
               {level >= 3 && (item[name] as string)}
             </span>
           </span>
@@ -159,7 +159,7 @@ const MenuItem = ({
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-            <span className="text-xs whitespace-nowrap">
+            <span className="text-sm whitespace-nowrap">
               {level >= 3 && (item[name] as string)}
             </span>
           </span>
@@ -215,7 +215,7 @@ const MenuItem = ({
         >
           <div className="flex gap-x-2 items-center">
             {item[iconName] as React.ReactNode}
-            <p className={`group-hover/a:text-primary text-xs whitespace-nowrap`}>
+            <p className={`group-hover/a:text-primary text-sm whitespace-nowrap`}>
               {!compact && (item[name] as string)}
             </p>
           </div>
@@ -243,7 +243,7 @@ const MenuItem = ({
           <span className="flex gap-x-2 whitespace-nowrap">
             {item[iconName] as React.ReactNode}
             <div className={`transition-all`}>
-              <span className="text-xs whitespace-nowrap">
+              <span className="text-sm whitespace-nowrap">
                 {!compact && (item[name] as string)}
               </span>
             </div>

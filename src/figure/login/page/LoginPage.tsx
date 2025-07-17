@@ -20,7 +20,7 @@ import SelectFormikForm from "@/component_common/commonForm/SelectFormikForm";
 import {
   useGetTokenLocation,
   useGetTokenUser,
-} from "@/api/react_query/query_auth";
+} from "@/api/react_query/query_common";
 
 const formSchema = Yup.object().shape({
   username: Yup.string().min(

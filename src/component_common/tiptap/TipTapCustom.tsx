@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useEditor, EditorContent, BubbleMenu } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Button } from "@/components/ui/button";
@@ -41,7 +41,6 @@ const TipTapCustom = ({
   onContentChange: (value: any) => void;
 }) => {
   const linkRef = useRef<HTMLInputElement>(null);
-
   const extensions = [
     Youtube.configure({
       width: 500,
@@ -94,6 +93,12 @@ const TipTapCustom = ({
 
   if (!editor) return null;
 
+  useEffect(() => {
+    if (editor && content) {
+      editor.commands.setContent(content, false); // false = không lưu vào history (undo)
+    }
+  }, [content, editor]);
+
   const addImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file: File | null = e.target.files ? e.target.files[0] : null;
     const reader = new FileReader();
@@ -114,6 +119,7 @@ const TipTapCustom = ({
       });
     }
   };
+  console.log(content);
   return (
     <>
       <div>
@@ -483,7 +489,10 @@ const TipTapCustom = ({
           </div>
         </div>
         <div>
-          <EditorContent editor={editor} className="h-96"></EditorContent>
+          <EditorContent
+            editor={editor}
+            className="h-[800px] overflow-y-scroll"
+          ></EditorContent>
           {editor && (
             <BubbleMenu editor={editor} tippyOptions={{ duration: 100 }}>
               <button

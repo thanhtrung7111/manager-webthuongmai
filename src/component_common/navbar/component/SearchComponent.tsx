@@ -39,7 +39,7 @@ const SearchComponent = () => {
         focusInput ? "w-96" : "w-80"
       } transition-[width] duration-300 bg-transparent h-fit`}
     >
-      <div className="w-full flex  rounded-full border border-clr-menu items-center px-4 gap-x-2 overflow-hidden">
+      <div className="w-full flex  rounded-md border border-gray-400 items-center px-4 gap-x-2 overflow-hidden">
         <input
           type="text"
           onFocus={() => setFocusInput(true)}

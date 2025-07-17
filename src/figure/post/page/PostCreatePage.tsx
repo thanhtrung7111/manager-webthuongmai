@@ -21,10 +21,10 @@ import { createSlug } from "@/helper/commonHelper";
 import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import SpinnerLoading from "@/component_common/loading/SpinnerLoading";
-import { useSetPost } from "@/api/react_query/query_post";
 import { useSetDocument } from "@/api/react_query/query_document";
 import MultiTagSelect from "../component/MultiTagSelect";
 import TipTapCustom from "@/component_common/tiptap/TipTapCustom";
+import { usePostNew } from "@/api/react_query/query_common";
 // import { Editor, EditorState } from "react-draft-wysiwyg";
 const breadBrumb = [
   {
@@ -56,7 +56,7 @@ const PostCreatePage = () => {
 
   //Dùng draft-js
 
-  const setPost = useSetPost({ key: "posts", update: true });
+  const setPost = usePostNew();
   const setImage = useSetDocument();
 
   const navigate = useNavigate();
@@ -297,7 +297,9 @@ const PostCreatePage = () => {
                                   }</h1>` +
                                     `<h5 style='font-size:14px'><span style='color:#484848;font-weight:500'>Ngày đăng:</span> ${moment(
                                       Date.now()
-                                    ).format("DD/MM/yyyy HH:mm:ss")}</h5>${value}`
+                                    ).format(
+                                      "DD/MM/yyyy HH:mm:ss"
+                                    )}</h5>${value}`
                                 ),
                               }}
                               className="w-full ql-review"

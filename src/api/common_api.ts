@@ -303,12 +303,10 @@ export const getApiDTA005 = async (body: { [key: string]: any }) => {
 };
 
 // =========================Lấy danh mục dữ liệu
-export const getApiDTA002 = async (category: string) => {
+export const getApiDTA002 = async (body: any) => {
   const response = await axios.post(
     "https://api-dev.firstems.com/Api/data/runApi_Data?run_Code=DTA002",
-    {
-      LISTCODE: category,
-    },
+    body,
     {
       headers: {
         token: useUserStore.getState().tokenLocation,
@@ -330,7 +328,6 @@ export const getApiDTA002 = async (category: string) => {
 
 //========================Lấy hình ảnh
 export const getApiDocument = async (url: string) => {
-  console.log(url);
   try {
     const response = await axios.get(url, {
       headers: {

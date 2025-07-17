@@ -1,4 +1,5 @@
-import { useGetLstPostTag } from "@/api/react_query/query_tag";
+import { VARIABLE_DCMNCODE } from "@/api/constant";
+import { useGetLst } from "@/api/react_query/query_common";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,7 +28,12 @@ const MultiTagSelect = ({
   onChange: (list: string) => void;
   value: string;
 }) => {
-  const getLstPostTag = useGetLstPostTag({ key: "post_tags" });
+  const varPostTag = VARIABLE_DCMNCODE.get("inpPostTag");
+  const getLstPostTag = useGetLst({
+    key: varPostTag?.key ? varPostTag.key : "",
+    body: varPostTag?.body,
+    enabled: true,
+  });
   const [options, setOptions] = useState([]);
   const [open, setOpen] = useState(false);
 

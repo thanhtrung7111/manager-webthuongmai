@@ -18,10 +18,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import SpinnerLoading from "@/component_common/loading/SpinnerLoading";
-import {
-  useDeletePostTag,
-  useGetLstPostTag,
-} from "@/api/react_query/query_tag";
 import PostTagCreateDialog from "../component/PostTagCreateDialog";
 import {
   Popover,
@@ -29,6 +25,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { getLabelByKey } from "@/helper/commonHelper";
+import { useGetLst, usePostDelete } from "@/api/react_query/query_common";
+import { VARIABLE_DCMNCODE } from "@/api/constant";
 
 const PostTagPage = () => {
   const navigate = useNavigate();
@@ -38,8 +36,13 @@ const PostTagPage = () => {
   const [objectDelete, setObjectDelete] = useState<ProductObject | null>(null);
 
   //Khai báo query và mutation
-  const getLstPostTag = useGetLstPostTag({ key: "post_tag" });
-  const deletePostTag = useDeletePostTag({ key: "post_tag", update: true });
+  const varPostTag = VARIABLE_DCMNCODE.get("inpPostTag");
+  const getLstPostTag = useGetLst({
+    key: varPostTag?.key ? varPostTag?.key : "",
+    body: varPostTag?.body,
+    enabled: true,
+  });
+  const postDelete = usePostDelete();
 
   const breadBrumb = [
     {
@@ -177,7 +180,7 @@ const PostTagPage = () => {
       <Dialog
         open={openDialogDelete}
         onOpenChange={() => {
-          if (!deletePostTag.isPending) {
+          if (!postDelete.isPending) {
             setOpentDialogDelete(false);
           }
         }}
@@ -188,12 +191,12 @@ const PostTagPage = () => {
             <div className="w-full overflow-hidden">
               <div
                 className={`${
-                  deletePostTag.isSuccess ? "-translate-x-1/2" : "translate-x-0"
+                  postDelete.isSuccess ? "-translate-x-1/2" : "translate-x-0"
                 } w-[200%] grid grid-cols-2 transition-transform`}
               >
                 <div className="flex flex-col">
                   <DialogDescription className="flex items-center mb-5 justify-center gap-x-2 py-6">
-                    {deletePostTag.isPending ? (
+                    {postDelete.isPending ? (
                       <>
                         <SpinnerLoading className="w-6 h-6 fill-primary"></SpinnerLoading>
                         <span className="text-gray-700 text-base">
@@ -221,8 +224,9 @@ const PostTagPage = () => {
                       label="Xác nhận"
                       onClick={async () => {
                         if (objectDelete != null)
-                          deletePostTag.mutateAsync({
+                          postDelete.mutateAsync({
                             KEY_CODE: objectDelete?.KKKK0000,
+                            DCMN_CODE: "inpSalePost",
                           });
                       }}
                     ></ButtonForm>

@@ -28,7 +28,9 @@ import {
   useSetDocument,
 } from "@/api/react_query/query_document";
 import MultiTagSelect from "../component/MultiTagSelect";
-import { useGetPost, useUpdatePost } from "@/api/react_query/query_post";
+import TipTapCustom from "@/component_common/tiptap/TipTapCustom";
+import { useGetDetail, usePostUpdate } from "@/api/react_query/query_common";
+import lodash from "lodash";
 const breadBrumb = [
   {
     itemName: "Quản lí chung",
@@ -51,34 +53,85 @@ const PostUpdatePage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [infoLoading, setInfoLoading] = useState<string>("");
   const queryClient = useQueryClient();
-  const [initialValue, setInitialValue] = useState<
-    PostUpdateObject & { newImage?: File | null; image?: string }
-  >({
-    image: "",
-    newImage: null,
-    COMPCODE: "",
-    LCTNCODE: "",
-    POSTCODE: "",
-    POSTTITL: "",
-    POSTSLUG: "",
-    POST_TAG: "",
-    DDDD: "",
-    ACCERGHT: 0,
-    STTESIGN: 0,
-    STTENAME: "",
-    KKKK0000: "",
-    DCMNFILE: [],
-  });
 
   // Khai báo các query lẫn mutation
-  const getDetailPost = useGetPost();
-  const updatePostDetail = useUpdatePost({ key: "posts", update: true });
-  const getImageThumnail = useGetDocument();
+  const getDetailPost = useGetDetail({
+    key: "inpSalePost" + id,
+    body: {
+      KEY_CODE: id,
+      DCMNCODE: "inpSalePost",
+    },
+    enabled: id != null && id != undefined,
+  });
+
+  const updatePostDetail = usePostUpdate();
+  const getImageThumnail = useGetDocument({
+    url: getDetailPost.data
+      ? getDetailPost.data[0].DCMNFILE.find(
+          (item: DcmnFileObject) => item.FILENAME == "thumnailPost"
+        )?.FILE_URL
+      : "",
+    enabled:
+      getDetailPost.data != undefined &&
+      getDetailPost.data[0].DCMNFILE.find(
+        (item: DcmnFileObject) => item.FILENAME == "thumnailPost"
+      )?.FILE_URL != undefined,
+  });
   const setImageThumnail = useSetDocument();
   const deleteImageThumnail = useDeleteDocument();
-  const getContentFile = useGetDocument();
+  const getContentFile = useGetDocument({
+    url: getDetailPost.data
+      ? getDetailPost.data[0].DCMNFILE.find(
+          (item: DcmnFileObject) => item.FILENAME == "contentPost"
+        )?.FILE_URL
+      : "",
+    enabled:
+      getDetailPost.data != undefined &&
+      getDetailPost.data[0].DCMNFILE.find(
+        (item: DcmnFileObject) => item.FILENAME == "contentPost"
+      )?.FILE_URL != undefined,
+  });
   const setContentFile = useSetDocument();
   const deleteContentFile = useDeleteDocument();
+
+  const [initialValue, setInitialValue] = useState<
+    PostUpdateObject & { newImage?: File | null; image?: string }
+  >(
+    getDetailPost && getDetailPost.data
+      ? getDetailPost.data[0]
+      : {
+          image: "",
+          newImage: "",
+          COMPCODE: "",
+          LCTNCODE: "",
+          POSTCODE: "",
+          POSTTITL: "",
+          POSTSLUG: "",
+          POST_TAG: "",
+          DDDD: "",
+          ACCERGHT: 0,
+          STTESIGN: 0,
+          STTENAME: "",
+          KKKK0000: "",
+          DCMNFILE: [],
+        }
+  );
+
+  useEffect(() => {
+    if (getDetailPost.data) {
+      if (lodash.isEqual(getDetailPost.data[0], initialValue)) return;
+      setInitialValue(getDetailPost.data[0]);
+    }
+  }, [getDetailPost.data]);
+
+  useEffect(() => {
+    if (!getContentFile.data) return;
+    async function fetchText() {
+      const text = await getContentFile.data.text();
+      setContentInitial(text);
+    }
+    fetchText();
+  }, [getContentFile.data]);
 
   const validationSchema = Yup.object().shape({
     POSTTITL: Yup.string().required("Không để trống tiêu đề bài viết!"),
@@ -203,31 +256,31 @@ const PostUpdatePage = () => {
     setIsLoading(false);
   };
 
-  useEffect(() => {
-    if (
-      getImageThumnail.isSuccess &&
-      getImageThumnail.data &&
-      getDetailPost.data
-    ) {
-      setInitialValue({
-        ...getDetailPost.data[0],
-        image: getImageThumnail.data,
-      });
-    }
-  }, [getImageThumnail.isSuccess]);
+  // useEffect(() => {
+  //   if (
+  //     getImageThumnail.isSuccess &&
+  //     getImageThumnail.data &&
+  //     getDetailPost.data
+  //   ) {
+  //     setInitialValue({
+  //       ...getDetailPost.data[0],
+  //       image: getImageThumnail.data,
+  //     });
+  //   }
+  // }, [getImageThumnail.isSuccess]);
 
-  useEffect(() => {
-    if (getContentFile.isSuccess && getContentFile.data) {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const textContent = e.target ? e.target.result : null;
-        console.log(textContent); // Kết quả dưới dạng văn bảns
-        setValue(textContent as string);
-        setContentInitial(textContent as string);
-      };
-      reader.readAsText(getContentFile.data);
-    }
-  }, [getContentFile.isSuccess]);
+  // useEffect(() => {
+  //   if (getContentFile.isSuccess && getContentFile.data) {
+  //     const reader = new FileReader();
+  //     reader.onload = function (e) {
+  //       const textContent = e.target ? e.target.result : null;
+  //       console.log(textContent); // Kết quả dưới dạng văn bảns
+  //       setValue(textContent as string);
+  //       setContentInitial(textContent as string);
+  //     };
+  //     reader.readAsText(getContentFile.data);
+  //   }
+  // }, [getContentFile.isSuccess]);
 
   //   useEffect(() => {
   //     refetch();
@@ -252,36 +305,35 @@ const PostUpdatePage = () => {
   //       setInitialValue({ ...initialValue, image: fetchImageThumnail.data });
   //     }
   //   }, []);
-  useEffect(() => {
-    const fetchData = async () => {
-      const data = await getDetailPost.mutateAsync({
-        body: {
-          DCMNCODE: "inpSalePost",
-          KEY_CODE: id,
-        },
-      });
-      await getImageThumnail.mutateAsync(
-        data[0].DCMNFILE.find(
-          (item: DcmnFileObject) => item.FILENAME == "thumnailPost"
-        ).FILE_URL
-          ? data[0].DCMNFILE.find(
-              (item: DcmnFileObject) => item.FILENAME == "thumnailPost"
-            ).FILE_URL
-          : ""
-      );
-      await getContentFile.mutateAsync(
-        data[0].DCMNFILE.find(
-          (item: DcmnFileObject) => item.FILENAME == "contentPost"
-        ).FILE_URL
-          ? data[0].DCMNFILE.find(
-              (item: DcmnFileObject) => item.FILENAME == "contentPost"
-            ).FILE_URL
-          : ""
-      );
-    };
-    fetchData();
-  }, [id]);
-  console.log(initialValue, "Initial value");
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     const data = await getDetailPost.mutateAsync({
+  //       body: {
+  //         DCMNCODE: "inpSalePost",
+  //         KEY_CODE: id,
+  //       },
+  //     });
+  //     await getImageThumnail.mutateAsync(
+  //       data[0].DCMNFILE.find(
+  //         (item: DcmnFileObject) => item.FILENAME == "thumnailPost"
+  //       ).FILE_URL
+  //         ? data[0].DCMNFILE.find(
+  //             (item: DcmnFileObject) => item.FILENAME == "thumnailPost"
+  //           ).FILE_URL
+  //         : ""
+  //     );
+  //     await getContentFile.mutateAsync(
+  //       data[0].DCMNFILE.find(
+  //         (item: DcmnFileObject) => item.FILENAME == "contentPost"
+  //       ).FILE_URL
+  //         ? data[0].DCMNFILE.find(
+  //             (item: DcmnFileObject) => item.FILENAME == "contentPost"
+  //           ).FILE_URL
+  //         : ""
+  //     );
+  //   };
+  //   fetchData();
+  // }, [id]);
   return (
     <>
       <Dialog
@@ -322,7 +374,6 @@ const PostUpdatePage = () => {
                       className="!w-28 !bg-red-500"
                       label="Hủy"
                       onClick={() => {
-                        getDetailPost.reset();
                         setOpenDialog(false);
                         setImageThumnail.reset();
                       }}
@@ -350,7 +401,7 @@ const PostUpdatePage = () => {
         </div>
 
         <Formik
-          key={"formLogin"}
+          key={JSON.stringify(initialValue)}
           initialValues={initialValue}
           enableReinitialize={true}
           validationSchema={validationSchema}
@@ -419,7 +470,7 @@ const PostUpdatePage = () => {
                           <i className="ri-eye-line text-gray-600"></i>
                         </div>
                       </DialogTrigger>
-                      <DialogContent className="sm:max-w-[1200px]">
+                      <DialogContent className="sm:max-w-[1200px] bg-white">
                         <div className="relative rounded-md p-5 bg-white border-gray-200 border shadow-md flex flex-col gap-y-3 h-[850px] overflow-y-scroll custom-scrollbar-wider">
                           {/* <div className="text-gray-600 text-xl pb-2 border-gray-400 border-b">
                     Review bài viết
@@ -428,7 +479,7 @@ const PostUpdatePage = () => {
                             id="content"
                             dangerouslySetInnerHTML={{
                               __html:
-                                `<h1>${
+                                `<h1 style='font-size:"18px"'>${
                                   values.POSTTITL
                                     ? values.POSTTITL
                                     : "Chưa có tiêu đề..."
@@ -436,9 +487,9 @@ const PostUpdatePage = () => {
                                 `<h5 style='font-size:14px'><span style='color:#484848;font-weight:500'>Ngày đăng:</span> ${moment(
                                   Date.now()
                                 ).format("DD/MM/yyyy HH:mm:ss")}</h5>` +
-                                value,
+                                contentInitial,
                             }}
-                            className="w-full ql-review"
+                            className="w-full"
                           ></div>
                         </div>
                       </DialogContent>
@@ -551,6 +602,10 @@ const PostUpdatePage = () => {
                       Nội dung <span className="text-red-400">*</span>
                     </Label>
 
+                    <TipTapCustom
+                      content={contentInitial}
+                      onContentChange={(value) => setValue(value)}
+                    ></TipTapCustom>
                     {/* <ReactQuill
                       modules={modules}
                       theme="snow"

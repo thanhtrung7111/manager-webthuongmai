@@ -6,8 +6,10 @@ import { useUserStore } from "./store/userStore";
 import SpinnerLoading from "./component_common/loading/SpinnerLoading";
 // import ProductCreatePage from "./page/create_product/ProductCreatePage";
 import { Toaster } from "sonner";
-import { useGetTokenInitial } from "./api/react_query/query_auth";
-import { useGetLanguage } from "./api/react_query/query_common";
+import {
+  useGetLanguage,
+  useGetTokenInitial,
+} from "./api/react_query/query_common";
 import AppCommon from "./template/AppCommon";
 import HomePage from "./figure/home/page/HomePage";
 import DashboardProductPage from "./figure/dashboard/page/DashboardProductPage";
@@ -44,8 +46,14 @@ function App() {
     (state) => state.themeConfig
   );
   const getTokenInitial = useGetTokenInitial();
-  const getLanguage = useGetLanguage();
-  // console.log(languageConfig);
+  const getLanguage = useGetLanguage({
+    key: keyLanguage,
+    body: { APP_CODE: "WER", LGGECODE: keyLanguage },
+    enabled:
+      getTokenInitial.isFetching &&
+      getTokenInitial.data != null &&
+      getTokenInitial.data != undefined,
+  });
   useEffect(() => {
     async function getConfiguation() {
       setTokenInitial(getTokenInitial.data?.TOKEN);
@@ -53,26 +61,10 @@ function App() {
         setKeyLanguages({ key: "V" });
       }
     }
-    if (getTokenInitial.isSuccess && getTokenInitial.data != undefined) {
+    if (getTokenInitial.data != undefined) {
       getConfiguation();
     }
-  }, [getTokenInitial.isSuccess]);
-
-  useEffect(() => {
-    async function getConfigLanguage() {
-      const result: LanguageObject[] = await getLanguage.mutateAsync({
-        body: {
-          APP_CODE: "WER",
-          LGGECODE: keyLanguage,
-        },
-      });
-      console.log(result);
-      setLanguages({ languages: result });
-    }
-    if (keyLanguage != null) {
-      getConfigLanguage();
-    }
-  }, [keyLanguage]);
+  }, [getTokenInitial.data]);
 
   useEffect(() => {
     const root = document.documentElement;

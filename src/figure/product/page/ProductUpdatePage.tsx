@@ -31,33 +31,15 @@ import * as Yup from "yup";
 // import Excel from "exceljs";
 import { exportExcelPattern } from "@/helper/excelHelper";
 import {
-  useGetEnumPrdcOptn,
-  useGetLstAssetAttribute,
-  useGetLstAssetType,
-  useGetLstAsstSgAt,
-  useGetLstColor,
-  useGetLstDcmnSbCd,
-  useGetLstMnfrTypeInpPrdcOdMt,
-  useGetLstPrdcMchn,
-  useGetLstPrdcSection,
-  useGetLstProductBrand,
-  useGetLstProductGroup,
-  useGetLstProductGroupMnfr,
-  useGetLstProductSetMtrl,
-  useGetLstQUOM,
-  useGetLstSortCode,
-  useGetLstSpndSgDtTaxRaNm,
-  useGetLstStdrQUOM,
-} from "@/api/react_query/query_common";
-import {
   useGetDocument,
   useSetDocument,
 } from "@/api/react_query/query_document";
 import {
-  useGetProduct,
-  useSetProduct,
-  useUpdateProduct,
-} from "@/api/react_query/query_product";
+  useGetDetail,
+  useGetLstCode,
+  usePostUpdate,
+} from "@/api/react_query/query_common";
+import { VARIABLE_LST_CODE } from "@/api/constant";
 
 const breadBrumb = [
   {
@@ -112,28 +94,132 @@ const ProductUpdatePage = () => {
   });
 
   //KHAI BÁO REACT QUERY
-  const getLstQUOM = useGetLstQUOM();
-  const getLstDcmnSbCd = useGetLstDcmnSbCd();
-  const getLstProductBrand = useGetLstProductBrand();
-  const getLstColor = useGetLstColor();
-  const getLstSpndSgDtTaxRaNm = useGetLstSpndSgDtTaxRaNm();
-  const getEnumPrdcOptn = useGetEnumPrdcOptn();
-  const getLstSortCode = useGetLstSortCode();
-  const getLstProductGroup = useGetLstProductGroup();
-  const getLstPrdcSection = useGetLstPrdcSection();
-  const getLstProductGroupMnfr = useGetLstProductGroupMnfr();
-  const getLstMnfrTypeInpPrdcOdMt = useGetLstMnfrTypeInpPrdcOdMt();
-  const getLstStdrQUOM = useGetLstStdrQUOM();
-  const getLstProductSetMtrl = useGetLstProductSetMtrl();
-  const getLstAssetType = useGetLstAssetType();
-  const getLstAssetSubType = useGetLstAssetType();
-  const getLstAsstSgAt = useGetLstAsstSgAt();
-  const getLstAssetAttribute = useGetLstAssetAttribute();
-  const getLstPrdcMchn = useGetLstPrdcMchn();
+  //KHAI BÁO REACT QUERY
+  const varLstQUOM = VARIABLE_LST_CODE.get("lstQUOM");
+  const getLstQUOM = useGetLstCode({
+    key: varLstQUOM?.key ? varLstQUOM.key : "",
+    body: varLstQUOM?.body,
+    enabled: true,
+  });
+  const varLstDcmnSbCd = VARIABLE_LST_CODE.get("lstDcmnSbCd");
+  const getLstDcmnSbCd = useGetLstCode({
+    key: varLstDcmnSbCd?.key ? varLstDcmnSbCd.key : "",
+    body: varLstDcmnSbCd?.body,
+    enabled: true,
+  });
+  const varLstProductBrand = VARIABLE_LST_CODE.get("lstProductBrand");
+  const getLstProductBrand = useGetLstCode({
+    key: varLstProductBrand?.key ? varLstProductBrand.key : "",
+    body: varLstProductBrand?.body,
+    enabled: true,
+  });
+  const varLstColor = VARIABLE_LST_CODE.get("lstColor");
+  const getLstColor = useGetLstCode({
+    key: varLstColor?.key ? varLstColor.key : "",
+    body: varLstColor?.body,
+    enabled: true,
+  });
+  const varLstSpndSgDtTaxRaNm = VARIABLE_LST_CODE.get("lstSpndSgDt_Tax_RaNm");
+  const getLstSpndSgDtTaxRaNm = useGetLstCode({
+    key: varLstSpndSgDtTaxRaNm?.key ? varLstSpndSgDtTaxRaNm.key : "",
+    body: varLstSpndSgDtTaxRaNm?.body,
+    enabled: true,
+  });
+  const varGetEnumPrdcOptn = VARIABLE_LST_CODE.get("Enum_PrdcOptn");
+  const getEnumPrdcOptn = useGetLstCode({
+    key: varGetEnumPrdcOptn?.key ? varGetEnumPrdcOptn.key : "",
+    body: varGetEnumPrdcOptn?.body,
+    enabled: true,
+  });
+
+  const varGetLstSortCode = VARIABLE_LST_CODE.get("lstSortCode");
+  const getLstSortCode = useGetLstCode({
+    key: varGetLstSortCode?.key ? varGetLstSortCode.key : "",
+    body: varGetLstSortCode?.body,
+    enabled: true,
+  });
+  const varGetLstProductGroup = VARIABLE_LST_CODE.get("lstSortCode");
+  const getLstProductGroup = useGetLstCode({
+    key: varGetLstProductGroup?.key ? varGetLstProductGroup.key : "",
+    body: varGetLstProductGroup?.body,
+    enabled: true,
+  });
+  const varGetLstPrdcSection = VARIABLE_LST_CODE.get("lstPrdcSection");
+  const getLstPrdcSection = useGetLstCode({
+    key: varGetLstPrdcSection?.key ? varGetLstPrdcSection.key : "",
+    body: varGetLstPrdcSection?.body,
+    enabled: true,
+  });
+  const varGetLstProductGroupMnfr = VARIABLE_LST_CODE.get(
+    "lstProductGroupMnfr"
+  );
+  const getLstProductGroupMnfr = useGetLstCode({
+    key: varGetLstProductGroupMnfr?.key ? varGetLstProductGroupMnfr.key : "",
+    body: varGetLstProductGroupMnfr?.body,
+    enabled: true,
+  });
+
+  const varGetLstMnfrTypeInpPrdcOdMt = VARIABLE_LST_CODE.get(
+    "lstMnfrType_inpPrdcOdMt"
+  );
+  const getLstMnfrTypeInpPrdcOdMt = useGetLstCode({
+    key: varGetLstMnfrTypeInpPrdcOdMt?.key
+      ? varGetLstMnfrTypeInpPrdcOdMt.key
+      : "",
+    body: varGetLstMnfrTypeInpPrdcOdMt?.body,
+    enabled: true,
+  });
+  const varGetLstStdrQUOM = VARIABLE_LST_CODE.get("lstStdrQUOM");
+  const getLstStdrQUOM = useGetLstCode({
+    key: varGetLstStdrQUOM?.key ? varGetLstStdrQUOM.key : "",
+    body: varGetLstStdrQUOM?.body,
+    enabled: true,
+  });
+  const varGetLstProductSetMtrl = VARIABLE_LST_CODE.get("lstProduct_Set_Mtrl");
+  const getLstProductSetMtrl = useGetLstCode({
+    key: varGetLstProductSetMtrl?.key ? varGetLstProductSetMtrl.key : "",
+    body: varGetLstProductSetMtrl?.body,
+    enabled: true,
+  });
+  const varGetLstAssetType = VARIABLE_LST_CODE.get("lstAssetType");
+  const getLstAssetType = useGetLstCode({
+    key: varGetLstAssetType?.key ? varGetLstAssetType.key : "",
+    body: varGetLstAssetType?.body,
+    enabled: true,
+  });
+  const varGetLstAssetSubType = VARIABLE_LST_CODE.get("lstAssetSubType");
+  const getLstAssetSubType = useGetLstCode({
+    key: varGetLstAssetType?.key ? varGetLstAssetType.key : "",
+    body: varGetLstAssetType?.body,
+    enabled: true,
+  });
+  const varGetLstAsstSgAt = VARIABLE_LST_CODE.get("lstAsstSgAt");
+  const getLstAsstSgAt = useGetLstCode({
+    key: varGetLstAsstSgAt?.key ? varGetLstAsstSgAt.key : "",
+    body: varGetLstAsstSgAt?.body,
+    enabled: true,
+  });
+  const varGetLstAssetAttribute = VARIABLE_LST_CODE.get("lstAssetAttribute");
+  const getLstAssetAttribute = useGetLstCode({
+    key: varGetLstAssetAttribute?.key ? varGetLstAssetAttribute.key : "",
+    body: varGetLstAssetAttribute?.body,
+    enabled: true,
+  });
+  const varGetlstPrdcMchn = VARIABLE_LST_CODE.get("lstPrdcMchn");
+  const getLstPrdcMchn = useGetLstCode({
+    key: varGetlstPrdcMchn?.key ? varGetlstPrdcMchn.key : "",
+    body: varGetlstPrdcMchn?.body,
+    enabled: true,
+  });
+
+  const getProduct = useGetDetail({
+    key: "INPPRODUCT" + id,
+    body: { DCMNCODE: "INPPRODUCT", KEY_CODE: id },
+    enabled: true,
+  });
   const setCreateImage = useSetDocument();
-  const updateProduct = useUpdateProduct({ key: "product", update: true });
-  const getProduct = useGetProduct();
-  const getImage = useGetDocument();
+  const getImage = useGetDocument({ url: "", enabled: false });
+  const postUpdate = usePostUpdate();
   const setUpdateImage = useSetDocument();
 
   const validationSchema = Yup.object().shape({
@@ -187,7 +273,7 @@ const ProductUpdatePage = () => {
     console.log(values);
     setOpenDialog(true);
     setInfoLoading("Đang tải dữ liệu...");
-    const data = await updateProduct.mutateAsync({
+    const data = await postUpdate.mutateAsync({
       body: {
         DCMNCODE: "inpProduct",
         HEADER: [{ ...values, PRDCPICT: "" }],
@@ -503,26 +589,26 @@ const ProductUpdatePage = () => {
     await exportExcelPattern(dataExcelObject);
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const data = await getProduct.mutateAsync({
-        KEY_CODE: id ? id : "",
-      });
-      if (data[0].DCMNFILE[0].FILE_URL)
-        await getImage.mutateAsync({ URL: data[0].DCMNFILE[0].FILE_URL });
-    };
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     const data = await getProduct.mutateAsync({
+  //       KEY_CODE: id ? id : "",
+  //     });
+  //     if (data[0].DCMNFILE[0].FILE_URL)
+  //       await getImage.mutateAsync({ URL: data[0].DCMNFILE[0].FILE_URL });
+  //   };
 
-    if (id) {
-      fetchData();
-    }
-  }, [id]);
+  //   if (id) {
+  //     fetchData();
+  //   }
+  // }, [id]);
 
   return (
     <div className="flex flex-col gap-y-2">
       <Dialog
         open={openDialog}
         onOpenChange={() => {
-          if (!setCreateImage.isPending && !updateProduct.isPending) {
+          if (!setCreateImage.isPending && !postUpdate.isPending) {
             setOpenDialog(false);
           }
         }}
@@ -533,7 +619,7 @@ const ProductUpdatePage = () => {
             <div className="w-full overflow-hidden">
               <div
                 className={`${
-                  setCreateImage.isSuccess && updateProduct.isSuccess
+                  setCreateImage.isSuccess && postUpdate.isSuccess
                     ? "-translate-x-1/2"
                     : "translate-x-0"
                 } w-[200%] grid grid-cols-2 transition-transform`}
@@ -567,7 +653,7 @@ const ProductUpdatePage = () => {
                       label="Thêm mới"
                       onClick={() => {
                         setOpenDialog(false);
-                        updateProduct.reset();
+                        postUpdate.reset();
                         setCreateImage.reset();
                       }}
                     ></ButtonForm>
@@ -621,7 +707,7 @@ const ProductUpdatePage = () => {
                   label="Import Excel"
                   type="submit"
                   className="bg-primary !w-36"
-                  disabled={updateProduct.isPending || setCreateImage.isPending}
+                  disabled={postUpdate.isPending || setCreateImage.isPending}
                   icon={<i className="ri-download-2-line"></i>}
                 ></ButtonForm>
                 <ButtonForm
@@ -635,7 +721,7 @@ const ProductUpdatePage = () => {
                   label="Lưu"
                   type="submit"
                   className="bg-secondary !w-16"
-                  loading={updateProduct.isPending || setCreateImage.isPending}
+                  loading={postUpdate.isPending || setCreateImage.isPending}
                 ></ButtonForm>
               </div>
             </div>

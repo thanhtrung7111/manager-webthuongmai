@@ -17,20 +17,18 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SpinnerLoading from "@/component_common/loading/SpinnerLoading";
 import {
-  useDeleteAdvertisement,
-  useGetLstAdvertisement,
-} from "@/api/react_query/query_advertisement";
-import {
-  useGetLstBannerDataType,
-  useGetLstBannerType,
-} from "@/api/react_query/query_common";
-import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { getLabelByKey } from "@/helper/commonHelper";
 import StatusBagde from "@/component_common/status/StatusBagde";
+import {
+  useGetLst,
+  useGetLstCode,
+  usePostDelete,
+} from "@/api/react_query/query_common";
+import { VARIABLE_DCMNCODE, VARIABLE_LST_CODE } from "@/api/constant";
 
 const AdvertisementPage = () => {
   const queryClient = useQueryClient();
@@ -57,13 +55,27 @@ const AdvertisementPage = () => {
   ];
 
   //Khai bao query vaf mutation
-  const getLstAdvertisement = useGetLstAdvertisement({ key: "advertisements" });
-  const getLstBannerDataType = useGetLstBannerDataType();
-  const getLstBannerType = useGetLstBannerType();
-  const deleteBanner = useDeleteAdvertisement({
-    key: "advertisements",
-    update: true,
+  const varAdvertisement = VARIABLE_DCMNCODE.get("inpBanner");
+  const getLstAdvertisement = useGetLst({
+    key: varAdvertisement?.key ? varAdvertisement.key : "",
+    body: varAdvertisement?.body,
+    enabled: true,
   });
+
+  const varBannerDataType = VARIABLE_LST_CODE.get("lstBannerDataType");
+  const getLstBannerDataType = useGetLstCode({
+    key: varBannerDataType?.key ? varBannerDataType?.key : "",
+    body: varBannerDataType?.body,
+    enabled: true,
+  });
+
+  const varBannerType = VARIABLE_LST_CODE.get("lstBannerType");
+  const getLstBannerType = useGetLstCode({
+    key: varBannerType?.key ? varBannerType?.key : "",
+    body: varBannerType?.body,
+    enabled: true,
+  });
+  const postDelete = usePostDelete();
 
   const columns: ColumnDef<AdvertisementObject>[] = [
     {
@@ -305,7 +317,7 @@ const AdvertisementPage = () => {
       <Dialog
         open={openDialogDelete}
         onOpenChange={() => {
-          if (!deleteBanner.isSuccess && !deleteBanner.isPending) {
+          if (!postDelete.isSuccess && !postDelete.isPending) {
             setOpentDialogDelete(false);
           }
         }}
@@ -316,12 +328,12 @@ const AdvertisementPage = () => {
             <div className="w-full overflow-hidden">
               <div
                 className={`${
-                  deleteBanner.isSuccess ? "-translate-x-1/2" : "translate-x-0"
+                  postDelete.isSuccess ? "-translate-x-1/2" : "translate-x-0"
                 } w-[200%] grid grid-cols-2 transition-transform`}
               >
                 <div className="flex flex-col">
                   <DialogDescription className="flex items-center mb-5 justify-center gap-x-2 py-6">
-                    {deleteBanner.isPending ? (
+                    {postDelete.isPending ? (
                       <>
                         <SpinnerLoading className="w-6 h-6 fill-primary"></SpinnerLoading>
                         <span className="text-gray-700 text-base">
@@ -349,8 +361,9 @@ const AdvertisementPage = () => {
                       label="Xác nhận"
                       onClick={async () => {
                         if (advertisementDelete != null)
-                          deleteBanner.mutateAsync({
+                          postDelete.mutateAsync({
                             KEY_CODE: advertisementDelete?.KKKK0000,
+                            DCMN_CODE: "inpBanner",
                           });
                       }}
                     ></ButtonForm>
