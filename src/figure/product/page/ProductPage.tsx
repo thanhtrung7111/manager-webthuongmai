@@ -333,13 +333,13 @@ const ProductPage = () => {
               </h4>
               <div className="flex gap-x-2">
                 <ButtonForm
-                  className="bg-clr-warning !w-28"
+                  className="!bg-clr-warning !w-28"
                   type="button"
                   icon={<i className="ri-download-2-line"></i>}
                   label="Xuất excel"
                 ></ButtonForm>
                 <ButtonForm
-                  className="bg-clr-success !w-28"
+                  className="!bg-clr-secondary !w-28"
                   type="button"
                   icon={<i className="ri-file-add-line"></i>}
                   onClick={() => navigate("/create_product")}

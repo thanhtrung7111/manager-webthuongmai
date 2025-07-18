@@ -316,7 +316,7 @@ const PostCreatePage = () => {
                       <ButtonForm
                         label="Lưu"
                         type="submit"
-                        className="bg-secondary !w-16"
+                        className="!bg-clr-secondary !w-16"
                         disabled={isLoading}
                         // loading={
                         //   handlePostProduct.isPending || setImage.isPending

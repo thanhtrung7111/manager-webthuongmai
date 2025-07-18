@@ -317,12 +317,13 @@ const AdvertisementPage = () => {
       <Dialog
         open={openDialogDelete}
         onOpenChange={() => {
-          if (!postDelete.isSuccess && !postDelete.isPending) {
+          if (!postDelete.isSuccess || !postDelete.isPending) {
             setOpentDialogDelete(false);
+            postDelete.reset();
           }
         }}
       >
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[425px] bg-white">
           <DialogHeader>
             <DialogTitle>Thông báo</DialogTitle>
             <div className="w-full overflow-hidden">
@@ -357,7 +358,7 @@ const AdvertisementPage = () => {
                   <div className="flex gap-x-2 justify-end">
                     <ButtonForm
                       type="button"
-                      className="!w-28 !bg-primary"
+                      className="!w-28 !bg-clr-primary"
                       label="Xác nhận"
                       onClick={async () => {
                         if (advertisementDelete != null)
@@ -447,13 +448,13 @@ const AdvertisementPage = () => {
             </h4>
             <div className="flex gap-x-2">
               <ButtonForm
-                className="!bg-primary !w-28"
+                className="!bg-clr-primary !w-28"
                 type="button"
                 icon={<i className="ri-download-2-line"></i>}
                 label="Xuất excel"
               ></ButtonForm>
               <ButtonForm
-                className="!bg-secondary !w-28"
+                className="!bg-clr-secondary !w-28"
                 type="button"
                 icon={<i className="ri-file-add-line"></i>}
                 onClick={() => navigate("/create_advertisement")}

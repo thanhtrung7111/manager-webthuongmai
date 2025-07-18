@@ -38,6 +38,7 @@ import { Form, Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import * as Yup from "yup";
+import lodash from "lodash";
 
 const breadBrumb = [
   {
@@ -99,7 +100,12 @@ const AdvertisementUpdatePage = () => {
 
   const postUpdate = usePostUpdate();
   const postDelete = usePostDelete();
-  const getImage = useGetDocument({ url: "", enabled: false });
+  const getImage = useGetDocument({
+    url: getDetail.data ? getDetail.data[0]?.DCMNFILE[0]?.FILE_URL : "",
+    enabled:
+      getDetail.data != undefined &&
+      getDetail.data[0]?.DCMNFILE[0]?.FILE_URL != undefined,
+  });
   const setCreateImage = useSetDocument();
   const deleteImage = useDeleteDocument();
 
@@ -111,21 +117,31 @@ const AdvertisementUpdatePage = () => {
     OBJCTYPE: Yup.string().required("Không để trống loại đối tượng quảng cáo!"),
     BANR_RUN: Yup.number().required("Không để trống trạng thái quảng cáo!"),
     OBJCCODE: Yup.string().required("Không để trống đối tượng quảng cáo!"),
-    IMAGE_BANR: Yup.string().required("Không để trống hình ảnh!"),
+    // IMAGE_BANR: Yup.string().required("Không để trống hình ảnh!"),
   });
 
-  const [initialValue, setInitialValue] = useState<AdvertisementUpdateObject>({
-    COMPCODE: "",
-    KKKK0000: "",
-    LCTNCODE: "",
-    BANRCODE: "",
-    BANRNAME: "",
-    BANRTYPE: "",
-    OBJCTYPE: "",
-    OBJCCODE: "",
-    BANR_RUN: 0,
-    IMAGE_BANR: "",
-  });
+  const [initialValue, setInitialValue] = useState<AdvertisementUpdateObject>(
+    getDetail.data
+      ? getDetail.data[0]
+      : {
+          COMPCODE: "",
+          KKKK0000: "",
+          LCTNCODE: "",
+          BANRCODE: "",
+          BANRNAME: "",
+          BANRTYPE: "",
+          OBJCTYPE: "",
+          OBJCCODE: "",
+          BANR_RUN: 0,
+          IMAGE_BANR: "",
+        }
+  );
+
+  useEffect(() => {
+    if (!getDetail.data) return;
+    if (lodash.isEqual(getDetail.data, initialValue)) return;
+    setInitialValue(getDetail.data[0]);
+  }, [getDetail.data]);
 
   const extractExcel = async () => {
     const dataExcelObject: DataExcelPatternObject[] = [];
@@ -235,7 +251,7 @@ const AdvertisementUpdatePage = () => {
           }
         }}
       >
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[425px] bg-white">
           <DialogHeader>
             <DialogTitle>Thông báo</DialogTitle>
             <div className="w-full overflow-hidden">
@@ -327,7 +343,7 @@ const AdvertisementUpdatePage = () => {
           }
         }}
       >
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[425px] bg-white">
           <DialogHeader>
             <DialogTitle>Thông báo</DialogTitle>
             <div className="w-full overflow-hidden">
@@ -412,7 +428,7 @@ const AdvertisementUpdatePage = () => {
                 <ButtonForm
                   label="Cập nhật"
                   type="submit"
-                  className="bg-secondary !w-fit px-3"
+                  className="!bg-clr-secondary !w-fit px-3"
                   icon={<i className="ri-save-3-line"></i>}
                   loading={postUpdate.isPending}
                 ></ButtonForm>

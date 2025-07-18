@@ -139,7 +139,7 @@ const AdvertisementCreatePage = () => {
           }
         }}
       >
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[425px] bg-white">
           <DialogHeader>
             <DialogTitle>Thông báo</DialogTitle>
             <div className="w-full overflow-hidden">
@@ -168,7 +168,7 @@ const AdvertisementCreatePage = () => {
                   <div className="flex gap-x-2 justify-end">
                     <ButtonForm
                       type="button"
-                      className="!w-32 bg-secondary"
+                      className="!w-32 bg-clr-secondary"
                       label="Xem danh sách"
                       onClick={() => navigate("/advertisement")}
                     ></ButtonForm>
@@ -232,7 +232,7 @@ const AdvertisementCreatePage = () => {
                 <ButtonForm
                   label="Lưu"
                   type="submit"
-                  className="bg-secondary !w-16"
+                  className="bg-clr-primary !w-16 !cursor-pointer"
                   loading={
                     setAdvertisement.isPending || setCreateImage.isPending
                   }

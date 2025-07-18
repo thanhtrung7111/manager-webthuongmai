@@ -83,7 +83,6 @@ function App() {
   return getTokenInitial.isFetching ? (
     <div className="h-screen w-full flex items-center justify-center gap-x-3">
       <SpinnerLoading className="w-10 h-10 fill-primary" />
-      <span className="text-2xl text-gray-500 italic">Đang tải dữ liệu..</span>
     </div>
   ) : (
     <>

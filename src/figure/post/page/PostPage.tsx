@@ -314,7 +314,7 @@ const PostPage = () => {
                 label="Xuất excel"
               ></ButtonForm>
               <ButtonForm
-                className="!bg-green-500 !w-28"
+                className="!bg-clr-secondary !w-28"
                 type="button"
                 icon={<i className="ri-file-add-line"></i>}
                 onClick={() => navigate("/create_post")}

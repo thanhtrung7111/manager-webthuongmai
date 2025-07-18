@@ -728,7 +728,7 @@ const ProductCreatePageFormik = () => {
                   <ButtonForm
                     label="Lưu"
                     type="submit"
-                    className="bg-secondary !w-16"
+                    className="!bg-clr-secondary !w-16"
                     loading={setProduct.isPending || setCreateImage.isPending}
                   ></ButtonForm>
                   <ButtonForm
