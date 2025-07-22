@@ -325,7 +325,7 @@ const ProductPage = () => {
         {/* Action  */}
 
         {/* table */}
-        <div className="grid grid-cols-[3fr_1fr] gap-x-3">
+        <div className="grid grid-cols-1 gap-x-3">
           <div className="rounded-sm p-5 pt-3 bg-clr-sidebar border border-clr-sidebar shadow-md">
             <div className="flex justify-between items-center mb-5">
               <h4 className="text-xl font-medium text-clr-content border-l-4 pl-2 border-clr-content">
@@ -368,13 +368,13 @@ const ProductPage = () => {
             ></TableCustom>
           </div>
 
-          <div className="rounded-sm p-5 pt-3 bg-clr-sidebar border border-clr-sidebar shadow-md h-96">
+          {/* <div className="rounded-sm p-5 pt-3 bg-clr-sidebar border border-clr-sidebar shadow-md h-96">
             <div className="flex justify-between items-center mb-5">
               <h4 className="text-xl font-medium text-clr-content border-l-4 pl-2 border-clr-content">
                 Sản phẩm vừa xem
               </h4>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>{" "}
     </>

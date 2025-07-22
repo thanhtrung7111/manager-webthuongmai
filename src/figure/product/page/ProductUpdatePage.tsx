@@ -40,6 +40,7 @@ import {
   usePostUpdate,
 } from "@/api/react_query/query_common";
 import { VARIABLE_LST_CODE } from "@/api/constant";
+import lodash from "lodash";
 
 const breadBrumb = [
   {
@@ -62,36 +63,6 @@ const ProductUpdatePage = () => {
   const [image, setImage] = useState<File | null>(null);
   //   const { currentUser } = useUserStore();
   const [openDialog, setOpenDialog] = useState<boolean>(false);
-
-  const [initialValue, setInitialValue] = useState<ProductUpdateObject>({
-    COMPCODE: "",
-    PRDCCODE: "",
-    LCTNCODE: "",
-    MPRDCNME: "",
-    SCTNCODE: "",
-    GRPRCODE: "",
-    BRNDCODE: "",
-    COLRCODE: "",
-    MDELPRDC: "",
-    BRIFNAME: "",
-    QUOMCODE: 0,
-    VAT_RATE: 0,
-    STDRQUOM: 0,
-    MNFRTYPE: 0,
-    PRDCPICT: "",
-    CURRCODE: "",
-    SORTCODE: 0,
-    GRP_MNFR: "",
-    DCMNSBCD: "",
-    DDDD: "",
-    ACCERGHT: 0,
-    STTESIGN: 0,
-    STTENAME: "",
-    QRC_DATA: "",
-    KKKK0000: "",
-    DETAIL: [],
-    DCMNFILE: [],
-  });
 
   //KHAI BÁO REACT QUERY
   //KHAI BÁO REACT QUERY
@@ -217,8 +188,59 @@ const ProductUpdatePage = () => {
     body: { DCMNCODE: "INPPRODUCT", KEY_CODE: id },
     enabled: true,
   });
+  const [initialValue, setInitialValue] = useState<ProductUpdateObject>(
+    getProduct.data && getProduct.data.length > 0
+      ? getProduct.data[0]
+      : {
+          COMPCODE: "",
+          PRDCCODE: "",
+          LCTNCODE: "",
+          MPRDCNME: "",
+          SCTNCODE: "",
+          GRPRCODE: "",
+          BRNDCODE: "",
+          COLRCODE: "",
+          MDELPRDC: "",
+          BRIFNAME: "",
+          QUOMCODE: 0,
+          VAT_RATE: 0,
+          STDRQUOM: 0,
+          MNFRTYPE: 0,
+          PRDCPICT: "",
+          CURRCODE: "",
+          SORTCODE: 0,
+          GRP_MNFR: "",
+          DCMNSBCD: "",
+          DDDD: "",
+          ACCERGHT: 0,
+          STTESIGN: 0,
+          STTENAME: "",
+          QRC_DATA: "",
+          KKKK0000: "",
+          DETAIL: [],
+          DCMNFILE: [],
+        }
+  );
+
+  useEffect(() => {
+    if (
+      !getProduct.data ||
+      getProduct.data == null ||
+      getProduct.data == undefined
+    )
+      return;
+    if (lodash.isEqual(getProduct.data[0], initialValue)) return;
+    setInitialValue(getProduct.data[0]);
+  }, [getProduct.data]);
   const setCreateImage = useSetDocument();
-  const getImage = useGetDocument({ url: "", enabled: false });
+  const getImage = useGetDocument({
+    url: getProduct.data?.[0]?.DCMNFILE?.[0]?.FILE_URL,
+    enabled:
+      getProduct.data != null &&
+      getProduct.data != undefined &&
+      getProduct.data?.[0]?.DCMNFILE != undefined &&
+      getProduct.data?.[0]?.DCMNFILE?.[0]?.FILE_URL != undefined,
+  });
   const postUpdate = usePostUpdate();
   const setUpdateImage = useSetDocument();
 
@@ -613,7 +635,7 @@ const ProductUpdatePage = () => {
           }
         }}
       >
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[425px] bg-white">
           <DialogHeader>
             <DialogTitle>Thông báo</DialogTitle>
             <div className="w-full overflow-hidden">
